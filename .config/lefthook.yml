@@ -1,0 +1,46 @@
+pre-commit:
+  parallel: true
+  commands:
+    golangci-lint:
+      glob: "*.go"
+      run: golangci-lint run --config .config/golangci.yml --new-from-rev=HEAD~1
+    gofmt-check:
+      glob: "*.go"
+      run: 'test -z "$(gofmt -l {staged_files})" || (gofmt -l {staged_files} && exit 1)'
+    markdownlint:
+      glob: "*.md"
+      run: markdownlint-cli2 --config .config/markdownlint.jsonc {staged_files}
+    yamllint:
+      glob: "*.{yml,yaml}"
+      run: yamllint -c .config/yamllint.yml {staged_files}
+    taplo-check:
+      glob: "*.toml"
+      run: taplo check --config .config/taplo.toml {staged_files}
+    json-check:
+      glob: "*.json"
+      run: 'python3 -c "import json,sys; [json.load(open(f)) for f in sys.argv[1:]]" {staged_files}'
+    shellcheck:
+      glob: "*.sh"
+      run: shellcheck {staged_files}
+    hadolint:
+      glob: "Dockerfile*"
+      run: hadolint {staged_files}
+    actionlint:
+      glob: ".github/workflows/*.{yml,yaml}"
+      run: actionlint {staged_files}
+    gitleaks:
+      run: gitleaks protect --staged --verbose
+
+commit-msg:
+  commands:
+    commitlint:
+      run: commitlint --config .config/commitlint.yml --edit {1}
+
+pre-push:
+  parallel: true
+  commands:
+    go-test:
+      glob: "*.go"
+      run: go test -race ./...
+    govulncheck:
+      run: govulncheck ./...
