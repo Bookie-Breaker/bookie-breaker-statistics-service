@@ -1,0 +1,25 @@
+linters:
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - unused
+    - gosimple
+    - ineffassign
+    - gofmt
+    - goimports
+    - misspell
+    - bodyclose
+    - nilerr
+    - exportloopref
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/Bookie-Breaker
+  misspell:
+    locale: US
+
+issues:
+  exclude-use-default: true
+  max-issues-per-linter: 50
+  max-same-issues: 10

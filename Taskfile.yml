@@ -1,0 +1,32 @@
+version: "3"
+
+env:
+  MISE_CONFIG_FILE: .config/mise.toml
+  LEFTHOOK_CONFIG: .config/lefthook.yml
+
+tasks:
+  bootstrap:
+    desc: Install all tools and activate git hooks
+    cmds:
+      - mise install
+      - lefthook install
+
+  dev:
+    desc: Run with hot reload
+    cmds:
+      - air -c .config/air.toml
+
+  lint:
+    desc: Run linters
+    cmds:
+      - golangci-lint run --config .config/golangci.yml
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -race ./...
+
+  build:
+    desc: Build binary
+    cmds:
+      - go build -o bin/server ./cmd/server
