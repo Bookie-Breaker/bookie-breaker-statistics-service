@@ -5,10 +5,12 @@ Centralized source of team/player statistics, schedules, and game results with R
 ## Quickstart
 
 ### With Docker Compose (recommended)
-task up  # from BookieBreaker/ root
+
+task up # from BookieBreaker/ root
 
 ### Standalone
-cp .env.example .env  # fill in values
+
+cp .env.example .env # fill in values
 task bootstrap
 task dev
 
