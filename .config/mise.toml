@@ -9,6 +9,7 @@
 go = "1.22"
 "go:github.com/air-verse/air" = "latest"
 "go:github.com/golangci/golangci-lint/cmd/golangci-lint" = "latest"
+"go:golang.org/x/vuln/cmd/govulncheck" = "latest"
 "npm:markdownlint-cli2" = "latest"
 "pipx:gitfluff" = "latest"
 "pipx:yamllint" = "latest"
