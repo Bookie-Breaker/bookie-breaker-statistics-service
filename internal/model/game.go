@@ -48,5 +48,7 @@ type Game struct {
 	HomeScore      *int        `json:"home_score"`
 	AwayScore      *int        `json:"away_score"`
 	Result         *GameResult `json:"result,omitempty"`
-	ExternalID     string      `json:"-"`
+	// ExternalID is the source's game id (additive to the contract payload;
+	// it must serialize because the Redis cache is the primary store).
+	ExternalID string `json:"external_id,omitempty"`
 }

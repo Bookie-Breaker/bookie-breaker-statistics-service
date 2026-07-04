@@ -1,0 +1,77 @@
+{
+  "meta": { "version": 1 },
+  "leagueSchedule": {
+    "seasonYear": "2025-26",
+    "leagueId": "00",
+    "gameDates": [
+      {
+        "gameDate": "10/21/2025 00:00:00",
+        "games": [
+          {
+            "gameId": "0022500001",
+            "gameStatus": 3,
+            "gameStatusText": "Final",
+            "gameDateTimeUTC": "2025-10-22T00:30:00Z",
+            "gameLabel": "",
+            "weekNumber": 1,
+            "arenaName": "TD Garden",
+            "arenaCity": "Boston",
+            "arenaState": "MA",
+            "homeTeam": {
+              "teamId": 1610612738,
+              "teamName": "Celtics",
+              "teamCity": "Boston",
+              "teamTricode": "BOS",
+              "score": 118,
+              "wins": 1,
+              "losses": 0
+            },
+            "awayTeam": {
+              "teamId": 1610612747,
+              "teamName": "Lakers",
+              "teamCity": "Los Angeles",
+              "teamTricode": "LAL",
+              "score": 110,
+              "wins": 0,
+              "losses": 1
+            }
+          }
+        ]
+      },
+      {
+        "gameDate": "01/15/2026 00:00:00",
+        "games": [
+          {
+            "gameId": "0022500456",
+            "gameStatus": 1,
+            "gameStatusText": "7:30 pm ET",
+            "gameDateTimeUTC": "2026-01-16T00:30:00Z",
+            "gameLabel": "",
+            "weekNumber": 13,
+            "arenaName": "Crypto.com Arena",
+            "arenaCity": "Los Angeles",
+            "arenaState": "CA",
+            "homeTeam": {
+              "teamId": 1610612747,
+              "teamName": "Lakers",
+              "teamCity": "Los Angeles",
+              "teamTricode": "LAL",
+              "score": 0,
+              "wins": 20,
+              "losses": 18
+            },
+            "awayTeam": {
+              "teamId": 1610612738,
+              "teamName": "Celtics",
+              "teamCity": "Boston",
+              "teamTricode": "BOS",
+              "score": 0,
+              "wins": 30,
+              "losses": 9
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -62,7 +62,8 @@ type TeamStats struct {
 	GamesPlayed      int             `json:"games_played"`
 	Stats            StatBlocks      `json:"stats"`
 	HomeAwaySplits   *HomeAwaySplits `json:"home_away_splits,omitempty"`
-	// Wins and Losses feed SeasonSummary; not part of the contract payload.
-	Wins   int `json:"-"`
-	Losses int `json:"-"`
+	// Wins and Losses feed SeasonSummary. Additive to the contract payload;
+	// they must serialize because the Redis cache is the primary store.
+	Wins   int `json:"wins"`
+	Losses int `json:"losses"`
 }

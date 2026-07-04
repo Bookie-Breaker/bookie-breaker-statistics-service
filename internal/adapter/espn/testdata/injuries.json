@@ -1,0 +1,34 @@
+{
+  "injuries": [
+    {
+      "id": "13",
+      "displayName": "Los Angeles Lakers",
+      "injuries": [
+        {
+          "status": "Out",
+          "date": "2026-07-01T18:30:00Z",
+          "shortComment": "James (ankle) will miss the summer league opener.",
+          "longComment": "LeBron James is dealing with a sprained ankle and has no timetable to return.",
+          "athlete": {
+            "id": "1966",
+            "displayName": "LeBron James",
+            "position": { "abbreviation": "SF" }
+          },
+          "details": { "type": "Ankle", "returnDate": "2026-10-01" }
+        },
+        {
+          "status": "Day-To-Day",
+          "date": "2026-07-02T12:00:00Z",
+          "shortComment": "Guard (knee) is questionable.",
+          "longComment": "",
+          "athlete": {
+            "id": "4432",
+            "displayName": "Rookie Guard",
+            "position": { "abbreviation": "PG" }
+          },
+          "details": { "type": "Knee", "returnDate": "" }
+        }
+      ]
+    }
+  ]
+}

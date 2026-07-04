@@ -29,7 +29,9 @@ type PlayerSummary struct {
 	Status            PlayerStatus      `json:"status"`
 	InjuryDescription *string           `json:"injury_description,omitempty"`
 	ExternalIDs       map[string]string `json:"external_ids,omitempty"`
-	League            League            `json:"-"`
+	// League is additive to the contract payload; it must serialize because
+	// the Redis cache is the primary store.
+	League League `json:"league,omitempty"`
 }
 
 // PlayerDetail matches the OpenAPI PlayerDetail schema.
