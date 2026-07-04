@@ -1,0 +1,38 @@
+{
+  "scoreboard": {
+    "gameDate": "2026-01-15",
+    "games": [
+      {
+        "gameId": "0022500456",
+        "gameStatus": 3,
+        "gameStatusText": "Final/OT",
+        "period": 5,
+        "gameTimeUTC": "2026-01-16T00:30:00Z",
+        "homeTeam": {
+          "teamId": 1610612747,
+          "teamTricode": "LAL",
+          "score": 128,
+          "periods": [
+            { "period": 1, "score": 28 },
+            { "period": 2, "score": 30 },
+            { "period": 3, "score": 25 },
+            { "period": 4, "score": 32 },
+            { "period": 5, "score": 13 }
+          ]
+        },
+        "awayTeam": {
+          "teamId": 1610612738,
+          "teamTricode": "BOS",
+          "score": 124,
+          "periods": [
+            { "period": 1, "score": 30 },
+            { "period": 2, "score": 26 },
+            { "period": 3, "score": 29 },
+            { "period": 4, "score": 30 },
+            { "period": 5, "score": 9 }
+          ]
+        }
+      }
+    ]
+  }
+}

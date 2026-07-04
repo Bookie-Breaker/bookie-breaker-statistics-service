@@ -6,7 +6,7 @@ Go REST API providing centralized team/player statistics, schedules, game result
 
 ## Language & Conventions
 
-- **Language:** Go 1.22
+- **Language:** Go 1.25
 - **Framework:** Echo
 - **Project layout:** `cmd/server/main.go` entry point, `internal/` for private code, `pkg/` for public libraries
 - **Naming:** `snake_case.go` files, `camelCase` variables, `PascalCase` exports
@@ -32,10 +32,14 @@ task build        # Build to bin/server
 
 ## Dependencies
 
-- **Redis** — Caching (6h TTL for stats) and pub/sub (`events:stats.updated`, `events:game.completed`)
-- **External APIs** — NBA.com endpoints (Phase 1), nfl_data_py/pybaseball via sidecar (Phase 6)
+- **Redis** — Primary store: canonical collections cached with per-type TTLs plus 7-day stale
+  mirrors; pub/sub (`events:stats.updated`, `events:game.completed`)
+- **PostgreSQL** — Archival only: raw API responses into `public.raw_api_responses`
+  (role `statistics_svc` owns no schema and no tables)
+- **External APIs** — stats.nba.com direct from Go (ADR-020), ESPN for injuries (ADR-008
+  fallback; NBA.com has no injury endpoint); nfl_data_py/pybaseball via sidecar (Phase 6)
 - No upstream service dependencies
 
 ## Environment Variables
 
-See `.env.example`. Key: `REDIS_URL`, `PORT=8002`.
+See `.env.example`. Key: `REDIS_URL`, `DATABASE_URL`, `PORT=8002`, `INJURY_SOURCE`.
