@@ -1,0 +1,96 @@
+{
+  "standings": [
+    {
+      "teamName": {
+        "default": "Colorado Avalanche",
+        "fr": "Avalanche du Colorado"
+      },
+      "teamCommonName": {
+        "default": "Avalanche"
+      },
+      "teamAbbrev": {
+        "default": "COL"
+      },
+      "placeName": {
+        "default": "Colorado"
+      },
+      "conferenceName": "Western",
+      "divisionName": "Central",
+      "wins": 55,
+      "losses": 16,
+      "otLosses": 11,
+      "gamesPlayed": 82,
+      "goalFor": 302,
+      "goalAgainst": 203
+    },
+    {
+      "teamName": {
+        "default": "Boston Bruins",
+        "fr": "Bruins de Boston"
+      },
+      "teamCommonName": {
+        "default": "Bruins"
+      },
+      "teamAbbrev": {
+        "default": "BOS"
+      },
+      "placeName": {
+        "default": "Boston"
+      },
+      "conferenceName": "Eastern",
+      "divisionName": "Atlantic",
+      "wins": 45,
+      "losses": 27,
+      "otLosses": 10,
+      "gamesPlayed": 82,
+      "goalFor": 272,
+      "goalAgainst": 250
+    },
+    {
+      "teamName": {
+        "default": "Washington Capitals",
+        "fr": "Capitals de Washington"
+      },
+      "teamCommonName": {
+        "default": "Capitals"
+      },
+      "teamAbbrev": {
+        "default": "WSH"
+      },
+      "placeName": {
+        "default": "Washington"
+      },
+      "conferenceName": "Eastern",
+      "divisionName": "Metropolitan",
+      "wins": 43,
+      "losses": 30,
+      "otLosses": 9,
+      "gamesPlayed": 82,
+      "goalFor": 263,
+      "goalAgainst": 244
+    },
+    {
+      "teamName": {
+        "default": "Toronto Maple Leafs",
+        "fr": "Maple Leafs de Toronto"
+      },
+      "teamCommonName": {
+        "default": "Maple Leafs"
+      },
+      "teamAbbrev": {
+        "default": "TOR"
+      },
+      "placeName": {
+        "default": "Toronto"
+      },
+      "conferenceName": "Eastern",
+      "divisionName": "Atlantic",
+      "wins": 32,
+      "losses": 36,
+      "otLosses": 14,
+      "gamesPlayed": 82,
+      "goalFor": 253,
+      "goalAgainst": 299
+    }
+  ]
+}

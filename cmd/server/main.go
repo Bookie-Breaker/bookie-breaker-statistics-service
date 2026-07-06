@@ -9,13 +9,16 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/cbbd"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/cfbd"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espn"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espnbb"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espnfb"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/mlb"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nba"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/ncaabsb"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nfl"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nhl"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/soccer"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cache"
@@ -89,8 +92,9 @@ func main() {
 	}
 	seasonYear := func() int { return seasonFor(time.Now().UTC()) }
 
-	// NBA (Wave 0), soccer (Wave 1), baseball (Wave 2), and football (Wave 3)
-	// adapters exist; later waves add the remaining leagues (ADR-026).
+	// NBA (Wave 0), soccer (Wave 1), baseball (Wave 2), football (Wave 3), and
+	// hockey plus college basketball (Waves 4-5) adapters exist; later waves
+	// add the remaining leagues (ADR-026).
 	var soccerClient *soccer.Client
 	var espnFBClient *espnfb.Client
 	espnFootball := func() *espnfb.Client {
@@ -98,6 +102,13 @@ func main() {
 			espnFBClient = espnfb.NewClient(cfg.ESPNBaseURL, cfg.NBAHTTPTimeout)
 		}
 		return espnFBClient
+	}
+	var espnBBClient *espnbb.Client
+	espnBasketball := func() *espnbb.Client {
+		if espnBBClient == nil {
+			espnBBClient = espnbb.NewClient(cfg.ESPNBaseURL, cfg.NBAHTTPTimeout)
+		}
+		return espnBBClient
 	}
 	providers := make(map[model.League]sportsdata.StatsProvider, len(cfg.LeaguesEnabled))
 	for _, league := range cfg.LeaguesEnabled {
@@ -122,6 +133,10 @@ func main() {
 			providers[league] = nfl.NewProvider(espnFootball(), nfl.NewNFLVerseClient(cfg.NFLVerseBaseURL, cfg.NBAHTTPTimeout))
 		case model.LeagueNCAAFB:
 			providers[league] = cfbd.NewProvider(espnFootball(), cfbd.NewClient(cfg.CFBDBaseURL, cfg.CFBDAPIKey, cfg.NBAHTTPTimeout))
+		case model.LeagueNHL:
+			providers[league] = nhl.NewProvider(nhl.NewClient(cfg.NHLWebBaseURL, cfg.NHLStatsBaseURL, cfg.NBAHTTPTimeout))
+		case model.LeagueNCAABB:
+			providers[league] = cbbd.NewProvider(espnBasketball(), cbbd.NewClient(cfg.CBBDBaseURL, cfg.CBBDAPIKey, cfg.NBAHTTPTimeout))
 		default:
 			slog.Error(fmt.Sprintf("no adapter for league %s yet", league))
 			os.Exit(1)

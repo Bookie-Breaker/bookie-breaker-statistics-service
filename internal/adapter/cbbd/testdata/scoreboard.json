@@ -1,0 +1,199 @@
+{
+  "events": [
+    {
+      "id": "401822913",
+      "date": "2026-01-24T17:30Z",
+      "name": "Villanova Wildcats at UConn Huskies",
+      "season": {
+        "year": 2026,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "status": {
+        "period": 3,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "PeoplesBank Arena"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "75",
+              "team": {
+                "id": "41",
+                "displayName": "UConn Huskies",
+                "abbreviation": "CONN",
+                "location": "UConn"
+              },
+              "linescores": [
+                {
+                  "value": 27.0
+                },
+                {
+                  "value": 34.0
+                },
+                {
+                  "value": 14.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "67",
+              "team": {
+                "id": "222",
+                "displayName": "Villanova Wildcats",
+                "abbreviation": "VILL",
+                "location": "Villanova"
+              },
+              "linescores": [
+                {
+                  "value": 31.0
+                },
+                {
+                  "value": 30.0
+                },
+                {
+                  "value": 6.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401825468",
+      "date": "2026-01-24T20:00Z",
+      "name": "Illinois Fighting Illini at Purdue Boilermakers",
+      "season": {
+        "year": 2026,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "status": {
+        "period": 2,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "Mackey Arena"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "82",
+              "team": {
+                "id": "2509",
+                "displayName": "Purdue Boilermakers",
+                "abbreviation": "PUR",
+                "location": "Purdue"
+              },
+              "linescores": [
+                {
+                  "value": 43.0
+                },
+                {
+                  "value": 39.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "88",
+              "team": {
+                "id": "356",
+                "displayName": "Illinois Fighting Illini",
+                "abbreviation": "ILL",
+                "location": "Illinois"
+              },
+              "linescores": [
+                {
+                  "value": 39.0
+                },
+                {
+                  "value": 49.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401820689",
+      "date": "2026-01-24T17:00Z",
+      "name": "Wake Forest Demon Deacons at Duke Blue Devils",
+      "season": {
+        "year": 2026,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "status": {
+        "period": 2,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "Cameron Indoor Stadium"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "90",
+              "team": {
+                "id": "150",
+                "displayName": "Duke Blue Devils",
+                "abbreviation": "DUKE",
+                "location": "Duke"
+              },
+              "linescores": [
+                {
+                  "value": 42.0
+                },
+                {
+                  "value": 48.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "69",
+              "team": {
+                "id": "154",
+                "displayName": "Wake Forest Demon Deacons",
+                "abbreviation": "WAKE",
+                "location": "Wake Forest"
+              },
+              "linescores": [
+                {
+                  "value": 31.0
+                },
+                {
+                  "value": 38.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -37,6 +37,17 @@ type Config struct {
 	// watcher-only (empty season stats).
 	CFBDBaseURL string
 	CFBDAPIKey  string
+	// CBBDBaseURL and CBBDAPIKey configure the CollegeBasketballData API
+	// behind NCAA_BB season stats and adjusted efficiencies (same shape and
+	// posture as CFBD). The key is optional: without it NCAA_BB runs
+	// watcher-only (empty season stats).
+	CBBDBaseURL string
+	CBBDAPIKey  string
+	// NHLWebBaseURL is the official NHL web API (schedule, scores, standings);
+	// NHLStatsBaseURL is the NHL stats REST API (team summary stats). Both are
+	// free and keyless (ADR-026).
+	NHLWebBaseURL   string
+	NHLStatsBaseURL string
 
 	RefreshTeamStatsInterval time.Duration
 	RefreshRostersInterval   time.Duration
@@ -91,6 +102,10 @@ func Load() (*Config, error) {
 		NFLVerseBaseURL: getEnv("NFLVERSE_BASE_URL", "https://github.com/nflverse/nflverse-data/releases/download"),
 		CFBDBaseURL:     getEnv("CFBD_BASE_URL", "https://api.collegefootballdata.com"),
 		CFBDAPIKey:      getEnv("CFBD_API_KEY", ""),
+		CBBDBaseURL:     getEnv("CBBD_BASE_URL", "https://api.collegebasketballdata.com"),
+		CBBDAPIKey:      getEnv("CBBD_API_KEY", ""),
+		NHLWebBaseURL:   getEnv("NHL_WEB_BASE_URL", "https://api-web.nhle.com"),
+		NHLStatsBaseURL: getEnv("NHL_STATS_BASE_URL", "https://api.nhle.com/stats/rest/en"),
 
 		RefreshTeamStatsInterval: getEnvDuration("REFRESH_TEAM_STATS_INTERVAL", 6*time.Hour),
 		RefreshRostersInterval:   getEnvDuration("REFRESH_ROSTERS_INTERVAL", 12*time.Hour),
