@@ -129,16 +129,18 @@ func (w *GameWatcher) publishCompleted(ctx context.Context, game model.Game) {
 	}
 
 	event := pubsub.GameCompletedEvent{
-		GameID:         game.ID,
-		GameExternalID: game.ExternalID,
-		League:         string(game.League),
-		HomeTeam:       game.HomeTeam.Abbreviation,
-		AwayTeam:       game.AwayTeam.Abbreviation,
-		HomeScore:      game.Result.HomeScore,
-		AwayScore:      game.Result.AwayScore,
-		Total:          game.Result.TotalScore,
-		Margin:         game.Result.Margin,
-		Overtime:       game.Result.Overtime,
+		GameID:              game.ID,
+		GameExternalID:      game.ExternalID,
+		League:              string(game.League),
+		HomeTeam:            game.HomeTeam.Abbreviation,
+		AwayTeam:            game.AwayTeam.Abbreviation,
+		HomeScore:           game.Result.HomeScore,
+		AwayScore:           game.Result.AwayScore,
+		Total:               game.Result.TotalScore,
+		Margin:              game.Result.Margin,
+		Overtime:            game.Result.Overtime,
+		RegulationHomeScore: game.Result.RegulationHomeScore,
+		RegulationAwayScore: game.Result.RegulationAwayScore,
 	}
 	if err := w.publisher.PublishGameCompleted(ctx, event); err != nil {
 		slog.Warn("failed to publish game.completed", "game_id", game.ID, "error", err)
