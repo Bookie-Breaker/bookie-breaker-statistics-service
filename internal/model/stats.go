@@ -65,6 +65,24 @@ type BaseballStats struct {
 	BullpenERA          float64 `json:"bullpen_era"`
 }
 
+// FootballStats matches the OpenAPI FootballStats schema (FOOTBALL-sport
+// leagues only; ADR-026). EPA metrics come from nflverse team stats (NFL)
+// and are absent for NCAA_FB, which carries SP+ ratings from CFBD instead.
+// Drive metrics derive from scoring totals divided by a league-average
+// drives-per-game constant when the source has no drive columns (see the
+// nfl adapter).
+type FootballStats struct {
+	PointsPerGame         float64 `json:"points_per_game"`
+	PointsAllowedPerGame  float64 `json:"points_allowed_per_game"`
+	DrivesPerGame         float64 `json:"drives_per_game"`
+	PointsPerDriveOff     float64 `json:"points_per_drive_off"`
+	PointsPerDriveDef     float64 `json:"points_per_drive_def"`
+	EPAPerPlayOff         float64 `json:"epa_per_play_off"`
+	EPAPerPlayDef         float64 `json:"epa_per_play_def"`
+	TurnoverMarginPerGame float64 `json:"turnover_margin_per_game"`
+	SPPlusRating          float64 `json:"sp_plus_rating"`
+}
+
 // SplitRecord matches the OpenAPI SplitRecord schema.
 type SplitRecord struct {
 	Wins                 int     `json:"wins"`
@@ -75,14 +93,15 @@ type SplitRecord struct {
 
 // StatBlocks groups the stat categories; fields are pointers so the
 // stat_type filter can omit whole blocks. Basketball leagues populate the
-// offensive/defensive/advanced blocks; soccer leagues populate only the
-// soccer block and baseball leagues only the baseball block (ADR-026).
+// offensive/defensive/advanced blocks; soccer, baseball, and football
+// leagues populate only their sport's block (ADR-026).
 type StatBlocks struct {
 	Offensive *OffensiveStats `json:"offensive,omitempty"`
 	Defensive *DefensiveStats `json:"defensive,omitempty"`
 	Advanced  *AdvancedStats  `json:"advanced,omitempty"`
 	Soccer    *SoccerStats    `json:"soccer,omitempty"`
 	Baseball  *BaseballStats  `json:"baseball,omitempty"`
+	Football  *FootballStats  `json:"football,omitempty"`
 }
 
 // HomeAwaySplits groups home/road records.

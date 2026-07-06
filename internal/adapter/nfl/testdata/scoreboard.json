@@ -1,0 +1,324 @@
+{
+  "events": [
+    {
+      "id": "401772510",
+      "date": "2025-09-05T00:20Z",
+      "name": "Dallas Cowboys at Philadelphia Eagles",
+      "season": {
+        "year": 2025,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "status": {
+        "period": 4,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "Lincoln Financial Field"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "24",
+              "team": {
+                "id": "21",
+                "displayName": "Philadelphia Eagles",
+                "abbreviation": "PHI",
+                "location": "Philadelphia",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 14.0
+                },
+                {
+                  "value": 3.0
+                },
+                {
+                  "value": 0.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "20",
+              "team": {
+                "id": "6",
+                "displayName": "Dallas Cowboys",
+                "abbreviation": "DAL",
+                "location": "Dallas",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 13.0
+                },
+                {
+                  "value": 0.0
+                },
+                {
+                  "value": 0.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401772921",
+      "date": "2025-09-29T00:20Z",
+      "name": "Green Bay Packers at Dallas Cowboys",
+      "season": {
+        "year": 2025,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "status": {
+        "period": 5,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "AT&T Stadium"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "40",
+              "team": {
+                "id": "6",
+                "displayName": "Dallas Cowboys",
+                "abbreviation": "DAL",
+                "location": "Dallas",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 0.0
+                },
+                {
+                  "value": 16.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 14.0
+                },
+                {
+                  "value": 3.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "40",
+              "team": {
+                "id": "9",
+                "displayName": "Green Bay Packers",
+                "abbreviation": "GB",
+                "location": "Green Bay",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 6.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 17.0
+                },
+                {
+                  "value": 3.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401772939",
+      "date": "2025-10-03T00:15Z",
+      "name": "San Francisco 49ers at Los Angeles Rams",
+      "season": {
+        "year": 2025,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "status": {
+        "period": 5,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "SoFi Stadium"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "23",
+              "team": {
+                "id": "14",
+                "displayName": "Los Angeles Rams",
+                "abbreviation": "LAR",
+                "location": "Los Angeles",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 0.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 9.0
+                },
+                {
+                  "value": 0.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "26",
+              "team": {
+                "id": "25",
+                "displayName": "San Francisco 49ers",
+                "abbreviation": "SF",
+                "location": "San Francisco",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 10.0
+                },
+                {
+                  "value": 3.0
+                },
+                {
+                  "value": 3.0
+                },
+                {
+                  "value": 3.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401772979",
+      "date": "2026-01-10T21:30Z",
+      "name": "Los Angeles Rams at Carolina Panthers",
+      "season": {
+        "year": 2025,
+        "type": 3,
+        "slug": "post-season"
+      },
+      "status": {
+        "period": 4,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "Bank of America Stadium"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "31",
+              "team": {
+                "id": "29",
+                "displayName": "Carolina Panthers",
+                "abbreviation": "CAR",
+                "location": "Carolina",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 0.0
+                },
+                {
+                  "value": 14.0
+                },
+                {
+                  "value": 3.0
+                },
+                {
+                  "value": 14.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "34",
+              "team": {
+                "id": "14",
+                "displayName": "Los Angeles Rams",
+                "abbreviation": "LAR",
+                "location": "Los Angeles",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 10.0
+                },
+                {
+                  "value": 3.0
+                },
+                {
+                  "value": 14.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
