@@ -1,0 +1,93 @@
+{
+  "sports": [
+    {
+      "leagues": [
+        {
+          "teams": [
+            {
+              "team": {
+                "id": "338",
+                "displayName": "Kennesaw State Owls",
+                "abbreviation": "KENN",
+                "location": "Kennesaw State",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "2335",
+                "displayName": "Liberty Flames",
+                "abbreviation": "LIB",
+                "location": "Liberty",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "309",
+                "displayName": "Louisiana Ragin' Cajuns",
+                "abbreviation": "UL",
+                "location": "Louisiana",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "130",
+                "displayName": "Michigan Wolverines",
+                "abbreviation": "MICH",
+                "location": "Michigan",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "2393",
+                "displayName": "Middle Tennessee Blue Raiders",
+                "abbreviation": "MTSU",
+                "location": "Middle Tennessee",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "166",
+                "displayName": "New Mexico State Aggies",
+                "abbreviation": "NMSU",
+                "location": "New Mexico State",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "249",
+                "displayName": "North Texas Mean Green",
+                "abbreviation": "UNT",
+                "location": "North Texas",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "194",
+                "displayName": "Ohio State Buckeyes",
+                "abbreviation": "OSU",
+                "location": "Ohio State",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "2433",
+                "displayName": "UL Monroe Warhawks",
+                "abbreviation": "ULM",
+                "location": "UL Monroe",
+                "isActive": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
