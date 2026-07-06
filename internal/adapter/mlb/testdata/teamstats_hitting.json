@@ -1,0 +1,106 @@
+{
+  "stats": [
+    {
+      "type": {
+        "displayName": "season"
+      },
+      "group": {
+        "displayName": "hitting"
+      },
+      "totalSplits": 30,
+      "exemptions": [],
+      "splits": [
+        {
+          "season": "2026",
+          "stat": {
+            "gamesPlayed": 91,
+            "groundOuts": 709,
+            "airOuts": 873,
+            "runs": 483,
+            "doubles": 154,
+            "triples": 9,
+            "homeRuns": 122,
+            "strikeOuts": 715,
+            "baseOnBalls": 375,
+            "intentionalWalks": 14,
+            "hits": 808,
+            "hitByPitch": 34,
+            "avg": ".264",
+            "atBats": 3061,
+            "obp": ".347",
+            "slg": ".440",
+            "ops": ".787",
+            "caughtStealing": 14,
+            "stolenBases": 35,
+            "stolenBasePercentage": ".714",
+            "caughtStealingPercentage": ".286",
+            "groundIntoDoublePlay": 77,
+            "numberOfPitches": 13952,
+            "plateAppearances": 3517,
+            "totalBases": 1346,
+            "rbi": 455,
+            "leftOnBase": 658,
+            "sacBunts": 10,
+            "sacFlies": 34,
+            "babip": ".304",
+            "groundOutsToAirouts": "0.81",
+            "catchersInterference": 3,
+            "atBatsPerHomeRun": "25.09"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "rank": 1
+        },
+        {
+          "season": "2026",
+          "stat": {
+            "gamesPlayed": 88,
+            "groundOuts": 839,
+            "airOuts": 714,
+            "runs": 449,
+            "doubles": 153,
+            "triples": 13,
+            "homeRuns": 83,
+            "strikeOuts": 722,
+            "baseOnBalls": 363,
+            "intentionalWalks": 17,
+            "hits": 761,
+            "hitByPitch": 21,
+            "avg": ".255",
+            "atBats": 2990,
+            "obp": ".337",
+            "slg": ".398",
+            "ops": ".735",
+            "caughtStealing": 27,
+            "stolenBases": 84,
+            "stolenBasePercentage": ".757",
+            "caughtStealingPercentage": ".243",
+            "groundIntoDoublePlay": 49,
+            "numberOfPitches": 13478,
+            "plateAppearances": 3427,
+            "totalBases": 1189,
+            "rbi": 423,
+            "leftOnBase": 659,
+            "sacBunts": 25,
+            "sacFlies": 21,
+            "babip": ".307",
+            "groundOutsToAirouts": "1.18",
+            "catchersInterference": 7,
+            "atBatsPerHomeRun": "36.02"
+          },
+          "team": {
+            "id": 158,
+            "name": "Milwaukee Brewers",
+            "link": "/api/v1/teams/158"
+          },
+          "rank": 6
+        }
+      ],
+      "splitsTiedWithOffset": [],
+      "splitsTiedWithLimit": []
+    }
+  ]
+}

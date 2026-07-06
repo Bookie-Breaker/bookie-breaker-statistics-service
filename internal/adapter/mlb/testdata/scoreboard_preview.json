@@ -1,0 +1,125 @@
+{
+  "copyright": "Copyright 2026 MLB Advanced Media, L.P.  Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt",
+  "totalItems": 8,
+  "totalEvents": 0,
+  "totalGames": 1,
+  "totalGamesInProgress": 0,
+  "dates": [
+    {
+      "date": "2026-07-06",
+      "totalItems": 8,
+      "totalEvents": 0,
+      "totalGames": 8,
+      "totalGamesInProgress": 0,
+      "games": [
+        {
+          "gamePk": 824089,
+          "gameGuid": "3a7ab861-602d-4241-b2cb-e8079128bc9f",
+          "link": "/api/v1.1/game/824089/feed/live",
+          "gameType": "R",
+          "season": "2026",
+          "gameDate": "2026-07-06T18:10:00Z",
+          "officialDate": "2026-07-06",
+          "status": {
+            "abstractGameState": "Preview",
+            "codedGameState": "S",
+            "detailedState": "Scheduled",
+            "statusCode": "S",
+            "startTimeTBD": false,
+            "abstractGameCode": "P"
+          },
+          "teams": {
+            "away": {
+              "team": {
+                "id": 143,
+                "name": "Philadelphia Phillies",
+                "link": "/api/v1/teams/143"
+              },
+              "leagueRecord": {
+                "wins": 50,
+                "losses": 40,
+                "ties": 0,
+                "pct": ".556"
+              },
+              "probablePitcher": {
+                "id": 650911,
+                "fullName": "Cristopher Sánchez",
+                "link": "/api/v1/people/650911"
+              },
+              "splitSquad": false,
+              "seriesNumber": 29
+            },
+            "home": {
+              "team": {
+                "id": 118,
+                "name": "Kansas City Royals",
+                "link": "/api/v1/teams/118"
+              },
+              "leagueRecord": {
+                "wins": 36,
+                "losses": 54,
+                "ties": 0,
+                "pct": ".400"
+              },
+              "probablePitcher": {
+                "id": 702070,
+                "fullName": "Noah Cameron",
+                "link": "/api/v1/people/702070"
+              },
+              "splitSquad": false,
+              "seriesNumber": 29
+            }
+          },
+          "linescore": {
+            "scheduledInnings": 9,
+            "innings": [],
+            "teams": {
+              "home": {},
+              "away": {}
+            },
+            "defense": {
+              "team": {
+                "id": 118,
+                "name": "Kansas City Royals",
+                "link": "/api/v1/teams/118"
+              }
+            },
+            "offense": {
+              "team": {
+                "id": 143,
+                "name": "Philadelphia Phillies",
+                "link": "/api/v1/teams/143"
+              }
+            }
+          },
+          "venue": {
+            "id": 7,
+            "name": "Kauffman Stadium",
+            "link": "/api/v1/venues/7"
+          },
+          "content": {
+            "link": "/api/v1/game/824089/content"
+          },
+          "gameNumber": 1,
+          "publicFacing": true,
+          "doubleHeader": "N",
+          "gamedayType": "P",
+          "tiebreaker": "N",
+          "calendarEventID": "14-824089-2026-07-06",
+          "seasonDisplay": "2026",
+          "dayNight": "day",
+          "scheduledInnings": 9,
+          "reverseHomeAwayStatus": false,
+          "inningBreakLength": 120,
+          "gamesInSeries": 3,
+          "seriesGameNumber": 3,
+          "seriesDescription": "Regular Season",
+          "recordSource": "S",
+          "ifNecessary": "N",
+          "ifNecessaryDescription": "Normal Game"
+        }
+      ],
+      "events": []
+    }
+  ]
+}

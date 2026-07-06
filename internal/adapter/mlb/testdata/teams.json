@@ -1,0 +1,193 @@
+{
+  "copyright": "Copyright 2026 MLB Advanced Media, L.P.  Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt",
+  "teams": [
+    {
+      "springLeague": {
+        "id": 114,
+        "name": "Cactus League",
+        "link": "/api/v1/league/114",
+        "abbreviation": "CL"
+      },
+      "allStarStatus": "N",
+      "id": 133,
+      "name": "Athletics",
+      "link": "/api/v1/teams/133",
+      "season": 2026,
+      "venue": {
+        "id": 2529,
+        "name": "Sutter Health Park",
+        "link": "/api/v1/venues/2529"
+      },
+      "springVenue": {
+        "id": 2507,
+        "link": "/api/v1/venues/2507"
+      },
+      "teamCode": "ath",
+      "fileCode": "ath",
+      "abbreviation": "ATH",
+      "teamName": "Athletics",
+      "locationName": "Sacramento",
+      "firstYearOfPlay": "1901",
+      "league": {
+        "id": 103,
+        "name": "American League",
+        "link": "/api/v1/league/103"
+      },
+      "division": {
+        "id": 200,
+        "name": "American League West",
+        "link": "/api/v1/divisions/200"
+      },
+      "sport": {
+        "id": 1,
+        "link": "/api/v1/sports/1",
+        "name": "Major League Baseball"
+      },
+      "shortName": "Athletics",
+      "franchiseName": "Athletics",
+      "clubName": "Athletics",
+      "active": true
+    },
+    {
+      "springLeague": {
+        "id": 115,
+        "name": "Grapefruit League",
+        "link": "/api/v1/league/115",
+        "abbreviation": "GL"
+      },
+      "allStarStatus": "N",
+      "id": 142,
+      "name": "Minnesota Twins",
+      "link": "/api/v1/teams/142",
+      "season": 2026,
+      "venue": {
+        "id": 3312,
+        "name": "Target Field",
+        "link": "/api/v1/venues/3312"
+      },
+      "springVenue": {
+        "id": 2862,
+        "link": "/api/v1/venues/2862"
+      },
+      "teamCode": "min",
+      "fileCode": "min",
+      "abbreviation": "MIN",
+      "teamName": "Twins",
+      "locationName": "Minneapolis",
+      "firstYearOfPlay": "1901",
+      "league": {
+        "id": 103,
+        "name": "American League",
+        "link": "/api/v1/league/103"
+      },
+      "division": {
+        "id": 202,
+        "name": "American League Central",
+        "link": "/api/v1/divisions/202"
+      },
+      "sport": {
+        "id": 1,
+        "link": "/api/v1/sports/1",
+        "name": "Major League Baseball"
+      },
+      "shortName": "Minnesota",
+      "franchiseName": "Minnesota",
+      "clubName": "Twins",
+      "active": true
+    },
+    {
+      "springLeague": {
+        "id": 114,
+        "name": "Cactus League",
+        "link": "/api/v1/league/114",
+        "abbreviation": "CL"
+      },
+      "allStarStatus": "N",
+      "id": 119,
+      "name": "Los Angeles Dodgers",
+      "link": "/api/v1/teams/119",
+      "season": 2026,
+      "venue": {
+        "id": 22,
+        "name": "UNIQLO Field at Dodger Stadium",
+        "link": "/api/v1/venues/22"
+      },
+      "springVenue": {
+        "id": 3809,
+        "link": "/api/v1/venues/3809"
+      },
+      "teamCode": "lan",
+      "fileCode": "la",
+      "abbreviation": "LAD",
+      "teamName": "Dodgers",
+      "locationName": "Los Angeles",
+      "firstYearOfPlay": "1884",
+      "league": {
+        "id": 104,
+        "name": "National League",
+        "link": "/api/v1/league/104"
+      },
+      "division": {
+        "id": 203,
+        "name": "National League West",
+        "link": "/api/v1/divisions/203"
+      },
+      "sport": {
+        "id": 1,
+        "link": "/api/v1/sports/1",
+        "name": "Major League Baseball"
+      },
+      "shortName": "LA Dodgers",
+      "franchiseName": "Los Angeles",
+      "clubName": "Dodgers",
+      "active": true
+    },
+    {
+      "springLeague": {
+        "id": 114,
+        "name": "Cactus League",
+        "link": "/api/v1/league/114",
+        "abbreviation": "CL"
+      },
+      "allStarStatus": "N",
+      "id": 114,
+      "name": "Cleveland Guardians",
+      "link": "/api/v1/teams/114",
+      "season": 2026,
+      "venue": {
+        "id": 5,
+        "name": "Progressive Field",
+        "link": "/api/v1/venues/5"
+      },
+      "springVenue": {
+        "id": 3834,
+        "link": "/api/v1/venues/3834"
+      },
+      "teamCode": "cle",
+      "fileCode": "cle",
+      "abbreviation": "CLE",
+      "teamName": "Guardians",
+      "locationName": "Cleveland",
+      "firstYearOfPlay": "1901",
+      "league": {
+        "id": 103,
+        "name": "American League",
+        "link": "/api/v1/league/103"
+      },
+      "division": {
+        "id": 202,
+        "name": "American League Central",
+        "link": "/api/v1/divisions/202"
+      },
+      "sport": {
+        "id": 1,
+        "link": "/api/v1/sports/1",
+        "name": "Major League Baseball"
+      },
+      "shortName": "Cleveland",
+      "franchiseName": "Cleveland",
+      "clubName": "Guardians",
+      "active": true
+    }
+  ]
+}

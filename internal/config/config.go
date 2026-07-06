@@ -26,6 +26,8 @@ type Config struct {
 	InjurySource string // espn | none
 	ESPNBaseURL  string
 
+	MLBStatsBaseURL string
+
 	RefreshTeamStatsInterval time.Duration
 	RefreshRostersInterval   time.Duration
 	RefreshScheduleInterval  time.Duration
@@ -73,6 +75,8 @@ func Load() (*Config, error) {
 
 		InjurySource: getEnv("INJURY_SOURCE", "espn"),
 		ESPNBaseURL:  getEnv("ESPN_BASE_URL", "https://site.api.espn.com"),
+
+		MLBStatsBaseURL: getEnv("MLB_STATS_BASE_URL", "https://statsapi.mlb.com/api/v1"),
 
 		RefreshTeamStatsInterval: getEnvDuration("REFRESH_TEAM_STATS_INTERVAL", 6*time.Hour),
 		RefreshRostersInterval:   getEnvDuration("REFRESH_ROSTERS_INTERVAL", 12*time.Hour),

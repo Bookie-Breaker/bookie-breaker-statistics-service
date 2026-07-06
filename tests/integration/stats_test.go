@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espn"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/mlb"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nba"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cache"
@@ -206,7 +207,7 @@ func TestStatisticsService(t *testing.T) {
 	}
 	rawRepo := postgres.NewRawResponseRepo(testPool)
 	publisher := pubsub.NewPublisher(testRedis)
-	refresh := service.NewRefreshService(providers, espnClient, statsCache, rawRepo, publisher)
+	refresh := service.NewRefreshService(providers, map[model.League]*espn.Client{model.LeagueNBA: espnClient}, statsCache, rawRepo, publisher)
 	watcher := service.NewGameWatcher(refresh, statsCache, publisher)
 	query := service.NewQueryService(statsCache, refresh, []model.League{model.LeagueNBA}, seasonFn)
 
@@ -506,4 +507,63 @@ func TestStatisticsService(t *testing.T) {
 		}
 	})
 
+}
+
+// TestMLBInjuriesRefresh exercises the per-league injuries generalization:
+// an enabled MLB league with an ESPN baseball/mlb client refreshes the MLB
+// injury report (real fixture recorded 2026-07-05) into the cache, mapping
+// injured-list stints to OUT.
+func TestMLBInjuriesRefresh(t *testing.T) {
+	ctx := context.Background()
+
+	espnMLB := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/apis/site/v2/sports/baseball/mlb/injuries" {
+			http.NotFound(w, r)
+			return
+		}
+		data, err := os.ReadFile(filepath.Join("..", "..", "internal", "adapter", "espn", "testdata", "injuries_mlb.json"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write(data)
+	}))
+	defer espnMLB.Close()
+
+	statsCache := cache.NewStatsCache(testRedis, cache.TTLs{
+		Teams: time.Hour, TeamStats: time.Hour, Players: time.Hour,
+		Games: time.Hour, Injuries: time.Hour, Stale: 24 * time.Hour,
+	})
+	// The injuries refresh never calls the stats provider; MLB only needs
+	// to be enabled.
+	providers := map[model.League]sportsdata.StatsProvider{
+		model.LeagueMLB: mlb.NewProvider(mlb.NewClient("http://unused", time.Second)),
+	}
+	espnClients := map[model.League]*espn.Client{
+		model.LeagueMLB: espn.NewClient(espnMLB.URL, "baseball/mlb", 10*time.Second),
+	}
+	refresh := service.NewRefreshService(providers, espnClients, statsCache,
+		postgres.NewRawResponseRepo(testPool), pubsub.NewPublisher(testRedis))
+
+	if err := refresh.RefreshInjuries(ctx); err != nil {
+		t.Fatalf("RefreshInjuries: %v", err)
+	}
+
+	reports, ok, err := statsCache.GetInjuries(ctx, string(model.LeagueMLB), false)
+	if err != nil || !ok {
+		t.Fatalf("GetInjuries: ok=%v err=%v", ok, err)
+	}
+	if len(reports) != 4 {
+		t.Fatalf("reports = %d, want 4", len(reports))
+	}
+	byName := make(map[string]model.InjuryReport, len(reports))
+	for _, r := range reports {
+		byName[r.PlayerName] = r
+	}
+	if byName["Landon Knack"].Status != string(model.PlayerOut) {
+		t.Errorf("60-day IL must map to OUT: %+v", byName["Landon Knack"])
+	}
+	if byName["Jazz Chisholm Jr."].Status != string(model.PlayerInjured) {
+		t.Errorf("day-to-day must map to INJURED: %+v", byName["Jazz Chisholm Jr."])
+	}
 }

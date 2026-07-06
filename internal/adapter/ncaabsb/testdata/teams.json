@@ -1,0 +1,495 @@
+{
+  "sports": [
+    {
+      "id": "1",
+      "leagues": [
+        {
+          "abbreviation": "CBASE",
+          "id": "14",
+          "name": "NCAA Baseball",
+          "season": {
+            "displayName": "2025-26",
+            "year": 2026
+          },
+          "shortName": "NCAA Baseball",
+          "slug": "college-baseball",
+          "teams": [
+            {
+              "team": {
+                "abbreviation": "ACU",
+                "color": "000000",
+                "displayName": "Abilene Christian Wildcats",
+                "id": "315",
+                "isActive": true,
+                "isAllStar": false,
+                "links": [],
+                "location": "Abilene Christian",
+                "logos": [
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/ncaa/500/2000.png",
+                    "rel": ["full", "default"],
+                    "width": 500
+                  },
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/2000.png",
+                    "rel": ["full", "dark"],
+                    "width": 500
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/primary_logo_on_white_color.png",
+                    "rel": ["full", "primary_logo_on_white_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/primary_logo_on_black_color.png",
+                    "rel": ["full", "primary_logo_on_black_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/primary_logo_on_primary_color.png",
+                    "rel": ["full", "primary_logo_on_primary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/primary_logo_on_secondary_color.png",
+                    "rel": ["full", "primary_logo_on_secondary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/primary_logo_black.png",
+                    "rel": ["full", "primary_logo_black"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/primary_logo_white.png",
+                    "rel": ["full", "primary_logo_white"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/secondary_logo_on_white_color.png",
+                    "rel": ["full", "secondary_logo_on_white_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/secondary_logo_on_black_color.png",
+                    "rel": ["full", "secondary_logo_on_black_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/secondary_logo_on_primary_color.png",
+                    "rel": ["full", "secondary_logo_on_primary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/secondary_logo_on_secondary_color.png",
+                    "rel": ["full", "secondary_logo_on_secondary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/secondary_logo_black.png",
+                    "rel": ["full", "secondary_logo_black"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/36a3ae1d-ef81-3a3b-b4ee-c15e5cc5a8e1/logos/secondary_logo_white.png",
+                    "rel": ["full", "secondary_logo_white"],
+                    "width": 4096
+                  }
+                ],
+                "name": "Wildcats",
+                "nickname": "Abilene Chrstn",
+                "shortDisplayName": "Abilene Chrstn",
+                "slug": "abilene-christian-wildcats",
+                "uid": "s:1~l:14~t:315"
+              }
+            },
+            {
+              "team": {
+                "abbreviation": "UNC",
+                "color": "002942",
+                "displayName": "North Carolina Tar Heels",
+                "id": "96",
+                "isActive": true,
+                "isAllStar": false,
+                "links": [],
+                "location": "North Carolina",
+                "logos": [
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/ncaa/500/153.png",
+                    "rel": ["full", "default"],
+                    "width": 500
+                  },
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/153.png",
+                    "rel": ["full", "dark"],
+                    "width": 500
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/primary_logo_on_white_color.png",
+                    "rel": ["full", "primary_logo_on_white_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/primary_logo_on_black_color.png",
+                    "rel": ["full", "primary_logo_on_black_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/primary_logo_on_primary_color.png",
+                    "rel": ["full", "primary_logo_on_primary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/primary_logo_on_secondary_color.png",
+                    "rel": ["full", "primary_logo_on_secondary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/primary_logo_black.png",
+                    "rel": ["full", "primary_logo_black"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/primary_logo_white.png",
+                    "rel": ["full", "primary_logo_white"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/secondary_logo_on_white_color.png",
+                    "rel": ["full", "secondary_logo_on_white_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/secondary_logo_on_black_color.png",
+                    "rel": ["full", "secondary_logo_on_black_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/secondary_logo_on_primary_color.png",
+                    "rel": ["full", "secondary_logo_on_primary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/secondary_logo_on_secondary_color.png",
+                    "rel": ["full", "secondary_logo_on_secondary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/secondary_logo_black.png",
+                    "rel": ["full", "secondary_logo_black"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/b237fb71-d9f4-334a-a4d0-7199381ee7c6/logos/secondary_logo_white.png",
+                    "rel": ["full", "secondary_logo_white"],
+                    "width": 4096
+                  }
+                ],
+                "name": "Tar Heels",
+                "nickname": "North Carolina",
+                "shortDisplayName": "North Carolina",
+                "slug": "north-carolina-tar-heels",
+                "uid": "s:1~l:14~t:96"
+              }
+            },
+            {
+              "team": {
+                "abbreviation": "OU",
+                "color": "7B0000",
+                "displayName": "Oklahoma Sooners",
+                "id": "112",
+                "isActive": true,
+                "isAllStar": false,
+                "links": [],
+                "location": "Oklahoma",
+                "logos": [
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/ncaa/500/201.png",
+                    "rel": ["full", "default"],
+                    "width": 500
+                  },
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/201.png",
+                    "rel": ["full", "dark"],
+                    "width": 500
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/primary_logo_on_white_color.png",
+                    "rel": ["full", "primary_logo_on_white_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/primary_logo_on_black_color.png",
+                    "rel": ["full", "primary_logo_on_black_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/primary_logo_on_primary_color.png",
+                    "rel": ["full", "primary_logo_on_primary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/primary_logo_on_secondary_color.png",
+                    "rel": ["full", "primary_logo_on_secondary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/primary_logo_black.png",
+                    "rel": ["full", "primary_logo_black"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/primary_logo_white.png",
+                    "rel": ["full", "primary_logo_white"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/secondary_logo_on_white_color.png",
+                    "rel": ["full", "secondary_logo_on_white_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/secondary_logo_on_black_color.png",
+                    "rel": ["full", "secondary_logo_on_black_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/secondary_logo_on_primary_color.png",
+                    "rel": ["full", "secondary_logo_on_primary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/secondary_logo_on_secondary_color.png",
+                    "rel": ["full", "secondary_logo_on_secondary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/secondary_logo_black.png",
+                    "rel": ["full", "secondary_logo_black"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/aede304c-6c5a-3554-b5f1-986f00129891/logos/secondary_logo_white.png",
+                    "rel": ["full", "secondary_logo_white"],
+                    "width": 4096
+                  }
+                ],
+                "name": "Sooners",
+                "nickname": "Oklahoma",
+                "shortDisplayName": "Oklahoma",
+                "slug": "oklahoma-sooners",
+                "uid": "s:1~l:14~t:112"
+              }
+            },
+            {
+              "team": {
+                "abbreviation": "UCLA",
+                "color": "005A94",
+                "displayName": "UCLA Bruins",
+                "id": "66",
+                "isActive": true,
+                "isAllStar": false,
+                "links": [],
+                "location": "UCLA",
+                "logos": [
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/ncaa/500/26.png",
+                    "rel": ["full", "default"],
+                    "width": 500
+                  },
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/26.png",
+                    "rel": ["full", "dark"],
+                    "width": 500
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/primary_logo_on_white_color.png",
+                    "rel": ["full", "primary_logo_on_white_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/primary_logo_on_black_color.png",
+                    "rel": ["full", "primary_logo_on_black_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/primary_logo_on_primary_color.png",
+                    "rel": ["full", "primary_logo_on_primary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/primary_logo_on_secondary_color.png",
+                    "rel": ["full", "primary_logo_on_secondary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/primary_logo_black.png",
+                    "rel": ["full", "primary_logo_black"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/primary_logo_white.png",
+                    "rel": ["full", "primary_logo_white"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/secondary_logo_on_white_color.png",
+                    "rel": ["full", "secondary_logo_on_white_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/secondary_logo_on_black_color.png",
+                    "rel": ["full", "secondary_logo_on_black_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/secondary_logo_on_primary_color.png",
+                    "rel": ["full", "secondary_logo_on_primary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/secondary_logo_on_secondary_color.png",
+                    "rel": ["full", "secondary_logo_on_secondary_color"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/secondary_logo_black.png",
+                    "rel": ["full", "secondary_logo_black"],
+                    "width": 4096
+                  },
+                  {
+                    "alt": "",
+                    "height": 4096,
+                    "href": "https://a.espncdn.com/guid/fda5ec7f-ee2f-3055-802e-dc420d4f2978/logos/secondary_logo_white.png",
+                    "rel": ["full", "secondary_logo_white"],
+                    "width": 4096
+                  }
+                ],
+                "name": "Bruins",
+                "nickname": "UCLA",
+                "shortDisplayName": "UCLA",
+                "slug": "ucla-bruins",
+                "uid": "s:1~l:14~t:66"
+              }
+            }
+          ],
+          "uid": "s:1~l:14",
+          "year": 2026
+        }
+      ],
+      "name": "Baseball",
+      "slug": "baseball",
+      "uid": "s:1"
+    }
+  ]
+}

@@ -33,16 +33,19 @@ const (
 type RefreshService struct {
 	providers map[model.League]sportsdata.StatsProvider
 	ordered   []sportsdata.StatsProvider // league-sorted for deterministic loops
-	espn      *espn.Client               // nil when INJURY_SOURCE=none
-	cache     *cache.StatsCache
-	rawRepo   repository.RawResponseRepository
-	publisher *pubsub.Publisher
+	// espnInjuries holds one ESPN injuries client per enabled league with an
+	// injuries path (NBA, MLB); empty when INJURY_SOURCE=none.
+	espnInjuries map[model.League]*espn.Client
+	cache        *cache.StatsCache
+	rawRepo      repository.RawResponseRepository
+	publisher    *pubsub.Publisher
 }
 
-// NewRefreshService creates a refresh service. espnClient may be nil.
+// NewRefreshService creates a refresh service. espnInjuries may be nil or
+// empty.
 func NewRefreshService(
 	providers map[model.League]sportsdata.StatsProvider,
-	espnClient *espn.Client,
+	espnInjuries map[model.League]*espn.Client,
 	statsCache *cache.StatsCache,
 	rawRepo repository.RawResponseRepository,
 	publisher *pubsub.Publisher,
@@ -58,12 +61,12 @@ func NewRefreshService(
 	}
 
 	return &RefreshService{
-		providers: providers,
-		ordered:   ordered,
-		espn:      espnClient,
-		cache:     statsCache,
-		rawRepo:   rawRepo,
-		publisher: publisher,
+		providers:    providers,
+		ordered:      ordered,
+		espnInjuries: espnInjuries,
+		cache:        statsCache,
+		rawRepo:      rawRepo,
+		publisher:    publisher,
 	}
 }
 
@@ -329,21 +332,32 @@ func (s *RefreshService) refreshScheduleFor(ctx context.Context, p sportsdata.St
 	return nil
 }
 
-// RefreshInjuries fetches the ESPN injury report and updates player
-// statuses. Injuries stay NBA-wired in Phase 6 Wave 0; a nil ESPN client
-// (INJURY_SOURCE=none) or a disabled NBA league is a no-op.
+// RefreshInjuries fetches the ESPN injury report for every enabled league
+// with an injuries client (NBA and MLB in Phase 6 Wave 2) and updates player
+// statuses. No clients (INJURY_SOURCE=none) is a no-op.
 func (s *RefreshService) RefreshInjuries(ctx context.Context) error {
-	if s.espn == nil {
+	if len(s.espnInjuries) == 0 {
 		return nil
 	}
-	if _, ok := s.providers[model.LeagueNBA]; !ok {
-		return nil
-	}
-	league := string(model.LeagueNBA)
 	ctx, span := refreshTracer.Start(ctx, "refresh.Injuries")
 	defer span.End()
 
-	resp, fetch, err := s.espn.Injuries(ctx)
+	for _, p := range s.ordered {
+		client, ok := s.espnInjuries[p.League()]
+		if !ok {
+			continue
+		}
+		if err := s.refreshInjuriesFor(ctx, p.League(), client); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *RefreshService) refreshInjuriesFor(ctx context.Context, forLeague model.League, client *espn.Client) error {
+	league := string(forLeague)
+
+	resp, fetch, err := client.Injuries(ctx)
 	if fetch != nil {
 		archiveErr := s.rawRepo.Insert(ctx, model.RawAPIResponse{
 			Service:      "statistics-service",
@@ -376,7 +390,7 @@ func (s *RefreshService) RefreshInjuries(ctx context.Context) error {
 		playerIDByKey[normalizeKey(p.FirstName+" "+p.LastName)+"|"+p.TeamAbbreviation] = p.ID
 	}
 
-	reports := espn.Normalize(resp, model.LeagueNBA, teamIDByName, abbrevByName, playerIDByKey)
+	reports := espn.Normalize(resp, forLeague, teamIDByName, abbrevByName, playerIDByKey)
 
 	previous, _, _ := s.cache.GetInjuries(ctx, league, false)
 	if err := s.cache.SetInjuries(ctx, league, reports); err != nil {

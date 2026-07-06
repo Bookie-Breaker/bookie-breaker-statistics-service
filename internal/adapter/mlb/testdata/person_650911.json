@@ -1,0 +1,155 @@
+{
+  "copyright": "Copyright 2026 MLB Advanced Media, L.P.  Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt",
+  "people": [
+    {
+      "id": 650911,
+      "fullName": "Cristopher Sánchez",
+      "link": "/api/v1/people/650911",
+      "firstName": "Cristopher",
+      "lastName": "Sánchez",
+      "primaryNumber": "61",
+      "birthDate": "1996-12-12",
+      "currentAge": 29,
+      "birthCity": "La Romana",
+      "birthCountry": "Dominican Republic",
+      "height": "6' 6\"",
+      "weight": 200,
+      "active": true,
+      "primaryPosition": {
+        "code": "1",
+        "name": "Pitcher",
+        "type": "Pitcher",
+        "abbreviation": "P"
+      },
+      "useName": "Cristopher",
+      "useLastName": "Sánchez",
+      "middleName": "Alexis",
+      "boxscoreName": "Sánchez, C",
+      "gender": "M",
+      "nameMatrilineal": "Valera",
+      "isPlayer": true,
+      "isVerified": true,
+      "pronunciation": "KRISS-tuh-furr",
+      "stats": [
+        {
+          "type": {
+            "displayName": "season"
+          },
+          "group": {
+            "displayName": "pitching"
+          },
+          "exemptions": [],
+          "splits": [
+            {
+              "season": "2026",
+              "stat": {
+                "age": 29,
+                "gamesPlayed": 18,
+                "gamesStarted": 18,
+                "groundOuts": 131,
+                "airOuts": 79,
+                "runs": 31,
+                "doubles": 21,
+                "triples": 0,
+                "homeRuns": 8,
+                "strikeOuts": 136,
+                "baseOnBalls": 23,
+                "intentionalWalks": 0,
+                "hits": 104,
+                "hitByPitch": 2,
+                "avg": ".232",
+                "atBats": 448,
+                "obp": ".272",
+                "slg": ".333",
+                "ops": ".605",
+                "caughtStealing": 2,
+                "stolenBases": 4,
+                "stolenBasePercentage": ".667",
+                "caughtStealingPercentage": ".333",
+                "groundIntoDoublePlay": 5,
+                "numberOfPitches": 1717,
+                "era": "2.00",
+                "inningsPitched": "117.0",
+                "wins": 10,
+                "losses": 3,
+                "saves": 0,
+                "saveOpportunities": 0,
+                "holds": 0,
+                "blownSaves": 0,
+                "earnedRuns": 26,
+                "whip": "1.09",
+                "battersFaced": 475,
+                "outs": 351,
+                "gamesPitched": 18,
+                "completeGames": 1,
+                "shutouts": 1,
+                "strikes": 1164,
+                "strikePercentage": ".680",
+                "hitBatsmen": 2,
+                "balks": 0,
+                "wildPitches": 1,
+                "pickoffs": 0,
+                "totalBases": 149,
+                "groundOutsToAirouts": "1.66",
+                "winPercentage": ".769",
+                "pitchesPerInning": "14.68",
+                "gamesFinished": 0,
+                "strikeoutWalkRatio": "5.91",
+                "strikeoutsPer9Inn": "10.46",
+                "walksPer9Inn": "1.77",
+                "hitsPer9Inn": "8.00",
+                "runsScoredPer9": "2.38",
+                "homeRunsPer9": "0.62",
+                "inheritedRunners": 0,
+                "inheritedRunnersScored": 0,
+                "catchersInterference": 0,
+                "sacBunts": 1,
+                "sacFlies": 1
+              },
+              "team": {
+                "id": 143,
+                "name": "Philadelphia Phillies",
+                "link": "/api/v1/teams/143"
+              },
+              "player": {
+                "id": 650911,
+                "fullName": "Cristopher Sánchez",
+                "link": "/api/v1/people/650911"
+              },
+              "league": {
+                "id": 104,
+                "name": "National League",
+                "link": "/api/v1/league/104"
+              },
+              "sport": {
+                "id": 1,
+                "link": "/api/v1/sports/1",
+                "abbreviation": "MLB"
+              },
+              "gameType": "R"
+            }
+          ]
+        }
+      ],
+      "mlbDebutDate": "2021-06-06",
+      "batSide": {
+        "code": "L",
+        "description": "Left"
+      },
+      "pitchHand": {
+        "code": "L",
+        "description": "Left"
+      },
+      "nameFirstLast": "Cristopher Sánchez",
+      "nameSlug": "cristopher-sanchez-650911",
+      "firstLastName": "Cristopher Sánchez",
+      "lastFirstName": "Sánchez, Cristopher",
+      "lastInitName": "Sánchez, C",
+      "initLastName": "C Sánchez",
+      "fullFMLName": "Cristopher Alexis Sánchez",
+      "fullLFMName": "Sánchez, Cristopher Alexis",
+      "strikeZoneTop": 3.478,
+      "strikeZoneBottom": 1.755
+    }
+  ]
+}

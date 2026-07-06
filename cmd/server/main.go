@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espn"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/mlb"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nba"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/ncaabsb"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/soccer"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cache"
@@ -84,8 +86,8 @@ func main() {
 	}
 	seasonYear := func() int { return seasonFor(time.Now().UTC()) }
 
-	// NBA (Wave 0) and soccer (Wave 1) adapters exist; later waves add the
-	// remaining leagues (ADR-026).
+	// NBA (Wave 0), soccer (Wave 1), and baseball (Wave 2) adapters exist;
+	// later waves add the remaining leagues (ADR-026).
 	var soccerClient *soccer.Client
 	providers := make(map[model.League]sportsdata.StatsProvider, len(cfg.LeaguesEnabled))
 	for _, league := range cfg.LeaguesEnabled {
@@ -102,6 +104,10 @@ func main() {
 				os.Exit(1)
 			}
 			providers[league] = soccer.NewProvider(soccerClient, comp)
+		case model.LeagueMLB:
+			providers[league] = mlb.NewProvider(mlb.NewClient(cfg.MLBStatsBaseURL, cfg.NBAHTTPTimeout))
+		case model.LeagueNCAABSB:
+			providers[league] = ncaabsb.NewProvider(ncaabsb.NewClient(cfg.ESPNBaseURL, cfg.NBAHTTPTimeout))
 		default:
 			slog.Error(fmt.Sprintf("no adapter for league %s yet", league))
 			os.Exit(1)
@@ -116,17 +122,31 @@ func main() {
 		})
 	}
 
-	var espnClient *espn.Client
+	// Injuries run per-league through ESPN for every enabled league with an
+	// injuries path (ADR-026 generalizes the ESPN client across leagues).
+	espnInjuryPaths := map[model.League]string{
+		model.LeagueNBA: "basketball/nba",
+		model.LeagueMLB: "baseball/mlb",
+	}
+	espnInjuries := make(map[model.League]*espn.Client)
 	if cfg.InjurySource == "espn" {
-		espnClient = espn.NewClient(cfg.ESPNBaseURL, "basketball/nba", cfg.NBAHTTPTimeout)
-		upstreams = append(upstreams, handler.UpstreamCheck{Source: "espn", Freshness: 2 * cfg.RefreshInjuriesInterval})
+		for _, league := range cfg.LeaguesEnabled {
+			path, ok := espnInjuryPaths[league]
+			if !ok {
+				continue
+			}
+			espnInjuries[league] = espn.NewClient(cfg.ESPNBaseURL, path, cfg.NBAHTTPTimeout)
+		}
+		if len(espnInjuries) > 0 {
+			upstreams = append(upstreams, handler.UpstreamCheck{Source: "espn", Freshness: 2 * cfg.RefreshInjuriesInterval})
+		}
 	} else {
 		slog.Info("injury source disabled; /injuries will return empty reports", "INJURY_SOURCE", cfg.InjurySource)
 	}
 
 	rawRepo := postgres.NewRawResponseRepo(db)
 	publisher := pubsub.NewPublisher(rdb)
-	refresh := service.NewRefreshService(providers, espnClient, statsCache, rawRepo, publisher)
+	refresh := service.NewRefreshService(providers, espnInjuries, statsCache, rawRepo, publisher)
 	watcher := service.NewGameWatcher(refresh, statsCache, publisher)
 	query := service.NewQueryService(statsCache, refresh, cfg.LeaguesEnabled, seasonYear)
 

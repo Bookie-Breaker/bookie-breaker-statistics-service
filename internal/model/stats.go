@@ -48,6 +48,23 @@ type SoccerStats struct {
 	FormPointsLast5       int     `json:"form_points_last5"`
 }
 
+// BaseballStats matches the OpenAPI BaseballStats schema (BASEBALL-sport
+// leagues only; ADR-026). FIP and wOBA are computed in-service from official
+// counting stats using published seasonal constants (see the mlb adapter).
+// Fields a source cannot provide stay zero (documented for NCAA_BSB).
+type BaseballStats struct {
+	RunsScoredPerGame   float64 `json:"runs_scored_per_game"`
+	RunsAllowedPerGame  float64 `json:"runs_allowed_per_game"`
+	TeamWOBA            float64 `json:"team_woba"`
+	TeamOBP             float64 `json:"team_obp"`
+	TeamSLG             float64 `json:"team_slg"`
+	BattingStrikeoutPct float64 `json:"batting_strikeout_pct"`
+	BattingWalkPct      float64 `json:"batting_walk_pct"`
+	TeamERA             float64 `json:"team_era"`
+	TeamFIP             float64 `json:"team_fip"`
+	BullpenERA          float64 `json:"bullpen_era"`
+}
+
 // SplitRecord matches the OpenAPI SplitRecord schema.
 type SplitRecord struct {
 	Wins                 int     `json:"wins"`
@@ -59,12 +76,13 @@ type SplitRecord struct {
 // StatBlocks groups the stat categories; fields are pointers so the
 // stat_type filter can omit whole blocks. Basketball leagues populate the
 // offensive/defensive/advanced blocks; soccer leagues populate only the
-// soccer block (ADR-026).
+// soccer block and baseball leagues only the baseball block (ADR-026).
 type StatBlocks struct {
 	Offensive *OffensiveStats `json:"offensive,omitempty"`
 	Defensive *DefensiveStats `json:"defensive,omitempty"`
 	Advanced  *AdvancedStats  `json:"advanced,omitempty"`
 	Soccer    *SoccerStats    `json:"soccer,omitempty"`
+	Baseball  *BaseballStats  `json:"baseball,omitempty"`
 }
 
 // HomeAwaySplits groups home/road records.
