@@ -1,0 +1,66 @@
+{
+  "sports": [
+    {
+      "leagues": [
+        {
+          "teams": [
+            {
+              "team": {
+                "id": "150",
+                "displayName": "Duke Blue Devils",
+                "abbreviation": "DUKE",
+                "location": "Duke",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "356",
+                "displayName": "Illinois Fighting Illini",
+                "abbreviation": "ILL",
+                "location": "Illinois",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "2509",
+                "displayName": "Purdue Boilermakers",
+                "abbreviation": "PUR",
+                "location": "Purdue",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "41",
+                "displayName": "UConn Huskies",
+                "abbreviation": "CONN",
+                "location": "UConn",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "222",
+                "displayName": "Villanova Wildcats",
+                "abbreviation": "VILL",
+                "location": "Villanova",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "154",
+                "displayName": "Wake Forest Demon Deacons",
+                "abbreviation": "WAKE",
+                "location": "Wake Forest",
+                "isActive": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

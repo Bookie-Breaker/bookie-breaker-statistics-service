@@ -30,6 +30,10 @@ type AdvancedStats struct {
 	TrueShootingPct     float64 `json:"true_shooting_pct"`
 	TurnoverPct         float64 `json:"turnover_pct"`
 	OffensiveReboundPct float64 `json:"offensive_rebound_pct"`
+	// AdjustedEfficiencyMargin is the opponent-adjusted efficiency margin
+	// (NCAA_BB via CBBD; ADR-026). Absent for leagues without an
+	// adjusted-ratings source, so it stays omitted when zero.
+	AdjustedEfficiencyMargin float64 `json:"adjusted_efficiency_margin,omitempty"`
 }
 
 // SoccerStats matches the OpenAPI SoccerStats schema (SOCCER-sport leagues
@@ -83,6 +87,21 @@ type FootballStats struct {
 	SPPlusRating          float64 `json:"sp_plus_rating"`
 }
 
+// HockeyStats matches the OpenAPI HockeyStats schema (HOCKEY-sport leagues
+// only; ADR-026). Per-game rates and special-teams percentages come straight
+// from the NHL team-summary stats endpoint; team_save_pct is computed
+// in-service as 1 - goals_against / shots_against (the endpoint carries no
+// save-percentage field). Percentages are fractions in [0,1].
+type HockeyStats struct {
+	GoalsForPerGame     float64 `json:"goals_for_per_game"`
+	GoalsAgainstPerGame float64 `json:"goals_against_per_game"`
+	ShotsForPerGame     float64 `json:"shots_for_per_game"`
+	ShotsAgainstPerGame float64 `json:"shots_against_per_game"`
+	PowerPlayPct        float64 `json:"power_play_pct"`
+	PenaltyKillPct      float64 `json:"penalty_kill_pct"`
+	TeamSavePct         float64 `json:"team_save_pct"`
+}
+
 // SplitRecord matches the OpenAPI SplitRecord schema.
 type SplitRecord struct {
 	Wins                 int     `json:"wins"`
@@ -93,8 +112,8 @@ type SplitRecord struct {
 
 // StatBlocks groups the stat categories; fields are pointers so the
 // stat_type filter can omit whole blocks. Basketball leagues populate the
-// offensive/defensive/advanced blocks; soccer, baseball, and football
-// leagues populate only their sport's block (ADR-026).
+// offensive/defensive/advanced blocks; soccer, baseball, football, and
+// hockey leagues populate only their sport's block (ADR-026).
 type StatBlocks struct {
 	Offensive *OffensiveStats `json:"offensive,omitempty"`
 	Defensive *DefensiveStats `json:"defensive,omitempty"`
@@ -102,6 +121,7 @@ type StatBlocks struct {
 	Soccer    *SoccerStats    `json:"soccer,omitempty"`
 	Baseball  *BaseballStats  `json:"baseball,omitempty"`
 	Football  *FootballStats  `json:"football,omitempty"`
+	Hockey    *HockeyStats    `json:"hockey,omitempty"`
 }
 
 // HomeAwaySplits groups home/road records.

@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "id": 21,
+      "triCode": "COL",
+      "fullName": "Colorado Avalanche"
+    },
+    {
+      "id": 15,
+      "triCode": "WSH",
+      "fullName": "Washington Capitals"
+    },
+    {
+      "id": 6,
+      "triCode": "BOS",
+      "fullName": "Boston Bruins"
+    },
+    {
+      "id": 10,
+      "triCode": "TOR",
+      "fullName": "Toronto Maple Leafs"
+    }
+  ],
+  "total": 4
+}

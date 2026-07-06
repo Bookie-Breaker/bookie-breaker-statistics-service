@@ -1,0 +1,61 @@
+{
+  "data": [
+    {
+      "teamId": 15,
+      "teamFullName": "Washington Capitals",
+      "gamesPlayed": 82,
+      "wins": 43,
+      "losses": 30,
+      "goalsAgainst": 238,
+      "goalsForPerGame": 3.18292,
+      "goalsAgainstPerGame": 2.90243,
+      "shotsForPerGame": 28.04878,
+      "shotsAgainstPerGame": 28.13414,
+      "powerPlayPct": 0.178423,
+      "penaltyKillPct": 0.800797
+    },
+    {
+      "teamId": 21,
+      "teamFullName": "Colorado Avalanche",
+      "gamesPlayed": 82,
+      "wins": 55,
+      "losses": 16,
+      "goalsAgainst": 197,
+      "goalsForPerGame": 3.63414,
+      "goalsAgainstPerGame": 2.40243,
+      "shotsForPerGame": 33.7317,
+      "shotsAgainstPerGame": 26.13414,
+      "powerPlayPct": 0.171102,
+      "penaltyKillPct": 0.846154
+    },
+    {
+      "teamId": 6,
+      "teamFullName": "Boston Bruins",
+      "gamesPlayed": 82,
+      "wins": 45,
+      "losses": 27,
+      "goalsAgainst": 247,
+      "goalsForPerGame": 3.26829,
+      "goalsAgainstPerGame": 3.01219,
+      "shotsForPerGame": 27.02439,
+      "shotsAgainstPerGame": 29.69512,
+      "powerPlayPct": 0.234042,
+      "penaltyKillPct": 0.769785
+    },
+    {
+      "teamId": 10,
+      "teamFullName": "Toronto Maple Leafs",
+      "gamesPlayed": 82,
+      "wins": 32,
+      "losses": 36,
+      "goalsAgainst": 295,
+      "goalsForPerGame": 3.07317,
+      "goalsAgainstPerGame": 3.59756,
+      "shotsForPerGame": 26.32926,
+      "shotsAgainstPerGame": 32.43902,
+      "powerPlayPct": 0.213197,
+      "penaltyKillPct": 0.812228
+    }
+  ],
+  "total": 4
+}

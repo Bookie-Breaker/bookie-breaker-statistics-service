@@ -1,0 +1,220 @@
+{
+  "games": [
+    {
+      "id": 2025020181,
+      "season": 20252026,
+      "gameType": 2,
+      "startTimeUTC": "2025-11-01T17:00:00Z",
+      "gameState": "OFF",
+      "gameScheduleState": "OK",
+      "venue": {
+        "default": "TD Garden"
+      },
+      "awayTeam": {
+        "id": 12,
+        "name": {
+          "default": "Hurricanes"
+        },
+        "abbrev": "CAR",
+        "score": 1
+      },
+      "homeTeam": {
+        "id": 6,
+        "name": {
+          "default": "Bruins"
+        },
+        "abbrev": "BOS",
+        "score": 2
+      },
+      "periodDescriptor": {
+        "number": 3,
+        "periodType": "REG",
+        "maxRegulationPeriods": 3
+      },
+      "gameOutcome": {
+        "lastPeriodType": "REG"
+      },
+      "goals": [
+        {
+          "teamAbbrev": "BOS",
+          "periodDescriptor": {
+            "number": 3,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "BOS",
+          "periodDescriptor": {
+            "number": 3,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "CAR",
+          "periodDescriptor": {
+            "number": 3,
+            "periodType": "REG"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2025020184,
+      "season": 20252026,
+      "gameType": 2,
+      "startTimeUTC": "2025-11-01T20:00:00Z",
+      "gameState": "OFF",
+      "gameScheduleState": "OK",
+      "venue": {
+        "default": "SAP Center at San Jose"
+      },
+      "awayTeam": {
+        "id": 21,
+        "name": {
+          "default": "Avalanche"
+        },
+        "abbrev": "COL",
+        "score": 2
+      },
+      "homeTeam": {
+        "id": 28,
+        "name": {
+          "default": "Sharks"
+        },
+        "abbrev": "SJS",
+        "score": 3
+      },
+      "periodDescriptor": {
+        "number": 4,
+        "periodType": "OT",
+        "maxRegulationPeriods": 3
+      },
+      "gameOutcome": {
+        "lastPeriodType": "OT"
+      },
+      "goals": [
+        {
+          "teamAbbrev": "COL",
+          "periodDescriptor": {
+            "number": 1,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "SJS",
+          "periodDescriptor": {
+            "number": 1,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "SJS",
+          "periodDescriptor": {
+            "number": 2,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "COL",
+          "periodDescriptor": {
+            "number": 2,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "SJS",
+          "periodDescriptor": {
+            "number": 4,
+            "periodType": "OT"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2025020185,
+      "season": 20252026,
+      "gameType": 2,
+      "startTimeUTC": "2025-11-01T22:00:00Z",
+      "gameState": "OFF",
+      "gameScheduleState": "OK",
+      "venue": {
+        "default": "Amerant Bank Arena"
+      },
+      "awayTeam": {
+        "id": 25,
+        "name": {
+          "default": "Stars"
+        },
+        "abbrev": "DAL",
+        "score": 3
+      },
+      "homeTeam": {
+        "id": 13,
+        "name": {
+          "default": "Panthers"
+        },
+        "abbrev": "FLA",
+        "score": 4
+      },
+      "periodDescriptor": {
+        "number": 5,
+        "periodType": "SO",
+        "maxRegulationPeriods": 3
+      },
+      "gameOutcome": {
+        "lastPeriodType": "SO"
+      },
+      "goals": [
+        {
+          "teamAbbrev": "FLA",
+          "periodDescriptor": {
+            "number": 2,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "FLA",
+          "periodDescriptor": {
+            "number": 2,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "DAL",
+          "periodDescriptor": {
+            "number": 2,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "DAL",
+          "periodDescriptor": {
+            "number": 2,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "FLA",
+          "periodDescriptor": {
+            "number": 3,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "DAL",
+          "periodDescriptor": {
+            "number": 3,
+            "periodType": "REG"
+          }
+        },
+        {
+          "teamAbbrev": "FLA",
+          "periodDescriptor": {
+            "number": 5,
+            "periodType": "SO"
+          }
+        }
+      ]
+    }
+  ]
+}
