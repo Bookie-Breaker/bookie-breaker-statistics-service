@@ -1,0 +1,253 @@
+{
+  "events": [
+    {
+      "id": "401752921",
+      "date": "2025-11-29T17:00Z",
+      "name": "Ohio State Buckeyes at Michigan Wolverines",
+      "season": {
+        "year": 2025,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "status": {
+        "period": 4,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "Michigan Stadium"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "9",
+              "team": {
+                "id": "130",
+                "displayName": "Michigan Wolverines",
+                "abbreviation": "MICH",
+                "location": "Michigan",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 6.0
+                },
+                {
+                  "value": 3.0
+                },
+                {
+                  "value": 0.0
+                },
+                {
+                  "value": 0.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "27",
+              "team": {
+                "id": "194",
+                "displayName": "Ohio State Buckeyes",
+                "abbreviation": "OSU",
+                "location": "Ohio State",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 3.0
+                },
+                {
+                  "value": 14.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 3.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401757315",
+      "date": "2025-11-29T20:00Z",
+      "name": "Middle Tennessee Blue Raiders at New Mexico State Aggies",
+      "season": {
+        "year": 2025,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "status": {
+        "period": 5,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "Aggie Memorial Stadium"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "24",
+              "team": {
+                "id": "166",
+                "displayName": "New Mexico State Aggies",
+                "abbreviation": "NMSU",
+                "location": "New Mexico State",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 0.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 10.0
+                },
+                {
+                  "value": 0.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "31",
+              "team": {
+                "id": "2393",
+                "displayName": "Middle Tennessee Blue Raiders",
+                "abbreviation": "MTSU",
+                "location": "Middle Tennessee",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 3.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 7.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401757313",
+      "date": "2025-11-29T20:30Z",
+      "name": "Kennesaw State Owls at Liberty Flames",
+      "season": {
+        "year": 2025,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "status": {
+        "period": 6,
+        "type": {
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true
+        }
+      },
+      "competitions": [
+        {
+          "venue": {
+            "fullName": "Williams Stadium (VA)"
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "42",
+              "team": {
+                "id": "2335",
+                "displayName": "Liberty Flames",
+                "abbreviation": "LIB",
+                "location": "Liberty",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 14.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 0.0
+                }
+              ]
+            },
+            {
+              "homeAway": "away",
+              "score": "48",
+              "team": {
+                "id": "338",
+                "displayName": "Kennesaw State Owls",
+                "abbreviation": "KENN",
+                "location": "Kennesaw State",
+                "isActive": true
+              },
+              "linescores": [
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 14.0
+                },
+                {
+                  "value": 7.0
+                },
+                {
+                  "value": 6.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

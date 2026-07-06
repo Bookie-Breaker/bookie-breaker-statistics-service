@@ -9,10 +9,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/cfbd"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espn"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espnfb"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/mlb"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nba"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/ncaabsb"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nfl"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/soccer"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cache"
@@ -86,9 +89,16 @@ func main() {
 	}
 	seasonYear := func() int { return seasonFor(time.Now().UTC()) }
 
-	// NBA (Wave 0), soccer (Wave 1), and baseball (Wave 2) adapters exist;
-	// later waves add the remaining leagues (ADR-026).
+	// NBA (Wave 0), soccer (Wave 1), baseball (Wave 2), and football (Wave 3)
+	// adapters exist; later waves add the remaining leagues (ADR-026).
 	var soccerClient *soccer.Client
+	var espnFBClient *espnfb.Client
+	espnFootball := func() *espnfb.Client {
+		if espnFBClient == nil {
+			espnFBClient = espnfb.NewClient(cfg.ESPNBaseURL, cfg.NBAHTTPTimeout)
+		}
+		return espnFBClient
+	}
 	providers := make(map[model.League]sportsdata.StatsProvider, len(cfg.LeaguesEnabled))
 	for _, league := range cfg.LeaguesEnabled {
 		switch league {
@@ -108,6 +118,10 @@ func main() {
 			providers[league] = mlb.NewProvider(mlb.NewClient(cfg.MLBStatsBaseURL, cfg.NBAHTTPTimeout))
 		case model.LeagueNCAABSB:
 			providers[league] = ncaabsb.NewProvider(ncaabsb.NewClient(cfg.ESPNBaseURL, cfg.NBAHTTPTimeout))
+		case model.LeagueNFL:
+			providers[league] = nfl.NewProvider(espnFootball(), nfl.NewNFLVerseClient(cfg.NFLVerseBaseURL, cfg.NBAHTTPTimeout))
+		case model.LeagueNCAAFB:
+			providers[league] = cfbd.NewProvider(espnFootball(), cfbd.NewClient(cfg.CFBDBaseURL, cfg.CFBDAPIKey, cfg.NBAHTTPTimeout))
 		default:
 			slog.Error(fmt.Sprintf("no adapter for league %s yet", league))
 			os.Exit(1)

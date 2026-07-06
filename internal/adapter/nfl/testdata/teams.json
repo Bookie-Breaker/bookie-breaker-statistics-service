@@ -1,0 +1,48 @@
+{
+  "sports": [
+    {
+      "leagues": [
+        {
+          "teams": [
+            {
+              "team": {
+                "id": "2",
+                "displayName": "Buffalo Bills",
+                "abbreviation": "BUF",
+                "location": "Buffalo",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "15",
+                "displayName": "Miami Dolphins",
+                "abbreviation": "MIA",
+                "location": "Miami",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "17",
+                "displayName": "New England Patriots",
+                "abbreviation": "NE",
+                "location": "New England",
+                "isActive": true
+              }
+            },
+            {
+              "team": {
+                "id": "20",
+                "displayName": "New York Jets",
+                "abbreviation": "NYJ",
+                "location": "New York",
+                "isActive": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

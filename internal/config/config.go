@@ -28,6 +28,16 @@ type Config struct {
 
 	MLBStatsBaseURL string
 
+	// NFLVerseBaseURL is the nflverse static CSV release download base URL
+	// (the GitHub releases download host); NFL season EPA and turnover
+	// aggregates come from its team-week files.
+	NFLVerseBaseURL string
+	// CFBDBaseURL and CFBDAPIKey configure the CollegeFootballData API behind
+	// NCAA_FB season stats. The key is optional: without it NCAA_FB runs
+	// watcher-only (empty season stats).
+	CFBDBaseURL string
+	CFBDAPIKey  string
+
 	RefreshTeamStatsInterval time.Duration
 	RefreshRostersInterval   time.Duration
 	RefreshScheduleInterval  time.Duration
@@ -77,6 +87,10 @@ func Load() (*Config, error) {
 		ESPNBaseURL:  getEnv("ESPN_BASE_URL", "https://site.api.espn.com"),
 
 		MLBStatsBaseURL: getEnv("MLB_STATS_BASE_URL", "https://statsapi.mlb.com/api/v1"),
+
+		NFLVerseBaseURL: getEnv("NFLVERSE_BASE_URL", "https://github.com/nflverse/nflverse-data/releases/download"),
+		CFBDBaseURL:     getEnv("CFBD_BASE_URL", "https://api.collegefootballdata.com"),
+		CFBDAPIKey:      getEnv("CFBD_API_KEY", ""),
 
 		RefreshTeamStatsInterval: getEnvDuration("REFRESH_TEAM_STATS_INTERVAL", 6*time.Hour),
 		RefreshRostersInterval:   getEnvDuration("REFRESH_ROSTERS_INTERVAL", 12*time.Hour),
