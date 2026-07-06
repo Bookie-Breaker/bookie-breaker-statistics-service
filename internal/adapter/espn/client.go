@@ -1,6 +1,7 @@
-// Package espn fetches NBA injury reports from ESPN's public site API.
-// stats.nba.com has no injury endpoint (the official report is a PDF);
-// ADR-008 names ESPN as the injuries fallback source. The adapter is
+// Package espn fetches injury reports from ESPN's public site API for any
+// league with an injuries path (NBA per ADR-008 — stats.nba.com has no
+// injury endpoint — and MLB since Phase 6 Wave 2; ADR-026 generalizes the
+// client across leagues via per-league sport paths). The adapter is
 // best-effort: failures degrade to an empty report, never an error page.
 package espn
 

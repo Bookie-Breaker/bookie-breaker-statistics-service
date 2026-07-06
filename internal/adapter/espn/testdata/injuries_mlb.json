@@ -1,0 +1,1780 @@
+{
+  "timestamp": "2026-07-06T03:48:56Z",
+  "status": "success",
+  "season": {
+    "year": 2026,
+    "type": 2,
+    "name": "Regular Season",
+    "displayName": "2026"
+  },
+  "injuries": [
+    {
+      "id": "19",
+      "displayName": "Los Angeles Dodgers",
+      "injuries": [
+        {
+          "id": "1013070",
+          "longComment": "During his most recent outing Tuesday, Knack built up to 2.2 innings and 50 pitches (30 strikes) while striking out four batters and allowing no runs on one hit and one walk. He'll look to build up his pitch count a bit more Sunday and will likely require one more rehab start beyond that before potentially returning from the 60-day injured list coming out of the All-Star break. The Dodgers aren't expected to have a rotation spot available for Knack, but he could join the big club as a long reliever if he isn't optioned to Triple-A upon his activation from the IL.",
+          "shortComment": "Knack (intercostal) will make his third rehab start Sunday with Triple-A Oklahoma City.",
+          "status": "60-Day-IL",
+          "date": "2026-07-05T22:50Z",
+          "athlete": {
+            "firstName": "Landon",
+            "lastName": "Knack",
+            "displayName": "Landon Knack",
+            "shortName": "L. Knack",
+            "links": [
+              {
+                "language": "en-US",
+                "rel": ["playercard", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/_/id/4417826",
+                "text": "Player Card",
+                "shortText": "Player Card",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["stats", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/stats/_/id/4417826/landon-knack",
+                "text": "Stats",
+                "shortText": "Stats",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["stats", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:4417826&section=stats",
+                "text": "Stats",
+                "shortText": "Stats",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["splits", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/splits/_/id/4417826/landon-knack",
+                "text": "Splits",
+                "shortText": "Splits",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["gamelog", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/gamelog/_/id/4417826/landon-knack",
+                "text": "Game Log",
+                "shortText": "Game Log",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["gamelog", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:4417826&section=gamelog",
+                "text": "Game Log",
+                "shortText": "Game Log",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["news", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/news/_/id/4417826/landon-knack",
+                "text": "News",
+                "shortText": "News",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["news", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:4417826&section=news",
+                "text": "News",
+                "shortText": "News",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["bio", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/bio/_/id/4417826/landon-knack",
+                "text": "Bio",
+                "shortText": "Bio",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["bio", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:4417826&section=bio",
+                "text": "Bio",
+                "shortText": "Bio",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["overview", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/_/id/4417826/landon-knack",
+                "text": "Overview",
+                "shortText": "Overview",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["overview", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:4417826",
+                "text": "Overview",
+                "shortText": "Overview",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["batvspitch", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/batvspitch/_/id/4417826/landon-knack",
+                "text": "Bat vs Pitch",
+                "shortText": "Bat vs Pitch",
+                "isExternal": false,
+                "isPremium": false
+              }
+            ],
+            "headshot": {
+              "href": "https://a.espncdn.com/i/headshots/mlb/players/full/4417826.png",
+              "alt": "Landon Knack"
+            },
+            "position": {
+              "id": "15",
+              "name": "Starting Pitcher",
+              "displayName": "Starting Pitcher",
+              "abbreviation": "SP",
+              "leaf": true
+            },
+            "team": {
+              "id": "19",
+              "uid": "s:1~l:10~t:19",
+              "slug": "los-angeles-dodgers",
+              "name": "Dodgers",
+              "abbreviation": "LAD",
+              "displayName": "Los Angeles Dodgers",
+              "logos": [
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500/lad.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "default"],
+                  "lastUpdated": "2024-07-01T17:48Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500-dark/lad.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "dark"],
+                  "lastUpdated": "2024-07-01T17:49Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/lad.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "scoreboard"],
+                  "lastUpdated": "2024-07-01T17:48Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500-dark/scoreboard/lad.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "scoreboard", "dark"],
+                  "lastUpdated": "2024-07-01T17:49Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_on_white_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_white_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_on_black_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_black_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_on_primary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_primary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_on_secondary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_secondary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_black.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_black"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_white.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_white"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_on_white_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_white_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_on_black_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_black_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_on_primary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_primary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_on_secondary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_secondary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_black.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_black"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_white.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_white"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                }
+              ],
+              "links": [
+                {
+                  "language": "en-US",
+                  "rel": ["clubhouse", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/_/name/lad/los-angeles-dodgers",
+                  "text": "Clubhouse",
+                  "shortText": "Clubhouse",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["roster", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/roster/_/name/lad/los-angeles-dodgers",
+                  "text": "Roster",
+                  "shortText": "Roster",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["roster", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:19&section=roster",
+                  "text": "Roster",
+                  "shortText": "Roster",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["stats", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/stats/_/name/lad/los-angeles-dodgers",
+                  "text": "Statistics",
+                  "shortText": "Statistics",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["stats", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:19&section=stats",
+                  "text": "Statistics",
+                  "shortText": "Statistics",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["schedule", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/schedule/_/name/lad",
+                  "text": "Schedule",
+                  "shortText": "Schedule",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["schedule", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:19&section=scores",
+                  "text": "Schedule",
+                  "shortText": "Schedule",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["photos", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/photos/_/name/lad",
+                  "text": "photos",
+                  "shortText": "photos",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["tickets", "desktop", "team"],
+                  "href": "https://www.vividseats.com/los-angeles-dodgers-tickets--sports-mlb-baseball/performer/481?wsUser=717",
+                  "text": "Tickets",
+                  "shortText": "Tickets",
+                  "isExternal": true,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["transactions", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/transactions/_/name/lad",
+                  "text": "Transactions",
+                  "shortText": "Transactions",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["injuries", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/injuries/_/name/lad",
+                  "text": "Injuries",
+                  "shortText": "Injuries",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["depthchart", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/depth/_/name/lad",
+                  "text": "Depth Chart",
+                  "shortText": "Depth Chart",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["depthchart", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:19&section=depthchart",
+                  "text": "Depth Chart",
+                  "shortText": "Depth Chart",
+                  "isExternal": false,
+                  "isPremium": false
+                }
+              ]
+            },
+            "notes": {
+              "items": [
+                {
+                  "id": "1013070",
+                  "type": "news",
+                  "date": "2026-07-05T22:50Z",
+                  "headline": "Knack (intercostal) will make his third rehab start Sunday with Triple-A Oklahoma City.",
+                  "text": "During his most recent outing Tuesday, Knack built up to 2.2 innings and 50 pitches (30 strikes) while striking out four batters and allowing no runs on one hit and one walk. He'll look to build up his pitch count a bit more Sunday and will likely require one more rehab start beyond that before potentially returning from the 60-day injured list coming out of the All-Star break. The Dodgers aren't expected to have a rotation spot available for Knack, but he could join the big club as a long reliever if he isn't optioned to Triple-A upon his activation from the IL.",
+                  "source": "RotoWire"
+                }
+              ]
+            },
+            "status": {
+              "id": "10",
+              "name": "Injured/60",
+              "type": "injured60",
+              "abbreviation": "IL60"
+            }
+          },
+          "source": {
+            "id": "1",
+            "description": "basic/manual",
+            "state": "basic"
+          },
+          "type": {
+            "id": "11",
+            "name": "INJURY_STATUS_60DAYIL",
+            "description": "60-day IL",
+            "abbreviation": "IL60"
+          },
+          "details": {
+            "fantasyStatus": {
+              "description": "60-Day IL",
+              "abbreviation": "60-Day IL"
+            },
+            "type": "Chest",
+            "detail": "Strain",
+            "side": "Not Specified",
+            "returnDate": "2026-07-17"
+          }
+        },
+        {
+          "id": "1013068",
+          "longComment": "Hernandez's ability to face live pitching about five and a half weeks after suffering what the Dodgers termed as a \"significant tear\" of his left oblique represents a major step forward in his recovery process. The Dodgers will likely check back in with Hernandez on Monday before mapping out his next steps in the recovery process, but he could soon be ready to head out on a minor-league rehab assignment. Hernandez isn't on track to be activated from the 10-day injured list prior to the All-Star break but looks to have a shot at rejoining the Dodgers before the end of July.",
+          "shortComment": "Hernandez (oblique) took live batting practice against rehabbing teammate Edwin Diaz (elbow) on Sunday, Katie Woo of The Athletic reports.",
+          "status": "10-Day-IL",
+          "date": "2026-07-05T22:41Z",
+          "athlete": {
+            "firstName": "Enrique",
+            "lastName": "Hernandez",
+            "displayName": "Enrique Hernandez",
+            "shortName": "E. Hernandez",
+            "links": [
+              {
+                "language": "en-US",
+                "rel": ["playercard", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/_/id/31358",
+                "text": "Player Card",
+                "shortText": "Player Card",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["stats", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/stats/_/id/31358/enrique-hernandez",
+                "text": "Stats",
+                "shortText": "Stats",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["stats", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:31358&section=stats",
+                "text": "Stats",
+                "shortText": "Stats",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["splits", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/splits/_/id/31358/enrique-hernandez",
+                "text": "Splits",
+                "shortText": "Splits",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["gamelog", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/gamelog/_/id/31358/enrique-hernandez",
+                "text": "Game Log",
+                "shortText": "Game Log",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["gamelog", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:31358&section=gamelog",
+                "text": "Game Log",
+                "shortText": "Game Log",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["news", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/news/_/id/31358/enrique-hernandez",
+                "text": "News",
+                "shortText": "News",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["news", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:31358&section=news",
+                "text": "News",
+                "shortText": "News",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["bio", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/bio/_/id/31358/enrique-hernandez",
+                "text": "Bio",
+                "shortText": "Bio",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["bio", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:31358&section=bio",
+                "text": "Bio",
+                "shortText": "Bio",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["overview", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/_/id/31358/enrique-hernandez",
+                "text": "Overview",
+                "shortText": "Overview",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["overview", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:31358",
+                "text": "Overview",
+                "shortText": "Overview",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["batvspitch", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/batvspitch/_/id/31358/enrique-hernandez",
+                "text": "Bat vs Pitch",
+                "shortText": "Bat vs Pitch",
+                "isExternal": false,
+                "isPremium": false
+              }
+            ],
+            "headshot": {
+              "href": "https://a.espncdn.com/i/headshots/mlb/players/full/31358.png",
+              "alt": "Enrique Hernandez"
+            },
+            "position": {
+              "id": "3",
+              "name": "First Base",
+              "displayName": "First Baseman",
+              "abbreviation": "1B",
+              "leaf": true
+            },
+            "team": {
+              "id": "19",
+              "uid": "s:1~l:10~t:19",
+              "slug": "los-angeles-dodgers",
+              "name": "Dodgers",
+              "abbreviation": "LAD",
+              "displayName": "Los Angeles Dodgers",
+              "logos": [
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500/lad.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "default"],
+                  "lastUpdated": "2024-07-01T17:48Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500-dark/lad.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "dark"],
+                  "lastUpdated": "2024-07-01T17:49Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/lad.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "scoreboard"],
+                  "lastUpdated": "2024-07-01T17:48Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500-dark/scoreboard/lad.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "scoreboard", "dark"],
+                  "lastUpdated": "2024-07-01T17:49Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_on_white_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_white_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_on_black_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_black_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_on_primary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_primary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_on_secondary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_secondary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_black.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_black"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_white.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_white"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_on_white_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_white_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_on_black_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_black_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_on_primary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_primary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_on_secondary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_secondary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_black.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_black"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/secondary_logo_white.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_white"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                }
+              ],
+              "links": [
+                {
+                  "language": "en-US",
+                  "rel": ["clubhouse", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/_/name/lad/los-angeles-dodgers",
+                  "text": "Clubhouse",
+                  "shortText": "Clubhouse",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["roster", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/roster/_/name/lad/los-angeles-dodgers",
+                  "text": "Roster",
+                  "shortText": "Roster",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["roster", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:19&section=roster",
+                  "text": "Roster",
+                  "shortText": "Roster",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["stats", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/stats/_/name/lad/los-angeles-dodgers",
+                  "text": "Statistics",
+                  "shortText": "Statistics",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["stats", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:19&section=stats",
+                  "text": "Statistics",
+                  "shortText": "Statistics",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["schedule", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/schedule/_/name/lad",
+                  "text": "Schedule",
+                  "shortText": "Schedule",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["schedule", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:19&section=scores",
+                  "text": "Schedule",
+                  "shortText": "Schedule",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["photos", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/photos/_/name/lad",
+                  "text": "photos",
+                  "shortText": "photos",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["tickets", "desktop", "team"],
+                  "href": "https://www.vividseats.com/los-angeles-dodgers-tickets--sports-mlb-baseball/performer/481?wsUser=717",
+                  "text": "Tickets",
+                  "shortText": "Tickets",
+                  "isExternal": true,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["transactions", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/transactions/_/name/lad",
+                  "text": "Transactions",
+                  "shortText": "Transactions",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["injuries", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/injuries/_/name/lad",
+                  "text": "Injuries",
+                  "shortText": "Injuries",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["depthchart", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/depth/_/name/lad",
+                  "text": "Depth Chart",
+                  "shortText": "Depth Chart",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["depthchart", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:19&section=depthchart",
+                  "text": "Depth Chart",
+                  "shortText": "Depth Chart",
+                  "isExternal": false,
+                  "isPremium": false
+                }
+              ]
+            },
+            "notes": {
+              "items": [
+                {
+                  "id": "1013068",
+                  "type": "news",
+                  "date": "2026-07-05T22:41Z",
+                  "headline": "Hernandez (oblique) took live batting practice against rehabbing teammate Edwin Diaz (elbow) on Sunday, Katie Woo of The Athletic reports.",
+                  "text": "Hernandez's ability to face live pitching about five and a half weeks after suffering what the Dodgers termed as a \"significant tear\" of his left oblique represents a major step forward in his recovery process. The Dodgers will likely check back in with Hernandez on Monday before mapping out his next steps in the recovery process, but he could soon be ready to head out on a minor-league rehab assignment. Hernandez isn't on track to be activated from the 10-day injured list prior to the All-Star break but looks to have a shot at rejoining the Dodgers before the end of July.",
+                  "source": "RotoWire"
+                }
+              ]
+            },
+            "status": {
+              "id": "3",
+              "name": "Injured",
+              "type": "injured",
+              "abbreviation": "IL"
+            }
+          },
+          "source": {
+            "id": "1",
+            "description": "basic/manual",
+            "state": "basic"
+          },
+          "type": {
+            "id": "14",
+            "name": "INJURY_STATUS_10DAYIL",
+            "description": "10-day IL",
+            "abbreviation": "IL10"
+          },
+          "details": {
+            "fantasyStatus": {
+              "description": "10-Day IL",
+              "abbreviation": "10-Day IL"
+            },
+            "type": "Oblique",
+            "detail": "Strain",
+            "side": "Left",
+            "returnDate": "2026-07-24"
+          }
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "displayName": "New York Yankees",
+      "injuries": [
+        {
+          "id": "1013039",
+          "longComment": "The second baseman went 1-for-2 and was caught stealing before departing Sunday's contest prior to the sixth inning. It appears Chisholm has avoided a serious injury, so he should be considered day-to-day heading into Monday's series opener at Tampa Bay.",
+          "shortComment": "Chisholm was diagnosed with right big toe discomfort after leaving Sunday's game against the Twins and having X-rays come back negative.",
+          "status": "Day-To-Day",
+          "date": "2026-07-05T20:22Z",
+          "athlete": {
+            "firstName": "Jazz",
+            "lastName": "Chisholm Jr.",
+            "displayName": "Jazz Chisholm Jr.",
+            "shortName": "J. Chisholm Jr.",
+            "links": [
+              {
+                "language": "en-US",
+                "rel": ["playercard", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/_/id/41433",
+                "text": "Player Card",
+                "shortText": "Player Card",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["stats", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/stats/_/id/41433/jazz-chisholm-jr",
+                "text": "Stats",
+                "shortText": "Stats",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["stats", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:41433&section=stats",
+                "text": "Stats",
+                "shortText": "Stats",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["splits", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/splits/_/id/41433/jazz-chisholm-jr",
+                "text": "Splits",
+                "shortText": "Splits",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["gamelog", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/gamelog/_/id/41433/jazz-chisholm-jr",
+                "text": "Game Log",
+                "shortText": "Game Log",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["gamelog", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:41433&section=gamelog",
+                "text": "Game Log",
+                "shortText": "Game Log",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["news", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/news/_/id/41433/jazz-chisholm-jr",
+                "text": "News",
+                "shortText": "News",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["news", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:41433&section=news",
+                "text": "News",
+                "shortText": "News",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["bio", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/bio/_/id/41433/jazz-chisholm-jr",
+                "text": "Bio",
+                "shortText": "Bio",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["bio", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:41433&section=bio",
+                "text": "Bio",
+                "shortText": "Bio",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["overview", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/_/id/41433/jazz-chisholm-jr",
+                "text": "Overview",
+                "shortText": "Overview",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["overview", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:41433",
+                "text": "Overview",
+                "shortText": "Overview",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["batvspitch", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/batvspitch/_/id/41433/jazz-chisholm-jr",
+                "text": "Bat vs Pitch",
+                "shortText": "Bat vs Pitch",
+                "isExternal": false,
+                "isPremium": false
+              }
+            ],
+            "headshot": {
+              "href": "https://a.espncdn.com/i/headshots/mlb/players/full/41433.png",
+              "alt": "Jazz Chisholm Jr."
+            },
+            "position": {
+              "id": "4",
+              "name": "Second Base",
+              "displayName": "Second Baseman",
+              "abbreviation": "2B",
+              "leaf": true
+            },
+            "team": {
+              "id": "10",
+              "uid": "s:1~l:10~t:10",
+              "slug": "new-york-yankees",
+              "name": "Yankees",
+              "abbreviation": "NYY",
+              "displayName": "New York Yankees",
+              "logos": [
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500/nyy.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "default"],
+                  "lastUpdated": "2024-07-01T17:48Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500-dark/nyy.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "dark"],
+                  "lastUpdated": "2024-07-01T17:49Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/nyy.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "scoreboard"],
+                  "lastUpdated": "2024-07-01T17:48Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500-dark/scoreboard/nyy.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "scoreboard", "dark"],
+                  "lastUpdated": "2024-07-01T17:49Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_on_white_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_white_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_on_black_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_black_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_on_primary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_primary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_on_secondary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_secondary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_black.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_black"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_white.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_white"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_on_white_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_white_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_on_black_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_black_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_on_primary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_primary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_on_secondary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_secondary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_black.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_black"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_white.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_white"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                }
+              ],
+              "links": [
+                {
+                  "language": "en-US",
+                  "rel": ["clubhouse", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/_/name/nyy/new-york-yankees",
+                  "text": "Clubhouse",
+                  "shortText": "Clubhouse",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["roster", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/roster/_/name/nyy/new-york-yankees",
+                  "text": "Roster",
+                  "shortText": "Roster",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["roster", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:10&section=roster",
+                  "text": "Roster",
+                  "shortText": "Roster",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["stats", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/stats/_/name/nyy/new-york-yankees",
+                  "text": "Statistics",
+                  "shortText": "Statistics",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["stats", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:10&section=stats",
+                  "text": "Statistics",
+                  "shortText": "Statistics",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["schedule", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/schedule/_/name/nyy",
+                  "text": "Schedule",
+                  "shortText": "Schedule",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["schedule", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:10&section=scores",
+                  "text": "Schedule",
+                  "shortText": "Schedule",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["photos", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/photos/_/name/nyy",
+                  "text": "photos",
+                  "shortText": "photos",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["tickets", "desktop", "team"],
+                  "href": "https://www.vividseats.com/new-york-yankees-tickets--sports-mlb-baseball/performer/607?wsUser=717",
+                  "text": "Tickets",
+                  "shortText": "Tickets",
+                  "isExternal": true,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["transactions", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/transactions/_/name/nyy",
+                  "text": "Transactions",
+                  "shortText": "Transactions",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["injuries", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/injuries/_/name/nyy",
+                  "text": "Injuries",
+                  "shortText": "Injuries",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["depthchart", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/depth/_/name/nyy",
+                  "text": "Depth Chart",
+                  "shortText": "Depth Chart",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["depthchart", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:10&section=depthchart",
+                  "text": "Depth Chart",
+                  "shortText": "Depth Chart",
+                  "isExternal": false,
+                  "isPremium": false
+                }
+              ]
+            },
+            "notes": {
+              "items": [
+                {
+                  "id": "1013039",
+                  "type": "news",
+                  "date": "2026-07-05T20:22Z",
+                  "headline": "Chisholm was diagnosed with right big toe discomfort after leaving Sunday's game against the Twins and having X-rays come back negative.",
+                  "text": "The second baseman went 1-for-2 and was caught stealing before departing Sunday's contest prior to the sixth inning. It appears Chisholm has avoided a serious injury, so he should be considered day-to-day heading into Monday's series opener at Tampa Bay.",
+                  "source": "RotoWire"
+                }
+              ]
+            },
+            "status": {
+              "id": "1",
+              "name": "Active",
+              "type": "active",
+              "abbreviation": "Active"
+            }
+          },
+          "source": {
+            "id": "1",
+            "description": "basic/manual",
+            "state": "basic"
+          },
+          "type": {
+            "id": "6",
+            "name": "INJURY_STATUS_DAYTODAY",
+            "description": "day-to-day",
+            "abbreviation": "DD"
+          },
+          "details": {
+            "fantasyStatus": {
+              "description": "Day-To-Day",
+              "abbreviation": "Day-To-Day"
+            },
+            "type": "Toe",
+            "detail": "Soreness",
+            "side": "Right",
+            "returnDate": "2026-07-06"
+          }
+        },
+        {
+          "id": "1012981",
+          "longComment": "The veteran left-hander continues to progress in his rehab from a bone bruise in his left elbow, and he's closing in on being cleared for game action. Fried landed on the shelf in mid-May and will likely require at least a couple starts in the minors before potentially rejoining the New York starting rotation in late July.",
+          "shortComment": "Fried (elbow) threw a successful 36-pitch live batting practice session Sunday and will face hitters again Thursday or Friday before embarking on a rehab assignment, Jorge Castillo of ESPN.com reports.",
+          "status": "15-Day-IL",
+          "date": "2026-07-05T16:22Z",
+          "athlete": {
+            "firstName": "Max",
+            "lastName": "Fried",
+            "displayName": "Max Fried",
+            "shortName": "M. Fried",
+            "links": [
+              {
+                "language": "en-US",
+                "rel": ["playercard", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/_/id/32685",
+                "text": "Player Card",
+                "shortText": "Player Card",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["stats", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/stats/_/id/32685/max-fried",
+                "text": "Stats",
+                "shortText": "Stats",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["stats", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:32685&section=stats",
+                "text": "Stats",
+                "shortText": "Stats",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["splits", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/splits/_/id/32685/max-fried",
+                "text": "Splits",
+                "shortText": "Splits",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["gamelog", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/gamelog/_/id/32685/max-fried",
+                "text": "Game Log",
+                "shortText": "Game Log",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["gamelog", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:32685&section=gamelog",
+                "text": "Game Log",
+                "shortText": "Game Log",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["news", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/news/_/id/32685/max-fried",
+                "text": "News",
+                "shortText": "News",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["news", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:32685&section=news",
+                "text": "News",
+                "shortText": "News",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["bio", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/bio/_/id/32685/max-fried",
+                "text": "Bio",
+                "shortText": "Bio",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["bio", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:32685&section=bio",
+                "text": "Bio",
+                "shortText": "Bio",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["overview", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/_/id/32685/max-fried",
+                "text": "Overview",
+                "shortText": "Overview",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["overview", "sportscenter", "app", "athlete"],
+                "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~a:32685",
+                "text": "Overview",
+                "shortText": "Overview",
+                "isExternal": false,
+                "isPremium": false
+              },
+              {
+                "language": "en-US",
+                "rel": ["batvspitch", "desktop", "athlete"],
+                "href": "https://www.espn.com/mlb/player/batvspitch/_/id/32685/max-fried",
+                "text": "Bat vs Pitch",
+                "shortText": "Bat vs Pitch",
+                "isExternal": false,
+                "isPremium": false
+              }
+            ],
+            "headshot": {
+              "href": "https://a.espncdn.com/i/headshots/mlb/players/full/32685.png",
+              "alt": "Max Fried"
+            },
+            "position": {
+              "id": "15",
+              "name": "Starting Pitcher",
+              "displayName": "Starting Pitcher",
+              "abbreviation": "SP",
+              "leaf": true
+            },
+            "team": {
+              "id": "10",
+              "uid": "s:1~l:10~t:10",
+              "slug": "new-york-yankees",
+              "name": "Yankees",
+              "abbreviation": "NYY",
+              "displayName": "New York Yankees",
+              "logos": [
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500/nyy.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "default"],
+                  "lastUpdated": "2024-07-01T17:48Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500-dark/nyy.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "dark"],
+                  "lastUpdated": "2024-07-01T17:49Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/nyy.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "scoreboard"],
+                  "lastUpdated": "2024-07-01T17:48Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/mlb/500-dark/scoreboard/nyy.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": ["full", "scoreboard", "dark"],
+                  "lastUpdated": "2024-07-01T17:49Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_on_white_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_white_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_on_black_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_black_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_on_primary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_primary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_on_secondary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_on_secondary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_black.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_black"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/primary_logo_white.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "primary_logo_white"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_on_white_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_white_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_on_black_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_black_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_on_primary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_primary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_on_secondary_color.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_on_secondary_color"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_black.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_black"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/guid/2b9cedf3-ce60-0bcf-fafe-8cd055255685/logos/secondary_logo_white.png",
+                  "width": 4096,
+                  "height": 4096,
+                  "alt": "",
+                  "rel": ["full", "secondary_logo_white"],
+                  "lastUpdated": "2026-02-12T22:40Z"
+                }
+              ],
+              "links": [
+                {
+                  "language": "en-US",
+                  "rel": ["clubhouse", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/_/name/nyy/new-york-yankees",
+                  "text": "Clubhouse",
+                  "shortText": "Clubhouse",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["roster", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/roster/_/name/nyy/new-york-yankees",
+                  "text": "Roster",
+                  "shortText": "Roster",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["roster", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:10&section=roster",
+                  "text": "Roster",
+                  "shortText": "Roster",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["stats", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/stats/_/name/nyy/new-york-yankees",
+                  "text": "Statistics",
+                  "shortText": "Statistics",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["stats", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:10&section=stats",
+                  "text": "Statistics",
+                  "shortText": "Statistics",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["schedule", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/schedule/_/name/nyy",
+                  "text": "Schedule",
+                  "shortText": "Schedule",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["schedule", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:10&section=scores",
+                  "text": "Schedule",
+                  "shortText": "Schedule",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["photos", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/photos/_/name/nyy",
+                  "text": "photos",
+                  "shortText": "photos",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["tickets", "desktop", "team"],
+                  "href": "https://www.vividseats.com/new-york-yankees-tickets--sports-mlb-baseball/performer/607?wsUser=717",
+                  "text": "Tickets",
+                  "shortText": "Tickets",
+                  "isExternal": true,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["transactions", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/transactions/_/name/nyy",
+                  "text": "Transactions",
+                  "shortText": "Transactions",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["injuries", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/injuries/_/name/nyy",
+                  "text": "Injuries",
+                  "shortText": "Injuries",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["depthchart", "desktop", "team"],
+                  "href": "https://www.espn.com/mlb/team/depth/_/name/nyy",
+                  "text": "Depth Chart",
+                  "shortText": "Depth Chart",
+                  "isExternal": false,
+                  "isPremium": false
+                },
+                {
+                  "language": "en-US",
+                  "rel": ["depthchart", "sportscenter", "app", "team"],
+                  "href": "sportscenter://x-callback-url/showClubhouse?uid=s:1~l:10~t:10&section=depthchart",
+                  "text": "Depth Chart",
+                  "shortText": "Depth Chart",
+                  "isExternal": false,
+                  "isPremium": false
+                }
+              ]
+            },
+            "notes": {
+              "items": [
+                {
+                  "id": "1012981",
+                  "type": "news",
+                  "date": "2026-07-05T16:22Z",
+                  "headline": "Fried (elbow) threw a successful 36-pitch live batting practice session Sunday and will face hitters again Thursday or Friday before embarking on a rehab assignment, Jorge Castillo of ESPN.com reports.",
+                  "text": "The veteran left-hander continues to progress in his rehab from a bone bruise in his left elbow, and he's closing in on being cleared for game action. Fried landed on the shelf in mid-May and will likely require at least a couple starts in the minors before potentially rejoining the New York starting rotation in late July.",
+                  "source": "RotoWire"
+                }
+              ]
+            },
+            "status": {
+              "id": "25",
+              "name": "15 Day IL",
+              "type": "15-day-il",
+              "abbreviation": "15 Day IL"
+            }
+          },
+          "source": {
+            "id": "1",
+            "description": "basic/manual",
+            "state": "basic"
+          },
+          "type": {
+            "id": "10",
+            "name": "INJURY_STATUS_15DAYIL",
+            "description": "15-day IL",
+            "abbreviation": "IL15"
+          },
+          "details": {
+            "fantasyStatus": {
+              "description": "15-Day IL",
+              "abbreviation": "15-Day IL"
+            },
+            "type": "Elbow",
+            "detail": "Bruise",
+            "side": "Left",
+            "returnDate": "2026-07-27"
+          }
+        }
+      ]
+    }
+  ]
+}
