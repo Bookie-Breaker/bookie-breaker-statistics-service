@@ -1,0 +1,136 @@
+{
+  "leagues": [
+    {
+      "id": "606",
+      "name": "FIFA World Cup",
+      "slug": "fifa.world",
+      "season": {
+        "year": 2026
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "760506",
+      "date": "2026-07-06T19:00Z",
+      "name": "Spain at Portugal",
+      "season": {
+        "year": 2026,
+        "type": 13800,
+        "slug": "round-of-16"
+      },
+      "status": {
+        "clock": 0,
+        "displayClock": "0'",
+        "period": null,
+        "type": {
+          "id": "1",
+          "name": "STATUS_SCHEDULED",
+          "state": "pre",
+          "completed": false,
+          "description": "Scheduled",
+          "detail": "Mon, July 6th at 3:00 PM EDT",
+          "shortDetail": "Scheduled"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760506",
+          "venue": {
+            "id": "3871",
+            "fullName": "AT&T Stadium",
+            "address": {
+              "city": "Arlington, Texas",
+              "country": "USA"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "0",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "482",
+                "displayName": "Portugal",
+                "abbreviation": "POR"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "0",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "164",
+                "displayName": "Spain",
+                "abbreviation": "ESP"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "760507",
+      "date": "2026-07-07T00:00Z",
+      "name": "Belgium at United States",
+      "season": {
+        "year": 2026,
+        "type": 13800,
+        "slug": "round-of-16"
+      },
+      "status": {
+        "clock": 0,
+        "displayClock": "0'",
+        "period": null,
+        "type": {
+          "id": "1",
+          "name": "STATUS_SCHEDULED",
+          "state": "pre",
+          "completed": false,
+          "description": "Scheduled",
+          "detail": "Mon, July 6th at 8:00 PM EDT",
+          "shortDetail": "Scheduled"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760507",
+          "venue": {
+            "id": "4485",
+            "fullName": "Lumen Field",
+            "address": {
+              "city": "Seattle, Washington",
+              "country": "USA"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "0",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "660",
+                "displayName": "United States",
+                "abbreviation": "USA"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "0",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "459",
+                "displayName": "Belgium",
+                "abbreviation": "BEL"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

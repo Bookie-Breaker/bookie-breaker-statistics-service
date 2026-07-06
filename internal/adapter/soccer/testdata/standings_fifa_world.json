@@ -1,0 +1,202 @@
+{
+  "uid": "s:600~l:606",
+  "id": "8675309",
+  "name": "FIFA World Cup",
+  "abbreviation": "FIFA World Cup",
+  "children": [
+    {
+      "id": "1",
+      "name": "Group A",
+      "abbreviation": "Group A",
+      "standings": {
+        "entries": [
+          {
+            "team": {
+              "id": "203",
+              "displayName": "Mexico",
+              "abbreviation": "MEX"
+            },
+            "stats": [
+              {
+                "name": "gamesPlayed",
+                "value": 3,
+                "displayValue": "3"
+              },
+              {
+                "name": "losses",
+                "value": 0,
+                "displayValue": "0"
+              },
+              {
+                "name": "points",
+                "value": 9,
+                "displayValue": "9"
+              },
+              {
+                "name": "pointsAgainst",
+                "value": 0,
+                "displayValue": "0"
+              },
+              {
+                "name": "pointsFor",
+                "value": 6,
+                "displayValue": "6"
+              },
+              {
+                "name": "ties",
+                "value": 0,
+                "displayValue": "0"
+              },
+              {
+                "name": "wins",
+                "value": 3,
+                "displayValue": "3"
+              }
+            ]
+          },
+          {
+            "team": {
+              "id": "450",
+              "displayName": "Czechia",
+              "abbreviation": "CZE"
+            },
+            "stats": [
+              {
+                "name": "gamesPlayed",
+                "value": 3,
+                "displayValue": "3"
+              },
+              {
+                "name": "losses",
+                "value": 2,
+                "displayValue": "2"
+              },
+              {
+                "name": "points",
+                "value": 1,
+                "displayValue": "1"
+              },
+              {
+                "name": "pointsAgainst",
+                "value": 6,
+                "displayValue": "6"
+              },
+              {
+                "name": "pointsFor",
+                "value": 2,
+                "displayValue": "2"
+              },
+              {
+                "name": "ties",
+                "value": 1,
+                "displayValue": "1"
+              },
+              {
+                "name": "wins",
+                "value": 0,
+                "displayValue": "0"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "2",
+      "name": "Group B",
+      "abbreviation": "Group B",
+      "standings": {
+        "entries": [
+          {
+            "team": {
+              "id": "206",
+              "displayName": "Canada",
+              "abbreviation": "CAN"
+            },
+            "stats": [
+              {
+                "name": "gamesPlayed",
+                "value": 3,
+                "displayValue": "3"
+              },
+              {
+                "name": "losses",
+                "value": 1,
+                "displayValue": "1"
+              },
+              {
+                "name": "points",
+                "value": 4,
+                "displayValue": "4"
+              },
+              {
+                "name": "pointsAgainst",
+                "value": 3,
+                "displayValue": "3"
+              },
+              {
+                "name": "pointsFor",
+                "value": 8,
+                "displayValue": "8"
+              },
+              {
+                "name": "ties",
+                "value": 1,
+                "displayValue": "1"
+              },
+              {
+                "name": "wins",
+                "value": 1,
+                "displayValue": "1"
+              }
+            ]
+          },
+          {
+            "team": {
+              "id": "452",
+              "displayName": "Bosnia-Herzegovina",
+              "abbreviation": "BIH"
+            },
+            "stats": [
+              {
+                "name": "gamesPlayed",
+                "value": 3,
+                "displayValue": "3"
+              },
+              {
+                "name": "losses",
+                "value": 1,
+                "displayValue": "1"
+              },
+              {
+                "name": "points",
+                "value": 4,
+                "displayValue": "4"
+              },
+              {
+                "name": "pointsAgainst",
+                "value": 6,
+                "displayValue": "6"
+              },
+              {
+                "name": "pointsFor",
+                "value": 5,
+                "displayValue": "5"
+              },
+              {
+                "name": "ties",
+                "value": 1,
+                "displayValue": "1"
+              },
+              {
+                "name": "wins",
+                "value": 1,
+                "displayValue": "1"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

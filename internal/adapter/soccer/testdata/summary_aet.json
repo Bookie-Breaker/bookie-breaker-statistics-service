@@ -1,0 +1,75 @@
+{
+  "header": {
+    "id": "760493",
+    "competitions": [
+      {
+        "id": "760493",
+        "date": "2026-07-01T20:00Z",
+        "status": {
+          "period": null,
+          "type": {
+            "id": "45",
+            "name": "STATUS_FINAL_AET",
+            "state": "post",
+            "completed": true,
+            "description": "Final Score - After Extra Time",
+            "detail": "AET",
+            "shortDetail": "AET"
+          }
+        },
+        "competitors": [
+          {
+            "homeAway": "home",
+            "score": "3",
+            "shootoutScore": null,
+            "winner": true,
+            "linescores": [
+              {
+                "displayValue": "0"
+              },
+              {
+                "displayValue": "2"
+              },
+              {
+                "displayValue": "0"
+              },
+              {
+                "displayValue": "1"
+              }
+            ],
+            "team": {
+              "id": "459",
+              "displayName": "Belgium",
+              "abbreviation": "BEL"
+            }
+          },
+          {
+            "homeAway": "away",
+            "score": "2",
+            "shootoutScore": null,
+            "winner": false,
+            "linescores": [
+              {
+                "displayValue": "1"
+              },
+              {
+                "displayValue": "1"
+              },
+              {
+                "displayValue": "0"
+              },
+              {
+                "displayValue": "0"
+              }
+            ],
+            "team": {
+              "id": "654",
+              "displayName": "Senegal",
+              "abbreviation": "SEN"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "header": {
+    "id": "760489",
+    "competitions": [
+      {
+        "id": "760489",
+        "date": "2026-06-29T20:30Z",
+        "status": {
+          "period": null,
+          "type": {
+            "id": "47",
+            "name": "STATUS_FINAL_PEN",
+            "state": "post",
+            "completed": true,
+            "description": "Final Score - After Penalties",
+            "detail": "FT-Pens",
+            "shortDetail": "FT-Pens"
+          }
+        },
+        "competitors": [
+          {
+            "homeAway": "home",
+            "score": "1",
+            "shootoutScore": 3,
+            "winner": false,
+            "linescores": [
+              {
+                "displayValue": "0"
+              },
+              {
+                "displayValue": "1"
+              },
+              {
+                "displayValue": "0"
+              },
+              {
+                "displayValue": "0"
+              },
+              {
+                "displayValue": "3"
+              }
+            ],
+            "team": {
+              "id": "481",
+              "displayName": "Germany",
+              "abbreviation": "GER"
+            }
+          },
+          {
+            "homeAway": "away",
+            "score": "1",
+            "shootoutScore": 4,
+            "winner": true,
+            "linescores": [
+              {
+                "displayValue": "1"
+              },
+              {
+                "displayValue": "0"
+              },
+              {
+                "displayValue": "0"
+              },
+              {
+                "displayValue": "0"
+              },
+              {
+                "displayValue": "4"
+              }
+            ],
+            "team": {
+              "id": "210",
+              "displayName": "Paraguay",
+              "abbreviation": "PAR"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

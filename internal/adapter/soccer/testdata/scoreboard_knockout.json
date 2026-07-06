@@ -1,0 +1,197 @@
+{
+  "leagues": [
+    {
+      "id": "606",
+      "name": "FIFA World Cup",
+      "slug": "fifa.world",
+      "season": {
+        "year": 2026
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "760489",
+      "date": "2026-06-29T20:30Z",
+      "name": "Paraguay at Germany",
+      "season": {
+        "year": 2026,
+        "type": 13801,
+        "slug": "round-of-32"
+      },
+      "status": {
+        "clock": 7200,
+        "displayClock": "120'",
+        "period": 5,
+        "type": {
+          "id": "47",
+          "name": "STATUS_FINAL_PEN",
+          "state": "post",
+          "completed": true,
+          "description": "Final Score - After Penalties",
+          "detail": "FT-Pens",
+          "shortDetail": "FT-Pens"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760489",
+          "venue": {
+            "id": "10660",
+            "fullName": "Gillette Stadium",
+            "address": {
+              "city": "Foxborough, Massachusetts",
+              "country": "USA"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "1",
+              "shootoutScore": 3,
+              "winner": false,
+              "team": {
+                "id": "481",
+                "displayName": "Germany",
+                "abbreviation": "GER"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "1",
+              "shootoutScore": 4,
+              "winner": true,
+              "team": {
+                "id": "210",
+                "displayName": "Paraguay",
+                "abbreviation": "PAR"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "760495",
+      "date": "2026-07-01T16:00Z",
+      "name": "Congo DR at England",
+      "season": {
+        "year": 2026,
+        "type": 13801,
+        "slug": "round-of-32"
+      },
+      "status": {
+        "clock": 5400,
+        "displayClock": "90'+7'",
+        "period": 2,
+        "type": {
+          "id": "28",
+          "name": "STATUS_FULL_TIME",
+          "state": "post",
+          "completed": true,
+          "description": "Full Time",
+          "detail": "FT",
+          "shortDetail": "FT"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760495",
+          "venue": {
+            "id": "7485",
+            "fullName": "Mercedes-Benz Stadium",
+            "address": {
+              "city": "Atlanta, Georgia",
+              "country": "USA"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "2",
+              "shootoutScore": null,
+              "winner": true,
+              "team": {
+                "id": "448",
+                "displayName": "England",
+                "abbreviation": "ENG"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "1",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "2850",
+                "displayName": "Congo DR",
+                "abbreviation": "COD"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "760493",
+      "date": "2026-07-01T20:00Z",
+      "name": "Senegal at Belgium",
+      "season": {
+        "year": 2026,
+        "type": 13801,
+        "slug": "round-of-32"
+      },
+      "status": {
+        "clock": 7200,
+        "displayClock": "120'+12'",
+        "period": 4,
+        "type": {
+          "id": "45",
+          "name": "STATUS_FINAL_AET",
+          "state": "post",
+          "completed": true,
+          "description": "Final Score - After Extra Time",
+          "detail": "AET",
+          "shortDetail": "AET"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760493",
+          "venue": {
+            "id": "4485",
+            "fullName": "Lumen Field",
+            "address": {
+              "city": "Seattle, Washington",
+              "country": "USA"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "3",
+              "shootoutScore": null,
+              "winner": true,
+              "team": {
+                "id": "459",
+                "displayName": "Belgium",
+                "abbreviation": "BEL"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "2",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "654",
+                "displayName": "Senegal",
+                "abbreviation": "SEN"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

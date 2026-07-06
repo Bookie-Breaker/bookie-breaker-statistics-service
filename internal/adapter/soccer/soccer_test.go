@@ -1,0 +1,447 @@
+package soccer
+
+// Golden-fixture tests over real ESPN responses recorded 2026-07-05 during
+// the live 2026 World Cup (testdata/*.json, trimmed). The extra-time and
+// penalty-shootout cases are real matches (Belgium 3-2 Senegal AET;
+// Germany 1-1 Paraguay, 3-4 on penalties). The eng.1 fixture is a
+// standings snapshot of the completed 2025-26 season — the EPL scoreboard
+// was empty in the July off-season, so no EPL scoreboard fixture exists.
+
+import (
+	"context"
+	"math"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync/atomic"
+	"testing"
+	"time"
+
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/ids"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
+)
+
+const leagueWC = string(model.LeagueFIFAWC)
+
+func testProvider(t *testing.T, comp Competition, handler http.Handler) *Provider {
+	t.Helper()
+	server := httptest.NewServer(handler)
+	t.Cleanup(server.Close)
+	return NewProvider(NewClient(server.URL, 5*time.Second), comp)
+}
+
+func serveFixture(t *testing.T, w http.ResponseWriter, name string) {
+	t.Helper()
+	data, err := os.ReadFile(filepath.Join("testdata", name))
+	if err != nil {
+		t.Fatalf("read fixture %s: %v", name, err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write(data)
+}
+
+// worldCupMux routes World Cup requests to the recorded fixtures: June
+// scoreboards to the group stage, July to the knockout rounds, and the two
+// extra-time events to their summaries.
+func worldCupMux(t *testing.T, summaryCalls *atomic.Int32) http.Handler {
+	t.Helper()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/teams"):
+			serveFixture(t, w, "teams_fifa_world.json")
+		case strings.HasSuffix(r.URL.Path, "/standings"):
+			serveFixture(t, w, "standings_fifa_world.json")
+		case strings.HasSuffix(r.URL.Path, "/summary"):
+			if summaryCalls != nil {
+				summaryCalls.Add(1)
+			}
+			switch r.URL.Query().Get("event") {
+			case "760493":
+				serveFixture(t, w, "summary_aet.json")
+			case "760489":
+				serveFixture(t, w, "summary_pen.json")
+			default:
+				http.NotFound(w, r)
+			}
+		case strings.HasSuffix(r.URL.Path, "/scoreboard"):
+			switch dates := r.URL.Query().Get("dates"); {
+			case strings.HasPrefix(dates, "202606"):
+				serveFixture(t, w, "scoreboard_group.json")
+			case strings.HasPrefix(dates, "202607"):
+				serveFixture(t, w, "scoreboard_knockout.json")
+			default:
+				_, _ = w.Write([]byte(`{"events":[]}`))
+			}
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+func TestTeamsNormalization(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), worldCupMux(t, nil))
+
+	teams, details, fetches, err := p.Teams(context.Background())
+	if err != nil {
+		t.Fatalf("Teams failed: %v", err)
+	}
+	if len(fetches) != 1 {
+		t.Errorf("fetches = %d, want 1", len(fetches))
+	}
+	if len(teams) != 4 || len(details) != 4 {
+		t.Fatalf("teams = %d, details = %d, want 4 each", len(teams), len(details))
+	}
+
+	var england model.TeamSummary
+	for _, team := range teams {
+		if team.Abbreviation == "ENG" {
+			england = team
+		}
+	}
+	if england.ID != ids.Team(leagueWC, "448") {
+		t.Errorf("id = %s, want UUIDv5 of espn team 448", england.ID)
+	}
+	if england.Name != "England" || england.League != model.LeagueFIFAWC || !england.Active {
+		t.Errorf("summary wrong: %+v", england)
+	}
+	if england.ExternalIDs["espn"] != "448" {
+		t.Errorf("external ids wrong: %+v", england.ExternalIDs)
+	}
+	if details[england.ID].Venue != nil {
+		t.Errorf("soccer teams should carry no venue, got %+v", details[england.ID].Venue)
+	}
+}
+
+func TestScoreboardLiveStatuses(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		serveFixture(t, w, "scoreboard_live.json")
+	}))
+
+	updates, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 5, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatalf("Scoreboard failed: %v", err)
+	}
+
+	live := updates["760505"] // STATUS_SECOND_HALF
+	if live.Status != model.GameInProgress || live.HomeScore != 2 || live.AwayScore != 3 {
+		t.Errorf("in-progress update wrong: %+v", live)
+	}
+	if live.Result != nil {
+		t.Errorf("in-progress game must carry no result: %+v", live.Result)
+	}
+}
+
+func TestScoreboardScheduledStatus(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		serveFixture(t, w, "scoreboard_scheduled.json")
+	}))
+
+	updates, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 6, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatalf("Scoreboard failed: %v", err)
+	}
+	for id, u := range updates {
+		if u.Status != model.GameScheduled || u.Result != nil {
+			t.Errorf("event %s: scheduled update wrong: %+v", id, u)
+		}
+	}
+}
+
+func TestScoreboardFinals(t *testing.T) {
+	var summaryCalls atomic.Int32
+	p := testProvider(t, FIFAWorldCup(), worldCupMux(t, &summaryCalls))
+
+	updates, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 1, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatalf("Scoreboard failed: %v", err)
+	}
+	if len(updates) != 3 {
+		t.Fatalf("updates = %d, want 3", len(updates))
+	}
+	// Only the two extra-time matches need a summary fetch.
+	if summaryCalls.Load() != 2 {
+		t.Errorf("summary calls = %d, want 2 (extra-time finals only)", summaryCalls.Load())
+	}
+
+	// England 2-1 Congo DR, decided in regulation: no regulation fields.
+	ft := updates["760495"]
+	if ft.Status != model.GameFinal || ft.Result == nil {
+		t.Fatalf("full-time update wrong: %+v", ft)
+	}
+	if ft.Result.HomeScore != 2 || ft.Result.AwayScore != 1 || ft.Result.Overtime {
+		t.Errorf("full-time result wrong: %+v", ft.Result)
+	}
+	if ft.Result.RegulationHomeScore != nil || ft.Result.RegulationAwayScore != nil {
+		t.Errorf("regulation-time final must carry no regulation fields: %+v", ft.Result)
+	}
+
+	// Belgium 3-2 Senegal after extra time; linescores 0+2|0+1 vs 1+1|0+0,
+	// so the ADR-027 regulation score is the first-two-period sum: 2-2.
+	aet := updates["760493"]
+	if aet.Result == nil || !aet.Result.Overtime {
+		t.Fatalf("AET result wrong: %+v", aet.Result)
+	}
+	if aet.Result.HomeScore != 3 || aet.Result.AwayScore != 2 || aet.Result.TotalScore != 5 {
+		t.Errorf("AET full-time score wrong: %+v", aet.Result)
+	}
+	if aet.Result.RegulationHomeScore == nil || *aet.Result.RegulationHomeScore != 2 ||
+		aet.Result.RegulationAwayScore == nil || *aet.Result.RegulationAwayScore != 2 {
+		t.Errorf("AET regulation score wrong: %+v", aet.Result)
+	}
+	if len(aet.Result.PeriodScores) != 4 || aet.Result.PeriodScores[1].Home != 2 {
+		t.Errorf("AET period scores wrong: %+v", aet.Result.PeriodScores)
+	}
+
+	// Germany 1-1 Paraguay, 3-4 on penalties: the full-time score excludes
+	// the shootout, and ESPN's trailing shootout linescore is dropped.
+	pen := updates["760489"]
+	if pen.Result == nil || !pen.Result.Overtime {
+		t.Fatalf("shootout result wrong: %+v", pen.Result)
+	}
+	if pen.Result.HomeScore != 1 || pen.Result.AwayScore != 1 || pen.Result.TotalScore != 2 || pen.Result.Margin != 0 {
+		t.Errorf("shootout full-time score must exclude shootout goals: %+v", pen.Result)
+	}
+	if pen.Result.RegulationHomeScore == nil || *pen.Result.RegulationHomeScore != 1 ||
+		pen.Result.RegulationAwayScore == nil || *pen.Result.RegulationAwayScore != 1 {
+		t.Errorf("shootout regulation score wrong: %+v", pen.Result)
+	}
+	if len(pen.Result.PeriodScores) != 4 {
+		t.Errorf("shootout linescore must be dropped from period scores: %+v", pen.Result.PeriodScores)
+	}
+}
+
+func TestScheduleSeasonTypesAndIDs(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), worldCupMux(t, nil))
+
+	games, _, err := p.Schedule(context.Background(), 2026)
+	if err != nil {
+		t.Fatalf("Schedule failed: %v", err)
+	}
+	if len(games) != 5 {
+		t.Fatalf("games = %d, want 5 (2 group + 3 knockout)", len(games))
+	}
+
+	byExternal := make(map[string]model.Game, len(games))
+	for _, g := range games {
+		byExternal[g.ExternalID] = g
+	}
+
+	group := byExternal["760428"] // Cape Verde at Spain, group stage
+	if group.SeasonType != model.SeasonRegular {
+		t.Errorf("group-stage season type = %s, want REGULAR", group.SeasonType)
+	}
+	if group.ID != ids.Game(leagueWC, "760428") || group.Season != 2026 {
+		t.Errorf("group game identity wrong: %+v", group)
+	}
+	if group.HomeTeam.ID != ids.Team(leagueWC, "164") || group.HomeTeam.Abbreviation != "ESP" {
+		t.Errorf("home team ref wrong: %+v", group.HomeTeam)
+	}
+	if group.Venue == nil || group.Venue.Name != "Mercedes-Benz Stadium" {
+		t.Errorf("venue wrong: %+v", group.Venue)
+	}
+
+	knockout := byExternal["760493"] // Belgium vs Senegal, round of 32
+	if knockout.SeasonType != model.SeasonPostseason {
+		t.Errorf("knockout season type = %s, want POSTSEASON", knockout.SeasonType)
+	}
+	// Schedule finals carry full results including regulation fields.
+	if knockout.Status != model.GameFinal || knockout.Result == nil {
+		t.Fatalf("knockout final wrong: %+v", knockout)
+	}
+	if knockout.Result.ID != knockout.ID {
+		t.Errorf("result id = %s, want game id %s", knockout.Result.ID, knockout.ID)
+	}
+	if knockout.Result.RegulationHomeScore == nil || *knockout.Result.RegulationHomeScore != 2 {
+		t.Errorf("schedule AET regulation score wrong: %+v", knockout.Result)
+	}
+}
+
+func TestTeamStatsStandingsAndForm(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/standings"):
+			if r.URL.Query().Get("season") != "2026" {
+				t.Errorf("standings season = %s, want 2026", r.URL.Query().Get("season"))
+			}
+			serveFixture(t, w, "standings_fifa_world.json")
+		case strings.HasSuffix(r.URL.Path, "/scoreboard"):
+			if strings.HasPrefix(r.URL.Query().Get("dates"), "202606") {
+				serveFixture(t, w, "scoreboard_form.json") // Mexico's 3 real group games
+			} else {
+				_, _ = w.Write([]byte(`{"events":[]}`))
+			}
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	p.now = func() time.Time { return time.Date(2026, 7, 5, 12, 0, 0, 0, time.UTC) }
+
+	stats, _, err := p.TeamStats(context.Background(), 2026, 0)
+	if err != nil {
+		t.Fatalf("TeamStats failed: %v", err)
+	}
+	if len(stats) != 4 {
+		t.Fatalf("teams = %d, want 4 (groups A and B, two entries each)", len(stats))
+	}
+
+	// Fixture totals: GF 6+2+8+5 = 21 over 4x3 = 12 team-games, so the
+	// competition average is 21/12 = 1.75 goals per team per match.
+	mexico := stats[ids.Team(leagueWC, "203")]
+	if mexico.GamesPlayed != 3 || mexico.Wins != 3 || mexico.Losses != 0 || mexico.Draws != 0 {
+		t.Errorf("Mexico record wrong: %+v", mexico)
+	}
+	if mexico.Stats.Offensive != nil || mexico.Stats.Defensive != nil || mexico.Stats.Advanced != nil {
+		t.Error("basketball blocks must stay nil for soccer")
+	}
+	soc := mexico.Stats.Soccer
+	if soc == nil {
+		t.Fatal("soccer block missing")
+	}
+	// Mexico: 6 GF / 3 GP = 2.0 per match; raw attack = 2.0/1.75 = 8/7;
+	// shrunk (K=5) = (3*(8/7) + 5) / (3+5) = 59/56.
+	if soc.GoalsForPerMatch != 2.0 || soc.GoalsAgainstPerMatch != 0.0 {
+		t.Errorf("Mexico per-match goals wrong: %+v", soc)
+	}
+	if math.Abs(soc.AttackStrength-59.0/56.0) > 1e-9 {
+		t.Errorf("attack strength = %v, want 59/56", soc.AttackStrength)
+	}
+	// Mexico defense: 0 GA, raw 0; shrunk = (3*0 + 5) / 8 = 0.625.
+	if math.Abs(soc.DefenseStrength-0.625) > 1e-9 {
+		t.Errorf("defense strength = %v, want 0.625", soc.DefenseStrength)
+	}
+	// Form from Mexico's three real group games (2-0, 1-0, 3-0 wins).
+	if soc.FormGoalsForLast5 != 2.0 || soc.FormGoalsAgainstLast5 != 0.0 || soc.FormPointsLast5 != 9 {
+		t.Errorf("Mexico form wrong: %+v", soc)
+	}
+
+	// Canada drew once (1W-1D-1L); draws surface both top-level and in the
+	// soccer block.
+	var canada model.TeamStats
+	for _, ts := range stats {
+		if ts.TeamAbbreviation == "CAN" {
+			canada = ts
+		}
+	}
+	if canada.Draws != 1 || canada.Stats.Soccer == nil || canada.Stats.Soccer.Draws != 1 {
+		t.Errorf("Canada draws wrong: %+v", canada)
+	}
+}
+
+func TestTeamStatsEPLStandings(t *testing.T) {
+	p := testProvider(t, PremierLeague(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/standings") {
+			serveFixture(t, w, "standings_eng1.json")
+			return
+		}
+		_, _ = w.Write([]byte(`{"events":[]}`)) // off-season: no form games
+	}))
+	p.now = func() time.Time { return time.Date(2026, 7, 5, 12, 0, 0, 0, time.UTC) }
+
+	stats, _, err := p.TeamStats(context.Background(), 2025, 0)
+	if err != nil {
+		t.Fatalf("TeamStats failed: %v", err)
+	}
+	if len(stats) != 3 {
+		t.Fatalf("teams = %d, want 3", len(stats))
+	}
+
+	var arsenal model.TeamStats
+	for _, ts := range stats {
+		if ts.TeamAbbreviation == "ARS" {
+			arsenal = ts
+		}
+	}
+	if arsenal.GamesPlayed != 38 || arsenal.Wins != 26 || arsenal.Draws != 7 || arsenal.Losses != 5 {
+		t.Errorf("Arsenal 2025-26 record wrong: %+v", arsenal)
+	}
+	// Fixture totals: GF 71+77+69 = 217 over 3x38 = 114 team-games.
+	avg := 217.0 / 114.0
+	wantAttack := (38.0*((71.0/38.0)/avg) + 5) / 43.0
+	if math.Abs(arsenal.Stats.Soccer.AttackStrength-wantAttack) > 1e-9 {
+		t.Errorf("attack strength = %v, want %v", arsenal.Stats.Soccer.AttackStrength, wantAttack)
+	}
+	if arsenal.Stats.Soccer.FormPointsLast5 != 0 {
+		t.Errorf("off-season form must be zero: %+v", arsenal.Stats.Soccer)
+	}
+}
+
+func TestTeamStatsRollingWindowUnsupported(t *testing.T) {
+	p := NewProvider(NewClient("http://unused", time.Second), FIFAWorldCup())
+	if _, _, err := p.TeamStats(context.Background(), 2026, 10); err == nil ||
+		!strings.Contains(err.Error(), "unsupported for soccer") {
+		t.Errorf("window > 0 must error, got %v", err)
+	}
+}
+
+func TestPlayersDescoped(t *testing.T) {
+	p := NewProvider(NewClient("http://unused", time.Second), PremierLeague())
+
+	summaries, details, fetches, err := p.Players(context.Background(), 2025)
+	if err != nil || summaries == nil || details == nil || len(summaries) != 0 || len(details) != 0 || fetches != nil {
+		t.Errorf("Players must return empty collections with nil error: %v %v %v %v", summaries, details, fetches, err)
+	}
+
+	log, fetches, err := p.PlayerGameLog(context.Background(), model.PlayerDetail{}, 2025)
+	if err != nil || log == nil || len(log) != 0 || fetches != nil {
+		t.Errorf("PlayerGameLog must return an empty log with nil error: %v %v %v", log, fetches, err)
+	}
+}
+
+func TestWorldCupSeasonYear(t *testing.T) {
+	wc := FIFAWorldCup()
+	for now, want := range map[time.Time]int{
+		time.Date(2026, 7, 5, 0, 0, 0, 0, time.UTC):   2026, // during the tournament
+		time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC):   2026, // tournament year, pre-tournament
+		time.Date(2027, 3, 1, 0, 0, 0, 0, time.UTC):   2026, // between tournaments
+		time.Date(2029, 12, 31, 0, 0, 0, 0, time.UTC): 2026,
+		time.Date(2030, 6, 1, 0, 0, 0, 0, time.UTC):   2030,
+	} {
+		if got := wc.SeasonYear(now); got != want {
+			t.Errorf("SeasonYear(%s) = %d, want %d", now.Format("2006-01-02"), got, want)
+		}
+	}
+}
+
+func TestEPLSeasonRollover(t *testing.T) {
+	epl := PremierLeague()
+	for now, want := range map[time.Time]int{
+		time.Date(2026, 8, 15, 0, 0, 0, 0, time.UTC):  2026, // just after kickoff
+		time.Date(2026, 12, 26, 0, 0, 0, 0, time.UTC): 2026, // boxing day
+		time.Date(2027, 1, 1, 0, 0, 0, 0, time.UTC):   2026, // january transfer window
+		time.Date(2027, 5, 20, 0, 0, 0, 0, time.UTC):  2026, // final matchday
+		time.Date(2026, 6, 30, 0, 0, 0, 0, time.UTC):  2025, // day before rollover
+		time.Date(2026, 7, 1, 0, 0, 0, 0, time.UTC):   2026, // rollover day
+	} {
+		if got := epl.SeasonYear(now); got != want {
+			t.Errorf("SeasonYear(%s) = %d, want %d", now.Format("2006-01-02"), got, want)
+		}
+	}
+
+	start, end := epl.SeasonWindow(2026)
+	if start != time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC) || end != time.Date(2027, 6, 15, 0, 0, 0, 0, time.UTC) {
+		t.Errorf("season window wrong: %s – %s", start, end)
+	}
+}
+
+func TestMonthChunks(t *testing.T) {
+	chunks := monthChunks(
+		time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC),
+		time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC),
+	)
+	if len(chunks) != 3 {
+		t.Fatalf("chunks = %d, want 3", len(chunks))
+	}
+	if !chunks[0][1].Equal(time.Date(2026, 6, 30, 0, 0, 0, 0, time.UTC)) {
+		t.Errorf("june chunk end = %s, want June 30", chunks[0][1])
+	}
+	if !chunks[2][0].Equal(chunks[2][1]) {
+		t.Errorf("final chunk should be the single day Aug 1: %v", chunks[2])
+	}
+
+	day := time.Date(2026, 7, 5, 0, 0, 0, 0, time.UTC)
+	if got := monthChunks(day, day); len(got) != 1 || !got[0][0].Equal(day) || !got[0][1].Equal(day) {
+		t.Errorf("single-day chunking wrong: %v", got)
+	}
+}
