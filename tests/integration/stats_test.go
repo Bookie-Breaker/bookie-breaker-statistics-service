@@ -12,9 +12,11 @@ import (
 
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espn"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nba"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cache"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/handler"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/ids"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/pubsub"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/repository/postgres"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/server"
@@ -196,14 +198,17 @@ func TestStatisticsService(t *testing.T) {
 		FailureThreshold:   5,
 		OpenDuration:       time.Minute,
 	})
-	espnClient := espn.NewClient(espnServer.URL, 10*time.Second)
+	espnClient := espn.NewClient(espnServer.URL, "basketball/nba", 10*time.Second)
 
 	seasonFn := func() int { return seasonYear }
+	providers := map[model.League]sportsdata.StatsProvider{
+		model.LeagueNBA: nba.NewProvider(nbaClient, func(time.Time) int { return seasonYear }),
+	}
 	rawRepo := postgres.NewRawResponseRepo(testPool)
 	publisher := pubsub.NewPublisher(testRedis)
-	refresh := service.NewRefreshService(nbaClient, espnClient, statsCache, rawRepo, publisher, seasonFn)
-	watcher := service.NewGameWatcher(refresh, nbaClient, statsCache, publisher, seasonFn)
-	query := service.NewQueryService(statsCache, refresh, seasonFn)
+	refresh := service.NewRefreshService(providers, espnClient, statsCache, rawRepo, publisher)
+	watcher := service.NewGameWatcher(refresh, statsCache, publisher)
+	query := service.NewQueryService(statsCache, refresh, []model.League{model.LeagueNBA}, seasonFn)
 
 	e := server.New(server.Deps{
 		DB:    testPool,

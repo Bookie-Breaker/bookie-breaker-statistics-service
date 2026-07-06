@@ -17,8 +17,6 @@ import (
 
 var tracer = otel.Tracer("espn-client")
 
-const injuriesPath = "/apis/site/v2/sports/basketball/nba/injuries"
-
 // Fetch carries the raw response for archival.
 type Fetch struct {
 	Endpoint   string
@@ -27,26 +25,30 @@ type Fetch struct {
 	CapturedAt time.Time
 }
 
-// Client fetches ESPN injury data.
+// Client fetches ESPN injury data for one sport/league.
 type Client struct {
-	baseURL    string
-	httpClient *http.Client
+	baseURL      string
+	injuriesPath string
+	httpClient   *http.Client
 }
 
-// NewClient creates an ESPN client.
-func NewClient(baseURL string, timeout time.Duration) *Client {
+// NewClient creates an ESPN client. sportPath is the site API's
+// sport/league path segment, e.g. "basketball/nba" (ADR-026 generalizes
+// this client across leagues).
+func NewClient(baseURL, sportPath string, timeout time.Duration) *Client {
 	return &Client{
-		baseURL:    baseURL,
-		httpClient: &http.Client{Timeout: timeout},
+		baseURL:      baseURL,
+		injuriesPath: "/apis/site/v2/sports/" + sportPath + "/injuries",
+		httpClient:   &http.Client{Timeout: timeout},
 	}
 }
 
-// Injuries fetches the current NBA injury report.
+// Injuries fetches the current injury report.
 func (c *Client) Injuries(ctx context.Context) (*injuriesResponse, *Fetch, error) {
 	ctx, span := tracer.Start(ctx, "espn.Injuries")
 	defer span.End()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+injuriesPath, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+c.injuriesPath, nil)
 	if err != nil {
 		return nil, nil, fmt.Errorf("create request: %w", err)
 	}
@@ -64,7 +66,7 @@ func (c *Client) Injuries(ctx context.Context) (*injuriesResponse, *Fetch, error
 	}
 
 	fetch := &Fetch{
-		Endpoint:   injuriesPath,
+		Endpoint:   c.injuriesPath,
 		Body:       body,
 		HTTPStatus: resp.StatusCode,
 		CapturedAt: time.Now().UTC(),

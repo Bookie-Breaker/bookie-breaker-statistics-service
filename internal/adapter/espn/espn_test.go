@@ -14,7 +14,7 @@ import (
 
 func TestInjuriesFetchAndNormalize(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != injuriesPath {
+		if r.URL.Path != "/apis/site/v2/sports/basketball/nba/injuries" {
 			http.NotFound(w, r)
 			return
 		}
@@ -27,7 +27,7 @@ func TestInjuriesFetchAndNormalize(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient(server.URL, 5*time.Second)
+	client := NewClient(server.URL, "basketball/nba", 5*time.Second)
 	resp, fetch, err := client.Injuries(context.Background())
 	if err != nil {
 		t.Fatalf("Injuries failed: %v", err)
@@ -40,7 +40,7 @@ func TestInjuriesFetchAndNormalize(t *testing.T) {
 	abbrevs := map[string]string{"los angeles lakers": "LAL"}
 	playerIDs := map[string]string{"lebron james|LAL": "player-uuid-lbj"}
 
-	reports := Normalize(resp, teamIDs, abbrevs, playerIDs)
+	reports := Normalize(resp, model.LeagueNBA, teamIDs, abbrevs, playerIDs)
 	if len(reports) != 2 {
 		t.Fatalf("reports = %d, want 2", len(reports))
 	}

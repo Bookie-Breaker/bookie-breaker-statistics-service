@@ -32,6 +32,11 @@ type GameResult struct {
 	Overtime     bool          `json:"overtime"`
 	CompletedAt  time.Time     `json:"completed_at,omitzero"`
 	PeriodScores []PeriodScore `json:"period_scores,omitempty"`
+	// Regulation scores are set only by leagues whose markets settle on
+	// regulation time (ADR-027). Absent means the final score is the
+	// settlement-relevant score.
+	RegulationHomeScore *int `json:"regulation_home_score,omitempty"`
+	RegulationAwayScore *int `json:"regulation_away_score,omitempty"`
 }
 
 // Game matches the OpenAPI Game schema.

@@ -18,18 +18,16 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/httpx"
 )
 
 var tracer = otel.Tracer("nba-client")
 
-// Fetch carries the raw response of one upstream call for archival.
-type Fetch struct {
-	Endpoint   string
-	Body       []byte
-	HTTPStatus int
-	CapturedAt time.Time
-}
+// Fetch carries the raw response of one upstream call for archival. It is
+// the shared sportsdata envelope; the alias keeps this package's existing
+// call sites unchanged.
+type Fetch = sportsdata.Fetch
 
 // Client is a throttled, circuit-broken stats.nba.com client.
 type Client struct {

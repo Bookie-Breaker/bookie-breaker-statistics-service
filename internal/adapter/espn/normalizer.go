@@ -7,12 +7,12 @@ import (
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
 )
 
-// Normalize converts the ESPN injury payload into canonical reports.
-// teamIDByName maps normalized full team names to canonical team UUIDs and
-// abbrevByName to their abbreviations (built from the cached team list).
-// playerIDByKey maps "name|teamAbbrev" to canonical player UUIDs;
-// ESPN-to-NBA player matching is best-effort by normalized name.
-func Normalize(resp *injuriesResponse, teamIDByName, abbrevByName, playerIDByKey map[string]string) []model.InjuryReport {
+// Normalize converts the ESPN injury payload into canonical reports for one
+// league. teamIDByName maps normalized full team names to canonical team
+// UUIDs and abbrevByName to their abbreviations (built from the cached team
+// list). playerIDByKey maps "name|teamAbbrev" to canonical player UUIDs;
+// ESPN-to-source player matching is best-effort by normalized name.
+func Normalize(resp *injuriesResponse, league model.League, teamIDByName, abbrevByName, playerIDByKey map[string]string) []model.InjuryReport {
 	var reports []model.InjuryReport
 	for _, team := range resp.Injuries {
 		nameKey := normalizeName(team.DisplayName)
@@ -24,7 +24,7 @@ func Normalize(resp *injuriesResponse, teamIDByName, abbrevByName, playerIDByKey
 				PlayerName:       inj.Athlete.DisplayName,
 				TeamID:           teamID,
 				TeamAbbreviation: abbrev,
-				League:           model.LeagueNBA,
+				League:           league,
 				Position:         inj.Athlete.Position.Abbreviation,
 				Status:           string(MapStatus(inj.Status)),
 				Description:      firstNonEmpty(inj.ShortComment, inj.Details.Type),
