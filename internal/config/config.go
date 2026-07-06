@@ -1,9 +1,13 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
 )
 
 type Config struct {
@@ -42,9 +46,18 @@ type Config struct {
 	// CurrentSeason overrides the clock-derived season when > 0
 	// (e.g. 2025 means the 2025-26 NBA season).
 	CurrentSeason int
+
+	// LeaguesEnabled lists the leagues this instance serves, from
+	// LEAGUES_ENABLED (comma-separated). Default: NBA.
+	LeaguesEnabled []model.League
 }
 
-func Load() *Config {
+func Load() (*Config, error) {
+	leagues, err := parseLeagues(getEnv("LEAGUES_ENABLED", "NBA"))
+	if err != nil {
+		return nil, err
+	}
+
 	return &Config{
 		Port:                 getEnvInt("PORT", 8002),
 		DatabaseURL:          getEnv("DATABASE_URL", "postgres://statistics_svc:localdev@localhost:5432/bookiebreaker?search_path=public"),
@@ -79,10 +92,37 @@ func Load() *Config {
 		CircuitOpenDuration:     getEnvDuration("CIRCUIT_OPEN_DURATION", 5*time.Minute),
 
 		CurrentSeason: getEnvInt("CURRENT_SEASON", 0),
-	}
+
+		LeaguesEnabled: leagues,
+	}, nil
 }
 
 const defaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+
+// parseLeagues validates a comma-separated league list against the known
+// league enum, failing fast on unknown values.
+func parseLeagues(raw string) ([]model.League, error) {
+	var leagues []model.League
+	seen := make(map[model.League]bool)
+	for _, part := range strings.Split(raw, ",") {
+		name := strings.ToUpper(strings.TrimSpace(part))
+		if name == "" {
+			continue
+		}
+		league := model.League(name)
+		if _, ok := model.SportForLeague[league]; !ok {
+			return nil, fmt.Errorf("unknown league %q in LEAGUES_ENABLED", strings.TrimSpace(part))
+		}
+		if !seen[league] {
+			seen[league] = true
+			leagues = append(leagues, league)
+		}
+	}
+	if len(leagues) == 0 {
+		return nil, fmt.Errorf("LEAGUES_ENABLED must name at least one league")
+	}
+	return leagues, nil
+}
 
 func getEnv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {

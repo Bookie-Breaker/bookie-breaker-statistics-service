@@ -26,10 +26,14 @@ import (
 )
 
 func main() {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		slog.Error("invalid configuration", "error", err)
+		os.Exit(1)
+	}
 
 	setupLogger(cfg.LogLevel)
-	slog.Info("starting statistics-service", "port", cfg.Port)
+	slog.Info("starting statistics-service", "port", cfg.Port, "leagues", cfg.LeaguesEnabled)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -71,17 +75,6 @@ func main() {
 		OpenDuration:       cfg.CircuitOpenDuration,
 	})
 
-	var espnClient *espn.Client
-	upstreams := []handler.UpstreamCheck{
-		{Source: "nba_com", Freshness: 2 * cfg.RefreshTeamStatsInterval},
-	}
-	if cfg.InjurySource == "espn" {
-		espnClient = espn.NewClient(cfg.ESPNBaseURL, cfg.NBAHTTPTimeout)
-		upstreams = append(upstreams, handler.UpstreamCheck{Source: "espn", Freshness: 2 * cfg.RefreshInjuriesInterval})
-	} else {
-		slog.Info("injury source disabled; /injuries will return empty reports", "INJURY_SOURCE", cfg.InjurySource)
-	}
-
 	seasonFor := func(now time.Time) int {
 		if cfg.CurrentSeason > 0 {
 			return cfg.CurrentSeason
@@ -90,15 +83,40 @@ func main() {
 	}
 	seasonYear := func() int { return seasonFor(time.Now().UTC()) }
 
-	providers := map[model.League]sportsdata.StatsProvider{
-		model.LeagueNBA: nba.NewProvider(nbaClient, seasonFor),
+	// Only the NBA adapter exists in Phase 6 Wave 0; later waves add the
+	// remaining leagues (ADR-026).
+	providers := make(map[model.League]sportsdata.StatsProvider, len(cfg.LeaguesEnabled))
+	for _, league := range cfg.LeaguesEnabled {
+		switch league {
+		case model.LeagueNBA:
+			providers[league] = nba.NewProvider(nbaClient, seasonFor)
+		default:
+			slog.Error(fmt.Sprintf("no adapter for league %s yet", league))
+			os.Exit(1)
+		}
+	}
+
+	upstreams := make([]handler.UpstreamCheck, 0, len(cfg.LeaguesEnabled)+1)
+	for _, league := range cfg.LeaguesEnabled {
+		upstreams = append(upstreams, handler.UpstreamCheck{
+			Source:    providers[league].Source(),
+			Freshness: 2 * cfg.RefreshTeamStatsInterval,
+		})
+	}
+
+	var espnClient *espn.Client
+	if cfg.InjurySource == "espn" {
+		espnClient = espn.NewClient(cfg.ESPNBaseURL, "basketball/nba", cfg.NBAHTTPTimeout)
+		upstreams = append(upstreams, handler.UpstreamCheck{Source: "espn", Freshness: 2 * cfg.RefreshInjuriesInterval})
+	} else {
+		slog.Info("injury source disabled; /injuries will return empty reports", "INJURY_SOURCE", cfg.InjurySource)
 	}
 
 	rawRepo := postgres.NewRawResponseRepo(db)
 	publisher := pubsub.NewPublisher(rdb)
 	refresh := service.NewRefreshService(providers, espnClient, statsCache, rawRepo, publisher)
 	watcher := service.NewGameWatcher(refresh, statsCache, publisher)
-	query := service.NewQueryService(statsCache, refresh, seasonYear)
+	query := service.NewQueryService(statsCache, refresh, cfg.LeaguesEnabled, seasonYear)
 
 	scheduler := service.NewScheduler(refresh, watcher, service.Intervals{
 		TeamStats:  cfg.RefreshTeamStatsInterval,

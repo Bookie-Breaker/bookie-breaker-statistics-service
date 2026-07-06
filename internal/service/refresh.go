@@ -22,7 +22,6 @@ import (
 var refreshTracer = otel.Tracer("refresh-service")
 
 const (
-	leagueNBA      = string(model.LeagueNBA)
 	sourceESPN     = "espn"
 	windowGamesMax = 82
 )
@@ -75,6 +74,40 @@ func (s *RefreshService) provider(league model.League) (sportsdata.StatsProvider
 		return nil, fmt.Errorf("no provider configured for league %s", league)
 	}
 	return p, nil
+}
+
+// Per-league dispatchers for cache-aside reads in the query service.
+
+func (s *RefreshService) refreshTeamsLeague(ctx context.Context, league model.League) error {
+	p, err := s.provider(league)
+	if err != nil {
+		return err
+	}
+	return s.refreshTeamsFor(ctx, p)
+}
+
+func (s *RefreshService) refreshTeamStatsLeague(ctx context.Context, league model.League) error {
+	p, err := s.provider(league)
+	if err != nil {
+		return err
+	}
+	return s.refreshTeamStatsFor(ctx, p)
+}
+
+func (s *RefreshService) refreshPlayersLeague(ctx context.Context, league model.League) error {
+	p, err := s.provider(league)
+	if err != nil {
+		return err
+	}
+	return s.refreshPlayersFor(ctx, p)
+}
+
+func (s *RefreshService) refreshScheduleLeague(ctx context.Context, league model.League) error {
+	p, err := s.provider(league)
+	if err != nil {
+		return err
+	}
+	return s.refreshScheduleFor(ctx, p)
 }
 
 // archive persists raw upstream bodies; failures are logged, never fatal
@@ -306,6 +339,7 @@ func (s *RefreshService) RefreshInjuries(ctx context.Context) error {
 	if _, ok := s.providers[model.LeagueNBA]; !ok {
 		return nil
 	}
+	league := string(model.LeagueNBA)
 	ctx, span := refreshTracer.Start(ctx, "refresh.Injuries")
 	defer span.End()
 
@@ -327,7 +361,7 @@ func (s *RefreshService) RefreshInjuries(ctx context.Context) error {
 		return fmt.Errorf("refresh injuries: %w", err)
 	}
 
-	teams, _, _ := s.cache.GetTeams(ctx, leagueNBA, true)
+	teams, _, _ := s.cache.GetTeams(ctx, league, true)
 	teamIDByName := make(map[string]string, len(teams))
 	abbrevByName := make(map[string]string, len(teams))
 	for _, t := range teams {
@@ -336,16 +370,16 @@ func (s *RefreshService) RefreshInjuries(ctx context.Context) error {
 		abbrevByName[key] = t.Abbreviation
 	}
 
-	players, _, _ := s.cache.GetPlayers(ctx, leagueNBA, true)
+	players, _, _ := s.cache.GetPlayers(ctx, league, true)
 	playerIDByKey := make(map[string]string, len(players))
 	for _, p := range players {
 		playerIDByKey[normalizeKey(p.FirstName+" "+p.LastName)+"|"+p.TeamAbbreviation] = p.ID
 	}
 
-	reports := espn.Normalize(resp, teamIDByName, abbrevByName, playerIDByKey)
+	reports := espn.Normalize(resp, model.LeagueNBA, teamIDByName, abbrevByName, playerIDByKey)
 
-	previous, _, _ := s.cache.GetInjuries(ctx, leagueNBA, false)
-	if err := s.cache.SetInjuries(ctx, leagueNBA, reports); err != nil {
+	previous, _, _ := s.cache.GetInjuries(ctx, league, false)
+	if err := s.cache.SetInjuries(ctx, league, reports); err != nil {
 		return err
 	}
 	if err := s.cache.SetLastSuccess(ctx, sourceESPN); err != nil {
@@ -354,7 +388,7 @@ func (s *RefreshService) RefreshInjuries(ctx context.Context) error {
 
 	if changes := diffInjuries(previous, reports); len(changes) > 0 {
 		s.publish(ctx, pubsub.StatsUpdatedEvent{
-			League:     leagueNBA,
+			League:     league,
 			UpdateType: "injuries",
 			Changes:    changes,
 		})
@@ -362,14 +396,14 @@ func (s *RefreshService) RefreshInjuries(ctx context.Context) error {
 
 	// Fold statuses into the player collections so /players reflects them.
 	if len(players) > 0 {
-		details, _, _ := s.cache.GetPlayerDetails(ctx, leagueNBA, true)
+		details, _, _ := s.cache.GetPlayerDetails(ctx, league, true)
 		summaries := players
-		applyInjuryStatuses(ctx, s.cache, leagueNBA, summaries, details)
-		if err := s.cache.SetPlayers(ctx, leagueNBA, summaries); err != nil {
+		applyInjuryStatuses(ctx, s.cache, league, summaries, details)
+		if err := s.cache.SetPlayers(ctx, league, summaries); err != nil {
 			slog.Warn("failed to update player statuses", "error", err)
 		}
 		if details != nil {
-			if err := s.cache.SetPlayerDetails(ctx, leagueNBA, details); err != nil {
+			if err := s.cache.SetPlayerDetails(ctx, league, details); err != nil {
 				slog.Warn("failed to update player detail statuses", "error", err)
 			}
 		}

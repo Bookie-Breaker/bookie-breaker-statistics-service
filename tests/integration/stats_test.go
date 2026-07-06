@@ -198,7 +198,7 @@ func TestStatisticsService(t *testing.T) {
 		FailureThreshold:   5,
 		OpenDuration:       time.Minute,
 	})
-	espnClient := espn.NewClient(espnServer.URL, 10*time.Second)
+	espnClient := espn.NewClient(espnServer.URL, "basketball/nba", 10*time.Second)
 
 	seasonFn := func() int { return seasonYear }
 	providers := map[model.League]sportsdata.StatsProvider{
@@ -208,7 +208,7 @@ func TestStatisticsService(t *testing.T) {
 	publisher := pubsub.NewPublisher(testRedis)
 	refresh := service.NewRefreshService(providers, espnClient, statsCache, rawRepo, publisher)
 	watcher := service.NewGameWatcher(refresh, statsCache, publisher)
-	query := service.NewQueryService(statsCache, refresh, seasonFn)
+	query := service.NewQueryService(statsCache, refresh, []model.League{model.LeagueNBA}, seasonFn)
 
 	e := server.New(server.Deps{
 		DB:    testPool,

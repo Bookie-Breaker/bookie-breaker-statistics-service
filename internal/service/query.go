@@ -19,17 +19,19 @@ var ErrNotFound = errors.New("not found")
 // ErrBadRequest wraps client input problems (bad windows, bad cursors).
 var ErrBadRequest = errors.New("bad request")
 
-// QueryService serves the read API from the cache, falling back to a
-// refresh (cache-aside) when a collection is cold.
+// QueryService serves the read API from the cache across the enabled
+// leagues, falling back to a refresh (cache-aside) when a collection is
+// cold.
 type QueryService struct {
 	cache      *cache.StatsCache
 	refresh    *RefreshService
+	leagues    []model.League
 	seasonYear func() int
 }
 
-// NewQueryService creates a query service.
-func NewQueryService(statsCache *cache.StatsCache, refresh *RefreshService, seasonYear func() int) *QueryService {
-	return &QueryService{cache: statsCache, refresh: refresh, seasonYear: seasonYear}
+// NewQueryService creates a query service over the enabled leagues.
+func NewQueryService(statsCache *cache.StatsCache, refresh *RefreshService, leagues []model.League, seasonYear func() int) *QueryService {
+	return &QueryService{cache: statsCache, refresh: refresh, leagues: leagues, seasonYear: seasonYear}
 }
 
 // TeamFilters narrow the team list.
@@ -42,8 +44,8 @@ type TeamFilters struct {
 	Cursor     string
 }
 
-// Teams lists teams. Only the NBA is populated in Phase 1; filters on other
-// leagues return empty pages.
+// Teams lists teams across the enabled leagues; filters on other leagues
+// return empty pages.
 func (q *QueryService) Teams(ctx context.Context, f TeamFilters) ([]model.TeamSummary, bool, string, error) {
 	teams, err := q.teams(ctx)
 	if err != nil {
@@ -76,49 +78,52 @@ func (q *QueryService) Teams(ctx context.Context, f TeamFilters) ([]model.TeamSu
 
 // TeamByID returns team details with the current season summary attached.
 func (q *QueryService) TeamByID(ctx context.Context, id string) (*model.TeamDetail, error) {
-	details, ok, err := q.cache.GetTeamDetails(ctx, leagueNBA, true)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		if err := q.refresh.RefreshTeams(ctx); err != nil {
-			return nil, err
-		}
-		details, _, err = q.cache.GetTeamDetails(ctx, leagueNBA, true)
+	for _, league := range q.leagues {
+		details, ok, err := q.cache.GetTeamDetails(ctx, string(league), true)
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	detail, ok := details[id]
-	if !ok {
-		return nil, ErrNotFound
-	}
-
-	seasonYear := q.seasonYear()
-	if stats, ok, _ := q.cache.GetTeamStats(ctx, leagueNBA, seasonYear, 0, true); ok {
-		if ts, ok := stats[id]; ok {
-			summary := &model.SeasonSummary{
-				Season: seasonYear,
-				Wins:   ts.Wins,
-				Losses: ts.Losses,
+		if !ok {
+			if err := q.refresh.refreshTeamsLeague(ctx, league); err != nil {
+				return nil, err
 			}
-			if games := ts.Wins + ts.Losses; games > 0 {
-				summary.WinPct = float64(ts.Wins) / float64(games)
+			details, _, err = q.cache.GetTeamDetails(ctx, string(league), true)
+			if err != nil {
+				return nil, err
 			}
-			if ts.Stats.Offensive != nil {
-				summary.PointsPerGame = ts.Stats.Offensive.PointsPerGame
-				summary.OffensiveRating = ts.Stats.Offensive.OffensiveRating
-			}
-			if ts.Stats.Defensive != nil {
-				summary.PointsAllowedPerGame = ts.Stats.Defensive.PointsAllowedPerGame
-				summary.DefensiveRating = ts.Stats.Defensive.DefensiveRating
-			}
-			detail.SeasonSummary = summary
 		}
-	}
 
-	return &detail, nil
+		detail, found := details[id]
+		if !found {
+			continue
+		}
+
+		seasonYear := q.seasonYear()
+		if stats, ok, _ := q.cache.GetTeamStats(ctx, string(league), seasonYear, 0, true); ok {
+			if ts, ok := stats[id]; ok {
+				summary := &model.SeasonSummary{
+					Season: seasonYear,
+					Wins:   ts.Wins,
+					Losses: ts.Losses,
+				}
+				if games := ts.Wins + ts.Losses; games > 0 {
+					summary.WinPct = float64(ts.Wins) / float64(games)
+				}
+				if ts.Stats.Offensive != nil {
+					summary.PointsPerGame = ts.Stats.Offensive.PointsPerGame
+					summary.OffensiveRating = ts.Stats.Offensive.OffensiveRating
+				}
+				if ts.Stats.Defensive != nil {
+					summary.PointsAllowedPerGame = ts.Stats.Defensive.PointsAllowedPerGame
+					summary.DefensiveRating = ts.Stats.Defensive.DefensiveRating
+				}
+				detail.SeasonSummary = summary
+			}
+		}
+
+		return &detail, nil
+	}
+	return nil, ErrNotFound
 }
 
 // TeamStats returns one team's stats shaped by stat_type, optionally over a
@@ -130,36 +135,37 @@ func (q *QueryService) TeamStats(ctx context.Context, teamID string, seasonParam
 		return nil, fmt.Errorf("%w: only the current season (%d) is available", ErrBadRequest, seasonYear)
 	}
 
-	var stats map[string]model.TeamStats
-	var err error
-	if window > 0 {
-		stats, err = q.refresh.FetchTeamStatsWindow(ctx, model.LeagueNBA, window)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		var ok bool
-		stats, ok, err = q.cache.GetTeamStats(ctx, leagueNBA, seasonYear, 0, true)
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			if err := q.refresh.RefreshTeamStats(ctx); err != nil {
-				return nil, err
-			}
-			stats, _, err = q.cache.GetTeamStats(ctx, leagueNBA, seasonYear, 0, true)
+	for _, league := range q.leagues {
+		var stats map[string]model.TeamStats
+		var err error
+		if window > 0 {
+			stats, err = q.refresh.FetchTeamStatsWindow(ctx, league, window)
 			if err != nil {
 				return nil, err
 			}
+		} else {
+			var ok bool
+			stats, ok, err = q.cache.GetTeamStats(ctx, string(league), seasonYear, 0, true)
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
+				if err := q.refresh.refreshTeamStatsLeague(ctx, league); err != nil {
+					return nil, err
+				}
+				stats, _, err = q.cache.GetTeamStats(ctx, string(league), seasonYear, 0, true)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		if ts, ok := stats[teamID]; ok {
+			shaped := shapeStatBlocks(ts, statType)
+			return &shaped, nil
 		}
 	}
-
-	ts, ok := stats[teamID]
-	if !ok {
-		return nil, ErrNotFound
-	}
-	shaped := shapeStatBlocks(ts, statType)
-	return &shaped, nil
+	return nil, ErrNotFound
 }
 
 // PlayerFilters narrow the player list.
@@ -205,33 +211,36 @@ func (q *QueryService) Players(ctx context.Context, f PlayerFilters) ([]model.Pl
 
 // PlayerByID returns player details, optionally with the season game log.
 func (q *QueryService) PlayerByID(ctx context.Context, id string, gameLog bool) (*model.PlayerDetail, error) {
-	details, ok, err := q.cache.GetPlayerDetails(ctx, leagueNBA, true)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		if err := q.refresh.RefreshPlayers(ctx); err != nil {
-			return nil, err
-		}
-		details, _, err = q.cache.GetPlayerDetails(ctx, leagueNBA, true)
+	for _, league := range q.leagues {
+		details, ok, err := q.cache.GetPlayerDetails(ctx, string(league), true)
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	detail, ok := details[id]
-	if !ok {
-		return nil, ErrNotFound
-	}
-
-	if gameLog {
-		log, err := q.refresh.FetchGameLog(ctx, detail.League, detail)
-		if err != nil {
-			return nil, err
+		if !ok {
+			if err := q.refresh.refreshPlayersLeague(ctx, league); err != nil {
+				return nil, err
+			}
+			details, _, err = q.cache.GetPlayerDetails(ctx, string(league), true)
+			if err != nil {
+				return nil, err
+			}
 		}
-		detail.GameLog = log
+
+		detail, found := details[id]
+		if !found {
+			continue
+		}
+
+		if gameLog {
+			log, err := q.refresh.FetchGameLog(ctx, league, detail)
+			if err != nil {
+				return nil, err
+			}
+			detail.GameLog = log
+		}
+		return &detail, nil
 	}
-	return &detail, nil
+	return nil, ErrNotFound
 }
 
 // GameFilters narrow the game list.
@@ -311,26 +320,40 @@ func (q *QueryService) GameResult(ctx context.Context, id string) (*model.GameRe
 	return game.Result, nil
 }
 
-// Injuries lists current injury reports.
+// Injuries lists current injury reports. A league filter outside the
+// enabled set returns empty.
 func (q *QueryService) Injuries(ctx context.Context, league, teamID, status string) ([]model.InjuryReport, error) {
-	if league != "" && !strings.EqualFold(league, leagueNBA) {
-		return []model.InjuryReport{}, nil
-	}
-
-	injuries, ok, err := q.cache.GetInjuries(ctx, leagueNBA, true)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		if err := q.refresh.RefreshInjuries(ctx); err != nil {
-			// Degrade to empty: injuries are best-effort by design.
-			return []model.InjuryReport{}, nil //nolint:nilerr // documented degradation
+	leagues := q.leagues
+	if league != "" {
+		leagues = nil
+		for _, l := range q.leagues {
+			if strings.EqualFold(league, string(l)) {
+				leagues = append(leagues, l)
+			}
 		}
-		injuries, _, _ = q.cache.GetInjuries(ctx, leagueNBA, true)
+		if len(leagues) == 0 {
+			return []model.InjuryReport{}, nil
+		}
 	}
 
-	filtered := make([]model.InjuryReport, 0, len(injuries))
-	for _, r := range injuries {
+	var all []model.InjuryReport
+	for _, l := range leagues {
+		injuries, ok, err := q.cache.GetInjuries(ctx, string(l), true)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			if err := q.refresh.RefreshInjuries(ctx); err != nil {
+				// Degrade to empty: injuries are best-effort by design.
+				return []model.InjuryReport{}, nil //nolint:nilerr // documented degradation
+			}
+			injuries, _, _ = q.cache.GetInjuries(ctx, string(l), true)
+		}
+		all = append(all, injuries...)
+	}
+
+	filtered := make([]model.InjuryReport, 0, len(all))
+	for _, r := range all {
 		if teamID != "" && r.TeamID != teamID {
 			continue
 		}
@@ -343,40 +366,48 @@ func (q *QueryService) Injuries(ctx context.Context, league, teamID, status stri
 }
 
 func (q *QueryService) teams(ctx context.Context) ([]model.TeamSummary, error) {
-	teams, ok, err := q.cache.GetTeams(ctx, leagueNBA, true)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		if err := q.refresh.RefreshTeams(ctx); err != nil {
-			return nil, err
-		}
-		teams, _, err = q.cache.GetTeams(ctx, leagueNBA, true)
+	var all []model.TeamSummary
+	for _, league := range q.leagues {
+		teams, ok, err := q.cache.GetTeams(ctx, string(league), true)
 		if err != nil {
 			return nil, err
 		}
+		if !ok {
+			if err := q.refresh.refreshTeamsLeague(ctx, league); err != nil {
+				return nil, err
+			}
+			teams, _, err = q.cache.GetTeams(ctx, string(league), true)
+			if err != nil {
+				return nil, err
+			}
+		}
+		all = append(all, teams...)
 	}
-	slices.SortFunc(teams, func(a, b model.TeamSummary) int {
+	slices.SortFunc(all, func(a, b model.TeamSummary) int {
 		return strings.Compare(a.Abbreviation, b.Abbreviation)
 	})
-	return teams, nil
+	return all, nil
 }
 
 func (q *QueryService) players(ctx context.Context) ([]model.PlayerSummary, error) {
-	players, ok, err := q.cache.GetPlayers(ctx, leagueNBA, true)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		if err := q.refresh.RefreshPlayers(ctx); err != nil {
-			return nil, err
-		}
-		players, _, err = q.cache.GetPlayers(ctx, leagueNBA, true)
+	var all []model.PlayerSummary
+	for _, league := range q.leagues {
+		players, ok, err := q.cache.GetPlayers(ctx, string(league), true)
 		if err != nil {
 			return nil, err
 		}
+		if !ok {
+			if err := q.refresh.refreshPlayersLeague(ctx, league); err != nil {
+				return nil, err
+			}
+			players, _, err = q.cache.GetPlayers(ctx, string(league), true)
+			if err != nil {
+				return nil, err
+			}
+		}
+		all = append(all, players...)
 	}
-	return players, nil
+	return all, nil
 }
 
 func (q *QueryService) games(ctx context.Context, seasonParam int) ([]model.Game, error) {
@@ -385,24 +416,28 @@ func (q *QueryService) games(ctx context.Context, seasonParam int) ([]model.Game
 		seasonYear = seasonParam
 	}
 
-	games, ok, err := q.cache.GetGames(ctx, leagueNBA, seasonYear, true)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		if seasonParam > 0 && seasonParam != q.seasonYear() {
-			// Only the current season is refreshed on demand.
-			return []model.Game{}, nil
-		}
-		if err := q.refresh.RefreshSchedule(ctx); err != nil {
-			return nil, err
-		}
-		games, _, err = q.cache.GetGames(ctx, leagueNBA, seasonYear, true)
+	var all []model.Game
+	for _, league := range q.leagues {
+		games, ok, err := q.cache.GetGames(ctx, string(league), seasonYear, true)
 		if err != nil {
 			return nil, err
 		}
+		if !ok {
+			if seasonParam > 0 && seasonParam != q.seasonYear() {
+				// Only the current season is refreshed on demand.
+				continue
+			}
+			if err := q.refresh.refreshScheduleLeague(ctx, league); err != nil {
+				return nil, err
+			}
+			games, _, err = q.cache.GetGames(ctx, string(league), seasonYear, true)
+			if err != nil {
+				return nil, err
+			}
+		}
+		all = append(all, games...)
 	}
-	return games, nil
+	return all, nil
 }
 
 func shapeStatBlocks(ts model.TeamStats, statType model.StatType) model.TeamStats {
