@@ -1,0 +1,136 @@
+{
+  "leagues": [
+    {
+      "id": "606",
+      "name": "FIFA World Cup",
+      "slug": "fifa.world",
+      "season": {
+        "year": 2026
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "760428",
+      "date": "2026-06-15T16:00Z",
+      "name": "Cape Verde at Spain",
+      "season": {
+        "year": 2026,
+        "type": 13802,
+        "slug": "group-stage"
+      },
+      "status": {
+        "clock": 5400,
+        "displayClock": "90'+5'",
+        "period": 2,
+        "type": {
+          "id": "28",
+          "name": "STATUS_FULL_TIME",
+          "state": "post",
+          "completed": true,
+          "description": "Full Time",
+          "detail": "FT",
+          "shortDetail": "FT"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760428",
+          "venue": {
+            "id": "7485",
+            "fullName": "Mercedes-Benz Stadium",
+            "address": {
+              "city": "Atlanta, Georgia",
+              "country": "USA"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "0",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "164",
+                "displayName": "Spain",
+                "abbreviation": "ESP"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "0",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "2597",
+                "displayName": "Cape Verde",
+                "abbreviation": "CPV"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "760426",
+      "date": "2026-06-15T19:00Z",
+      "name": "Egypt at Belgium",
+      "season": {
+        "year": 2026,
+        "type": 13802,
+        "slug": "group-stage"
+      },
+      "status": {
+        "clock": 5400,
+        "displayClock": "90'+5'",
+        "period": 2,
+        "type": {
+          "id": "28",
+          "name": "STATUS_FULL_TIME",
+          "state": "post",
+          "completed": true,
+          "description": "Full Time",
+          "detail": "FT",
+          "shortDetail": "FT"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760426",
+          "venue": {
+            "id": "4485",
+            "fullName": "Lumen Field",
+            "address": {
+              "city": "Seattle, Washington",
+              "country": "USA"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "1",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "459",
+                "displayName": "Belgium",
+                "abbreviation": "BEL"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "1",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "2620",
+                "displayName": "Egypt",
+                "abbreviation": "EGY"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

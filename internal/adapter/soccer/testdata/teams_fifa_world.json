@@ -1,0 +1,84 @@
+{
+  "sports": [
+    {
+      "leagues": [
+        {
+          "teams": [
+            {
+              "team": {
+                "id": "624",
+                "displayName": "Algeria",
+                "abbreviation": "ALG",
+                "location": "Algeria",
+                "isActive": true,
+                "logos": [
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/countries/500/alg.png",
+                    "rel": ["full", "default"],
+                    "width": 500
+                  }
+                ]
+              }
+            },
+            {
+              "team": {
+                "id": "448",
+                "displayName": "England",
+                "abbreviation": "ENG",
+                "location": "England",
+                "isActive": true,
+                "logos": [
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/countries/500/eng.png",
+                    "rel": ["full", "default"],
+                    "width": 500
+                  }
+                ]
+              }
+            },
+            {
+              "team": {
+                "id": "203",
+                "displayName": "Mexico",
+                "abbreviation": "MEX",
+                "location": "Mexico",
+                "isActive": true,
+                "logos": [
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
+                    "rel": ["full", "default"],
+                    "width": 500
+                  }
+                ]
+              }
+            },
+            {
+              "team": {
+                "id": "660",
+                "displayName": "United States",
+                "abbreviation": "USA",
+                "location": "United States",
+                "isActive": true,
+                "logos": [
+                  {
+                    "alt": "",
+                    "height": 500,
+                    "href": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+                    "rel": ["full", "default"],
+                    "width": 500
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

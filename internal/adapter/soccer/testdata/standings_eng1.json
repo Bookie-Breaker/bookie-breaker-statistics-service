@@ -1,0 +1,149 @@
+{
+  "uid": "s:600~l:700",
+  "id": "23",
+  "name": "English Premier League",
+  "abbreviation": "Premier League",
+  "children": [
+    {
+      "id": "1",
+      "name": "English Premier League 2025-2026",
+      "abbreviation": "2025-2026",
+      "standings": {
+        "entries": [
+          {
+            "team": {
+              "id": "359",
+              "displayName": "Arsenal",
+              "abbreviation": "ARS"
+            },
+            "stats": [
+              {
+                "name": "gamesPlayed",
+                "value": 38,
+                "displayValue": "38"
+              },
+              {
+                "name": "losses",
+                "value": 5,
+                "displayValue": "5"
+              },
+              {
+                "name": "points",
+                "value": 85,
+                "displayValue": "85"
+              },
+              {
+                "name": "pointsAgainst",
+                "value": 27,
+                "displayValue": "27"
+              },
+              {
+                "name": "pointsFor",
+                "value": 71,
+                "displayValue": "71"
+              },
+              {
+                "name": "ties",
+                "value": 7,
+                "displayValue": "7"
+              },
+              {
+                "name": "wins",
+                "value": 26,
+                "displayValue": "26"
+              }
+            ]
+          },
+          {
+            "team": {
+              "id": "382",
+              "displayName": "Manchester City",
+              "abbreviation": "MNC"
+            },
+            "stats": [
+              {
+                "name": "gamesPlayed",
+                "value": 38,
+                "displayValue": "38"
+              },
+              {
+                "name": "losses",
+                "value": 6,
+                "displayValue": "6"
+              },
+              {
+                "name": "points",
+                "value": 78,
+                "displayValue": "78"
+              },
+              {
+                "name": "pointsAgainst",
+                "value": 35,
+                "displayValue": "35"
+              },
+              {
+                "name": "pointsFor",
+                "value": 77,
+                "displayValue": "77"
+              },
+              {
+                "name": "ties",
+                "value": 9,
+                "displayValue": "9"
+              },
+              {
+                "name": "wins",
+                "value": 23,
+                "displayValue": "23"
+              }
+            ]
+          },
+          {
+            "team": {
+              "id": "360",
+              "displayName": "Manchester United",
+              "abbreviation": "MAN"
+            },
+            "stats": [
+              {
+                "name": "gamesPlayed",
+                "value": 38,
+                "displayValue": "38"
+              },
+              {
+                "name": "losses",
+                "value": 7,
+                "displayValue": "7"
+              },
+              {
+                "name": "points",
+                "value": 71,
+                "displayValue": "71"
+              },
+              {
+                "name": "pointsAgainst",
+                "value": 50,
+                "displayValue": "50"
+              },
+              {
+                "name": "pointsFor",
+                "value": 69,
+                "displayValue": "69"
+              },
+              {
+                "name": "ties",
+                "value": 11,
+                "displayValue": "11"
+              },
+              {
+                "name": "wins",
+                "value": 20,
+                "displayValue": "20"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

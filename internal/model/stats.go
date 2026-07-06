@@ -32,6 +32,22 @@ type AdvancedStats struct {
 	OffensiveReboundPct float64 `json:"offensive_rebound_pct"`
 }
 
+// SoccerStats matches the OpenAPI SoccerStats schema (SOCCER-sport leagues
+// only; ADR-026). Strengths are multiplicative factors relative to the
+// competition average (1.0 = average), shrunk toward 1.0 by matches played
+// to damp small samples. Form fields cover the last (up to) five completed
+// matches: goals are per-match averages, points are the summed 3/1/0.
+type SoccerStats struct {
+	GoalsForPerMatch      float64 `json:"goals_for_per_match"`
+	GoalsAgainstPerMatch  float64 `json:"goals_against_per_match"`
+	AttackStrength        float64 `json:"attack_strength"`
+	DefenseStrength       float64 `json:"defense_strength"`
+	Draws                 int     `json:"draws"`
+	FormGoalsForLast5     float64 `json:"form_goals_for_last5"`
+	FormGoalsAgainstLast5 float64 `json:"form_goals_against_last5"`
+	FormPointsLast5       int     `json:"form_points_last5"`
+}
+
 // SplitRecord matches the OpenAPI SplitRecord schema.
 type SplitRecord struct {
 	Wins                 int     `json:"wins"`
@@ -40,12 +56,15 @@ type SplitRecord struct {
 	PointsAllowedPerGame float64 `json:"points_allowed_per_game"`
 }
 
-// StatBlocks groups the three stat categories; fields are pointers so the
-// stat_type filter can omit whole blocks.
+// StatBlocks groups the stat categories; fields are pointers so the
+// stat_type filter can omit whole blocks. Basketball leagues populate the
+// offensive/defensive/advanced blocks; soccer leagues populate only the
+// soccer block (ADR-026).
 type StatBlocks struct {
 	Offensive *OffensiveStats `json:"offensive,omitempty"`
 	Defensive *DefensiveStats `json:"defensive,omitempty"`
 	Advanced  *AdvancedStats  `json:"advanced,omitempty"`
+	Soccer    *SoccerStats    `json:"soccer,omitempty"`
 }
 
 // HomeAwaySplits groups home/road records.
@@ -66,4 +85,6 @@ type TeamStats struct {
 	// they must serialize because the Redis cache is the primary store.
 	Wins   int `json:"wins"`
 	Losses int `json:"losses"`
+	// Draws is set only for sports with three-way results (soccer; ADR-027).
+	Draws int `json:"draws,omitempty"`
 }

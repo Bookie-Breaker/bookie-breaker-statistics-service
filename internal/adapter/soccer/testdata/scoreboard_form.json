@@ -1,0 +1,197 @@
+{
+  "leagues": [
+    {
+      "id": "606",
+      "name": "FIFA World Cup",
+      "slug": "fifa.world",
+      "season": {
+        "year": 2026
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "760415",
+      "date": "2026-06-11T19:00Z",
+      "name": "South Africa at Mexico",
+      "season": {
+        "year": 2026,
+        "type": 13802,
+        "slug": "group-stage"
+      },
+      "status": {
+        "clock": 5400,
+        "displayClock": "90'+8'",
+        "period": 2,
+        "type": {
+          "id": "28",
+          "name": "STATUS_FULL_TIME",
+          "state": "post",
+          "completed": true,
+          "description": "Full Time",
+          "detail": "FT",
+          "shortDetail": "FT"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760415",
+          "venue": {
+            "id": "1672",
+            "fullName": "Estadio Banorte",
+            "address": {
+              "city": "Mexico City",
+              "country": "Mexico"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "2",
+              "shootoutScore": null,
+              "winner": true,
+              "team": {
+                "id": "203",
+                "displayName": "Mexico",
+                "abbreviation": "MEX"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "0",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "467",
+                "displayName": "South Africa",
+                "abbreviation": "RSA"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "760441",
+      "date": "2026-06-19T01:00Z",
+      "name": "South Korea at Mexico",
+      "season": {
+        "year": 2026,
+        "type": 13802,
+        "slug": "group-stage"
+      },
+      "status": {
+        "clock": 5400,
+        "displayClock": "90'+6'",
+        "period": 2,
+        "type": {
+          "id": "28",
+          "name": "STATUS_FULL_TIME",
+          "state": "post",
+          "completed": true,
+          "description": "Full Time",
+          "detail": "FT",
+          "shortDetail": "FT"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760441",
+          "venue": {
+            "id": "5009",
+            "fullName": "Estadio Akron",
+            "address": {
+              "city": "Guadalajara",
+              "country": "Mexico"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "1",
+              "shootoutScore": null,
+              "winner": true,
+              "team": {
+                "id": "203",
+                "displayName": "Mexico",
+                "abbreviation": "MEX"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "0",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "451",
+                "displayName": "South Korea",
+                "abbreviation": "KOR"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "760467",
+      "date": "2026-06-25T01:00Z",
+      "name": "Mexico at Czechia",
+      "season": {
+        "year": 2026,
+        "type": 13802,
+        "slug": "group-stage"
+      },
+      "status": {
+        "clock": 5400,
+        "displayClock": "90'+6'",
+        "period": 2,
+        "type": {
+          "id": "28",
+          "name": "STATUS_FULL_TIME",
+          "state": "post",
+          "completed": true,
+          "description": "Full Time",
+          "detail": "FT",
+          "shortDetail": "FT"
+        }
+      },
+      "competitions": [
+        {
+          "id": "760467",
+          "venue": {
+            "id": "1672",
+            "fullName": "Estadio Banorte",
+            "address": {
+              "city": "Mexico City",
+              "country": "Mexico"
+            }
+          },
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "0",
+              "shootoutScore": null,
+              "winner": false,
+              "team": {
+                "id": "450",
+                "displayName": "Czechia",
+                "abbreviation": "CZE"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "3",
+              "shootoutScore": null,
+              "winner": true,
+              "team": {
+                "id": "203",
+                "displayName": "Mexico",
+                "abbreviation": "MEX"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
 )
 
@@ -35,6 +36,41 @@ func TestWatchDatesOffseasonIdle(t *testing.T) {
 	}
 	if dates := watchDates(games, now); len(dates) != 0 {
 		t.Errorf("offseason should watch nothing, got %v", dates)
+	}
+}
+
+// TestApplyScoreboardUpdateRegulationScores covers the soccer extra-time
+// transition: a status flip to FINAL adopts the provider-built result
+// including the ADR-027 regulation scores, which publishCompleted then
+// carries onto events:game.completed (fields wired in Wave 0).
+func TestApplyScoreboardUpdateRegulationScores(t *testing.T) {
+	regHome, regAway := 2, 2
+	game := model.Game{ID: "game-uuid", Status: model.GameInProgress}
+	update := sportsdata.ScoreboardUpdate{
+		Status:    model.GameFinal,
+		HomeScore: 3,
+		AwayScore: 2,
+		Result: &model.GameResult{
+			HomeScore: 3, AwayScore: 2, TotalScore: 5, Margin: 1,
+			Overtime:            true,
+			RegulationHomeScore: &regHome,
+			RegulationAwayScore: &regAway,
+		},
+	}
+
+	applyScoreboardUpdate(&game, update)
+	if game.Status != model.GameFinal || game.Result == nil {
+		t.Fatalf("final transition wrong: %+v", game)
+	}
+	if game.Result.ID != "game-uuid" {
+		t.Errorf("result id = %q, want the canonical game id", game.Result.ID)
+	}
+	if game.Result.RegulationHomeScore == nil || *game.Result.RegulationHomeScore != 2 ||
+		game.Result.RegulationAwayScore == nil || *game.Result.RegulationAwayScore != 2 {
+		t.Errorf("regulation scores lost in transition: %+v", game.Result)
+	}
+	if *game.HomeScore != 3 || *game.AwayScore != 2 {
+		t.Errorf("full-time scores wrong: %d-%d", *game.HomeScore, *game.AwayScore)
 	}
 }
 

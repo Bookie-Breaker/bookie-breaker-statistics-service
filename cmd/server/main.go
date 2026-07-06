@@ -11,6 +11,7 @@ import (
 
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espn"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nba"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/soccer"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cache"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/config"
@@ -83,13 +84,24 @@ func main() {
 	}
 	seasonYear := func() int { return seasonFor(time.Now().UTC()) }
 
-	// Only the NBA adapter exists in Phase 6 Wave 0; later waves add the
+	// NBA (Wave 0) and soccer (Wave 1) adapters exist; later waves add the
 	// remaining leagues (ADR-026).
+	var soccerClient *soccer.Client
 	providers := make(map[model.League]sportsdata.StatsProvider, len(cfg.LeaguesEnabled))
 	for _, league := range cfg.LeaguesEnabled {
 		switch league {
 		case model.LeagueNBA:
 			providers[league] = nba.NewProvider(nbaClient, seasonFor)
+		case model.LeagueFIFAWC, model.LeagueEPL:
+			if soccerClient == nil {
+				soccerClient = soccer.NewClient(cfg.ESPNBaseURL, cfg.NBAHTTPTimeout)
+			}
+			comp, err := soccer.CompetitionForLeague(league)
+			if err != nil {
+				slog.Error("invalid soccer league", "league", league, "error", err)
+				os.Exit(1)
+			}
+			providers[league] = soccer.NewProvider(soccerClient, comp)
 		default:
 			slog.Error(fmt.Sprintf("no adapter for league %s yet", league))
 			os.Exit(1)
