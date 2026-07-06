@@ -133,7 +133,7 @@ func (q *QueryService) TeamStats(ctx context.Context, teamID string, seasonParam
 	var stats map[string]model.TeamStats
 	var err error
 	if window > 0 {
-		stats, err = q.refresh.FetchTeamStatsWindow(ctx, window)
+		stats, err = q.refresh.FetchTeamStatsWindow(ctx, model.LeagueNBA, window)
 		if err != nil {
 			return nil, err
 		}
@@ -225,7 +225,7 @@ func (q *QueryService) PlayerByID(ctx context.Context, id string, gameLog bool) 
 	}
 
 	if gameLog {
-		log, err := q.refresh.FetchGameLog(ctx, detail)
+		log, err := q.refresh.FetchGameLog(ctx, detail.League, detail)
 		if err != nil {
 			return nil, err
 		}

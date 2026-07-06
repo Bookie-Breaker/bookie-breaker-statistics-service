@@ -7,8 +7,9 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
-	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nba"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cache"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/pubsub"
@@ -16,35 +17,43 @@ import (
 
 var watcherTracer = otel.Tracer("game-watcher")
 
-// GameWatcher polls the scoreboard for dates with unfinished games and
-// publishes game.completed on transitions to FINAL. It stays idle when the
-// schedule shows nothing to watch (e.g. the offseason).
+// GameWatcher polls each enabled league's scoreboard for dates with
+// unfinished games and publishes game.completed on transitions to FINAL. It
+// stays idle when the schedule shows nothing to watch (e.g. the offseason).
 type GameWatcher struct {
-	refresh    *RefreshService
-	nba        *nba.Client
-	cache      *cache.StatsCache
-	publisher  *pubsub.Publisher
-	seasonYear func() int
+	refresh   *RefreshService
+	cache     *cache.StatsCache
+	publisher *pubsub.Publisher
 }
 
-// NewGameWatcher creates a game watcher.
-func NewGameWatcher(refresh *RefreshService, nbaClient *nba.Client, statsCache *cache.StatsCache, publisher *pubsub.Publisher, seasonYear func() int) *GameWatcher {
+// NewGameWatcher creates a game watcher over the refresh service's
+// providers.
+func NewGameWatcher(refresh *RefreshService, statsCache *cache.StatsCache, publisher *pubsub.Publisher) *GameWatcher {
 	return &GameWatcher{
-		refresh:    refresh,
-		nba:        nbaClient,
-		cache:      statsCache,
-		publisher:  publisher,
-		seasonYear: seasonYear,
+		refresh:   refresh,
+		cache:     statsCache,
+		publisher: publisher,
 	}
 }
 
-// Tick runs one watch cycle.
+// Tick runs one watch cycle across every enabled league.
 func (w *GameWatcher) Tick(ctx context.Context) error {
 	ctx, span := watcherTracer.Start(ctx, "watcher.Tick")
 	defer span.End()
 
-	seasonYear := w.seasonYear()
-	games, ok, err := w.cache.GetGames(ctx, leagueNBA, seasonYear, true)
+	for _, p := range w.refresh.ordered {
+		if err := w.tickLeague(ctx, span, p); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (w *GameWatcher) tickLeague(ctx context.Context, span trace.Span, p sportsdata.StatsProvider) error {
+	league := string(p.League())
+	seasonYear := p.SeasonYear(time.Now().UTC())
+
+	games, ok, err := w.cache.GetGames(ctx, league, seasonYear, true)
 	if err != nil || !ok {
 		return err // nothing to watch until the schedule refresh lands
 	}
@@ -55,26 +64,26 @@ func (w *GameWatcher) Tick(ctx context.Context) error {
 		return nil
 	}
 
-	entriesByGame := make(map[string]nba.ScoreboardEntry)
+	updatesByGame := make(map[string]sportsdata.ScoreboardUpdate)
 	for _, date := range dates {
-		entries, fetch, err := w.nba.Scoreboard(ctx, date)
-		w.refresh.archiveNBA(ctx, fetch)
+		updates, fetches, err := p.Scoreboard(ctx, date)
+		w.refresh.archive(ctx, p.Source(), fetches...)
 		if err != nil {
 			return err
 		}
-		for _, e := range entries {
-			entriesByGame[e.NBAGameID] = e
+		for id, u := range updates {
+			updatesByGame[id] = u
 		}
 	}
 
 	updated := false
 	for i := range games {
-		entry, ok := entriesByGame[games[i].ExternalID]
+		update, ok := updatesByGame[games[i].ExternalID]
 		if !ok {
 			continue
 		}
 		before := games[i].Status
-		games[i] = nba.ApplyScoreboard(games[i], entry)
+		applyScoreboardUpdate(&games[i], update)
 		if games[i].Status != before {
 			updated = true
 		}
@@ -85,11 +94,26 @@ func (w *GameWatcher) Tick(ctx context.Context) error {
 	}
 
 	if updated {
-		if err := w.cache.SetGames(ctx, leagueNBA, seasonYear, games); err != nil {
+		if err := w.cache.SetGames(ctx, league, seasonYear, games); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// applyScoreboardUpdate folds a neutral scoreboard update into a canonical
+// game, adopting the provider-built result on FINAL.
+func applyScoreboardUpdate(game *model.Game, update sportsdata.ScoreboardUpdate) {
+	game.Status = update.Status
+	if update.Status != model.GameScheduled {
+		home, away := update.HomeScore, update.AwayScore
+		game.HomeScore = &home
+		game.AwayScore = &away
+	}
+	if update.Status == model.GameFinal && update.Result != nil {
+		update.Result.ID = game.ID
+		game.Result = update.Result
+	}
 }
 
 func (w *GameWatcher) publishCompleted(ctx context.Context, game model.Game) {

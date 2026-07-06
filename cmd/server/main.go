@@ -11,10 +11,12 @@ import (
 
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/espn"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/nba"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cache"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/config"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/database"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/handler"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/pubsub"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/repository/postgres"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/season"
@@ -80,17 +82,22 @@ func main() {
 		slog.Info("injury source disabled; /injuries will return empty reports", "INJURY_SOURCE", cfg.InjurySource)
 	}
 
-	seasonYear := func() int {
+	seasonFor := func(now time.Time) int {
 		if cfg.CurrentSeason > 0 {
 			return cfg.CurrentSeason
 		}
-		return season.Current(time.Now().UTC())
+		return season.Current(now)
+	}
+	seasonYear := func() int { return seasonFor(time.Now().UTC()) }
+
+	providers := map[model.League]sportsdata.StatsProvider{
+		model.LeagueNBA: nba.NewProvider(nbaClient, seasonFor),
 	}
 
 	rawRepo := postgres.NewRawResponseRepo(db)
 	publisher := pubsub.NewPublisher(rdb)
-	refresh := service.NewRefreshService(nbaClient, espnClient, statsCache, rawRepo, publisher, seasonYear)
-	watcher := service.NewGameWatcher(refresh, nbaClient, statsCache, publisher, seasonYear)
+	refresh := service.NewRefreshService(providers, espnClient, statsCache, rawRepo, publisher)
+	watcher := service.NewGameWatcher(refresh, statsCache, publisher)
 	query := service.NewQueryService(statsCache, refresh, seasonYear)
 
 	scheduler := service.NewScheduler(refresh, watcher, service.Intervals{
