@@ -1,0 +1,50 @@
+{
+  "team": {
+    "id": "448",
+    "displayName": "England",
+    "abbreviation": "ENG"
+  },
+  "athletes": [
+    {
+      "id": "310580",
+      "firstName": "Harry",
+      "lastName": "Kane",
+      "displayName": "Harry Kane",
+      "jersey": "9",
+      "position": {
+        "name": "Forward",
+        "abbreviation": "F"
+      },
+      "statistics": [
+        { "name": "appearances", "abbreviation": "APP", "value": 6 },
+        { "name": "minutesPlayed", "abbreviation": "MIN", "value": 512 },
+        { "name": "totalGoals", "abbreviation": "G", "value": 5 },
+        { "name": "goalAssists", "abbreviation": "A", "value": 2 },
+        { "name": "totalShots", "abbreviation": "SH", "value": 21 },
+        { "name": "shotsOnTarget", "abbreviation": "ST", "value": 11 },
+        { "name": "yellowCards", "abbreviation": "YC", "value": 1 },
+        { "name": "redCards", "abbreviation": "RC", "value": 0 }
+      ]
+    },
+    {
+      "id": "384967",
+      "firstName": "Jude",
+      "lastName": "Bellingham",
+      "displayName": "Jude Bellingham",
+      "jersey": "10",
+      "position": {
+        "name": "Midfielder",
+        "abbreviation": "M"
+      }
+    },
+    {
+      "id": "293119",
+      "displayName": "Jordan Pickford",
+      "jersey": "1",
+      "position": {
+        "name": "Goalkeeper",
+        "abbreviation": "G"
+      }
+    }
+  ]
+}

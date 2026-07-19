@@ -244,3 +244,9 @@ func (p *Provider) Scoreboard(ctx context.Context, date time.Time) (map[string]s
 func (p *Provider) PlayerGameLog(context.Context, model.PlayerDetail, int) ([]model.PlayerGameLine, []*sportsdata.Fetch, error) {
 	return []model.PlayerGameLine{}, nil, nil
 }
+
+// BoxScore is a tracked Phase 7 deferral: MLB box scores arrive in a later
+// wave.
+func (p *Provider) BoxScore(context.Context, string) (*model.BoxScore, []*sportsdata.Fetch, error) {
+	return nil, nil, sportsdata.ErrNotSupported
+}

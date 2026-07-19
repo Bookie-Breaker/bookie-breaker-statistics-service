@@ -10,6 +10,9 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/ids"
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
 )
 
 func testClient(t *testing.T, handler http.Handler) *Client {
@@ -59,6 +62,8 @@ func fixtureMux(t *testing.T) http.Handler {
 			serveFixture(t, w, "scheduleleaguev2.json")
 		case "/stats/scoreboardv3":
 			serveFixture(t, w, "scoreboardv3.json")
+		case "/stats/boxscoretraditionalv2":
+			serveFixture(t, w, "boxscoretraditionalv2.json")
 		default:
 			http.NotFound(w, r)
 		}
@@ -256,6 +261,73 @@ func TestNormalizePlayers(t *testing.T) {
 				t.Errorf("rookie experience should be 0: %+v", d.ExperienceYears)
 			}
 		}
+	}
+}
+
+func TestBoxScoreNormalization(t *testing.T) {
+	client := testClient(t, fixtureMux(t))
+	provider := NewProvider(client, func(time.Time) int { return 2025 })
+
+	box, fetches, err := provider.BoxScore(context.Background(), "0022500001")
+	if err != nil {
+		t.Fatalf("BoxScore failed: %v", err)
+	}
+	if len(fetches) != 1 {
+		t.Errorf("fetches = %d, want 1", len(fetches))
+	}
+
+	if box.Sport != "BASKETBALL" {
+		t.Errorf("sport = %q, want BASKETBALL", box.Sport)
+	}
+	// The provider emits teams in response order (LAL first in the
+	// fixture); the query layer swaps against the canonical game.
+	lal, bos := box.HomeTeam, box.AwayTeam
+	if lal.Abbreviation != "LAL" || bos.Abbreviation != "BOS" {
+		t.Fatalf("teams = %s/%s, want LAL/BOS", lal.Abbreviation, bos.Abbreviation)
+	}
+	if lal.ID != ids.Team("NBA", "1610612747") || bos.ID != ids.Team("NBA", "1610612738") {
+		t.Errorf("team ids not minted with ids.Team: %s / %s", lal.ID, bos.ID)
+	}
+	if lal.Score != 112 || bos.Score != 104 {
+		t.Errorf("scores = %d-%d, want 112-104", lal.Score, bos.Score)
+	}
+	if lal.TeamStats == nil || lal.TeamStats.FieldGoalsMade != 42 || lal.TeamStats.Turnovers != 12 {
+		t.Errorf("team stats wrong: %+v", lal.TeamStats)
+	}
+	if len(lal.SoccerPlayers) != 0 || len(bos.SoccerPlayers) != 0 {
+		t.Error("soccer players must be empty for basketball")
+	}
+
+	if len(lal.Players) != 3 || len(bos.Players) != 1 {
+		t.Fatalf("players = %d/%d, want 3/1", len(lal.Players), len(bos.Players))
+	}
+	byName := make(map[string]model.BasketballPlayerBoxScore)
+	for _, p := range append(lal.Players, bos.Players...) {
+		byName[p.PlayerName] = p
+	}
+
+	lebron := byName["LeBron James"]
+	if lebron.PlayerID != ids.Player("NBA", "2544") {
+		t.Errorf("player id not minted with ids.Player: %s", lebron.PlayerID)
+	}
+	if lebron.Position != "F" || lebron.Points != 28 || lebron.Rebounds != 8 || lebron.Assists != 9 ||
+		lebron.Steals != 1 || lebron.Blocks != 1 || lebron.Turnovers != 4 ||
+		lebron.FieldGoalsMade != 10 || lebron.FieldGoalsAttempted != 18 ||
+		lebron.ThreePointersMade != 2 || lebron.ThreePointersAttempted != 6 ||
+		lebron.FreeThrowsMade != 6 || lebron.FreeThrowsAttempted != 8 || lebron.PlusMinus != 6 {
+		t.Errorf("line wrong: %+v", lebron)
+	}
+	if math.Abs(lebron.Minutes-37.75) > 1e-9 {
+		t.Errorf("minutes = %v, want 37.75 (parsed from 37:45)", lebron.Minutes)
+	}
+
+	// "39.000000:12" is the endpoint's occasional decimal-minutes form.
+	if luka := byName["Luka Doncic"]; math.Abs(luka.Minutes-39.2) > 1e-9 {
+		t.Errorf("minutes = %v, want 39.2 (parsed from 39.000000:12)", luka.Minutes)
+	}
+	// DNPs keep a zero line.
+	if bench := byName["Bench Guy"]; bench.Minutes != 0 || bench.Points != 0 {
+		t.Errorf("DNP line should be zero: %+v", bench)
 	}
 }
 

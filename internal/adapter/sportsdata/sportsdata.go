@@ -8,10 +8,16 @@ package sportsdata
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
 )
+
+// ErrNotSupported is returned by providers for surfaces their league does
+// not implement yet (e.g. box scores outside NBA and soccer in Phase 7
+// Wave 0). The handler layer maps it to a 404.
+var ErrNotSupported = errors.New("not supported for this league")
 
 // Fetch carries the raw response of one upstream call for archival into
 // raw_api_responses.
@@ -59,4 +65,10 @@ type StatsProvider interface {
 	Scoreboard(ctx context.Context, date time.Time) (map[string]ScoreboardUpdate, []*Fetch, error)
 	// PlayerGameLog returns one player's per-game lines for a season.
 	PlayerGameLog(ctx context.Context, player model.PlayerDetail, seasonYear int) ([]model.PlayerGameLine, []*Fetch, error)
+	// BoxScore returns one game's per-player box score by the source's
+	// external game id. The provider fills teams in source order with
+	// canonical ids; the service orients home/away against the canonical
+	// game and owns game_id/sport/status. Leagues without box-score support
+	// return ErrNotSupported (tracked Phase 7 deferrals).
+	BoxScore(ctx context.Context, gameExternalID string) (*model.BoxScore, []*Fetch, error)
 }

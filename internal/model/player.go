@@ -34,12 +34,28 @@ type PlayerSummary struct {
 	League League `json:"league,omitempty"`
 }
 
+// SoccerSeasonStats matches the OpenAPI SoccerSeasonStats schema: season
+// totals for soccer players (Phase 7; PlayerSeasonStats stays
+// basketball-shaped for compatibility).
+type SoccerSeasonStats struct {
+	Appearances   int `json:"appearances"`
+	Minutes       int `json:"minutes"`
+	Goals         int `json:"goals"`
+	Assists       int `json:"assists"`
+	Shots         int `json:"shots"`
+	ShotsOnTarget int `json:"shots_on_target"`
+	YellowCards   int `json:"yellow_cards"`
+	RedCards      int `json:"red_cards"`
+}
+
 // PlayerDetail matches the OpenAPI PlayerDetail schema.
 type PlayerDetail struct {
 	PlayerSummary
 	ExperienceYears *int               `json:"experience_years,omitempty"`
 	SeasonStats     *PlayerSeasonStats `json:"season_stats,omitempty"`
-	GameLog         []PlayerGameLine   `json:"game_log,omitempty"`
+	// SoccerSeasonStats is set for SOCCER leagues only (Phase 7).
+	SoccerSeasonStats *SoccerSeasonStats `json:"soccer_season_stats,omitempty"`
+	GameLog           []PlayerGameLine   `json:"game_log,omitempty"`
 }
 
 // PlayerGameLine is one row of a player's per-game log (returned when

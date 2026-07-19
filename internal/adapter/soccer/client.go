@@ -70,6 +70,13 @@ func (c *Client) Summary(ctx context.Context, code, eventID string) (*summaryRes
 	return &parsed, fetch, err
 }
 
+// Roster fetches one team's player list (Phase 7 soccer player surfaces).
+func (c *Client) Roster(ctx context.Context, code, teamID string) (*rosterResponse, *sportsdata.Fetch, error) {
+	var parsed rosterResponse
+	fetch, err := c.get(ctx, fmt.Sprintf("/apis/site/v2/sports/soccer/%s/teams/%s/roster", code, teamID), &parsed)
+	return &parsed, fetch, err
+}
+
 // Standings fetches the competition table(s) for a season: per-team W/D/L,
 // goals for/against, and games played. Note the /apis/v2 prefix — the
 // /apis/site/v2 standings route returns an empty object (verified live).

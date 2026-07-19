@@ -23,6 +23,7 @@ func registerRoutes(e *echo.Echo, deps Deps) {
 	api.GET("/games", gamesHandler.GetGames)
 	api.GET("/games/:game_id", gamesHandler.GetGameByID)
 	api.GET("/games/:game_id/result", gamesHandler.GetGameResult)
+	api.GET("/games/:game_id/box-score", gamesHandler.GetBoxScore)
 	api.GET("/schedule", gamesHandler.GetSchedule)
 	api.GET("/injuries", injuriesHandler.GetInjuries)
 }

@@ -264,6 +264,91 @@ func buildResult(gameID string, homeScore, awayScore int, homePeriods, awayPerio
 	return result
 }
 
+// NormalizeBoxScore converts boxscoretraditionalv2 result sets into the
+// canonical box score. Teams are emitted in response order with canonical
+// ids; the query layer orients home/away against the canonical game (the
+// endpoint carries no home/away marker) and owns game_id/sport/status.
+func NormalizeBoxScore(players []BoxScorePlayerLine, teams []BoxScoreTeamLine) *model.BoxScore {
+	if len(teams) == 0 {
+		return nil
+	}
+
+	playersByTeam := make(map[string][]model.BasketballPlayerBoxScore)
+	for _, p := range players {
+		playersByTeam[p.NBATeamID] = append(playersByTeam[p.NBATeamID], model.BasketballPlayerBoxScore{
+			PlayerID:               ids.Player(leagueNBA, p.NBAPlayerID),
+			PlayerName:             p.Name,
+			Position:               p.Position,
+			Minutes:                parseBoxMinutes(p.MIN),
+			Points:                 p.PTS,
+			Rebounds:               p.REB,
+			Assists:                p.AST,
+			Steals:                 p.STL,
+			Blocks:                 p.BLK,
+			Turnovers:              p.TOV,
+			FieldGoalsMade:         p.FGM,
+			FieldGoalsAttempted:    p.FGA,
+			ThreePointersMade:      p.FG3M,
+			ThreePointersAttempted: p.FG3A,
+			FreeThrowsMade:         p.FTM,
+			FreeThrowsAttempted:    p.FTA,
+			PlusMinus:              p.PlusMinus,
+		})
+	}
+
+	teamBox := func(t BoxScoreTeamLine) model.TeamBoxScore {
+		return model.TeamBoxScore{
+			ID:           ids.Team(leagueNBA, t.NBATeamID),
+			Abbreviation: t.TeamAbbrev,
+			Score:        t.PTS,
+			TeamStats: &model.BasketballTeamStats{
+				FieldGoalsMade:         t.FGM,
+				FieldGoalsAttempted:    t.FGA,
+				ThreePointersMade:      t.FG3M,
+				ThreePointersAttempted: t.FG3A,
+				FreeThrowsMade:         t.FTM,
+				FreeThrowsAttempted:    t.FTA,
+				Rebounds:               t.REB,
+				OffensiveRebounds:      t.OREB,
+				DefensiveRebounds:      t.DREB,
+				Assists:                t.AST,
+				Steals:                 t.STL,
+				Blocks:                 t.BLK,
+				Turnovers:              t.TOV,
+			},
+			Players: playersByTeam[t.NBATeamID],
+		}
+	}
+
+	box := &model.BoxScore{
+		Sport:    string(model.SportBasketball),
+		HomeTeam: teamBox(teams[0]),
+	}
+	if len(teams) > 1 {
+		box.AwayTeam = teamBox(teams[1])
+	}
+	return box
+}
+
+// parseBoxMinutes converts a box-score MIN value ("34:12", occasionally
+// "34.000000:12", "" for DNPs) to decimal minutes.
+func parseBoxMinutes(raw string) float64 {
+	if raw == "" {
+		return 0
+	}
+	parts := strings.SplitN(raw, ":", 2)
+	minutes, err := strconv.ParseFloat(parts[0], 64)
+	if err != nil {
+		return 0
+	}
+	if len(parts) == 2 {
+		if seconds, err := strconv.ParseFloat(parts[1], 64); err == nil {
+			minutes += seconds / 60
+		}
+	}
+	return minutes
+}
+
 func statusFromCode(code int) model.GameStatus {
 	switch code {
 	case statusLive:

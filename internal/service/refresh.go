@@ -449,6 +449,44 @@ func (s *RefreshService) FetchGameLog(ctx context.Context, league model.League, 
 	return log, nil
 }
 
+// FetchBoxScore fetches one game's box score through its league provider,
+// orients it against the canonical game, and caches it when the game is
+// FINAL (box scores are immutable post-final; pre-final responses are
+// served uncached). Raw bodies are archived like every provider fetch.
+func (s *RefreshService) FetchBoxScore(ctx context.Context, game *model.Game) (*model.BoxScore, error) {
+	p, err := s.provider(game.League)
+	if err != nil {
+		return nil, err
+	}
+
+	box, fetches, err := p.BoxScore(ctx, game.ExternalID)
+	s.archive(ctx, p.Source(), fetches...)
+	if err != nil {
+		return nil, err
+	}
+
+	orientBoxScore(box, game)
+	if game.Status == model.GameFinal {
+		if err := s.cache.SetBoxScore(ctx, game.ID, box); err != nil {
+			slog.Warn("failed to cache box score", "game_id", game.ID, "error", err)
+		}
+	}
+	return box, nil
+}
+
+// orientBoxScore aligns a provider-built box score with the canonical
+// game: the service owns game_id, sport, and status, and swaps the team
+// blocks when the provider emitted them in the opposite order (the NBA box
+// score endpoint carries no home/away marker).
+func orientBoxScore(box *model.BoxScore, game *model.Game) {
+	box.GameID = game.ID
+	box.Sport = string(model.SportForLeague[game.League])
+	box.Status = string(game.Status)
+	if box.HomeTeam.ID == game.AwayTeam.ID && box.AwayTeam.ID == game.HomeTeam.ID {
+		box.HomeTeam, box.AwayTeam = box.AwayTeam, box.HomeTeam
+	}
+}
+
 func (s *RefreshService) publish(ctx context.Context, event pubsub.StatsUpdatedEvent) {
 	if err := s.publisher.PublishStatsUpdated(ctx, event); err != nil {
 		slog.Warn("failed to publish stats.updated", "update_type", event.UpdateType, "error", err)

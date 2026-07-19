@@ -144,6 +144,54 @@ type ScoreboardEntry struct {
 	AwayPeriods []int
 }
 
+// BoxScorePlayerLine is one boxscoretraditionalv2 PlayerStats row. MIN is
+// kept raw ("34:12", sometimes "34.000000:12"); the normalizer parses it.
+type BoxScorePlayerLine struct {
+	NBATeamID   string
+	TeamAbbrev  string
+	NBAPlayerID string
+	Name        string
+	Position    string
+	MIN         string
+	FGM         int
+	FGA         int
+	FG3M        int
+	FG3A        int
+	FTM         int
+	FTA         int
+	OREB        int
+	DREB        int
+	REB         int
+	AST         int
+	STL         int
+	BLK         int
+	TOV         int
+	PTS         int
+	PlusMinus   int
+}
+
+// BoxScoreTeamLine is one boxscoretraditionalv2 TeamStats row, in response
+// order (the endpoint carries no home/away marker; the service orients the
+// teams against the canonical game).
+type BoxScoreTeamLine struct {
+	NBATeamID  string
+	TeamAbbrev string
+	FGM        int
+	FGA        int
+	FG3M       int
+	FG3A       int
+	FTM        int
+	FTA        int
+	OREB       int
+	DREB       int
+	REB        int
+	AST        int
+	STL        int
+	BLK        int
+	TOV        int
+	PTS        int
+}
+
 // leagueDashParams is the full parameter set leaguedashteamstats and
 // leaguedashplayerstats require; stats.nba.com rejects requests with
 // missing keys even when values are empty.
@@ -473,4 +521,82 @@ func (c *Client) Scoreboard(ctx context.Context, date time.Time) ([]ScoreboardEn
 		entries = append(entries, entry)
 	}
 	return entries, fetch, nil
+}
+
+// BoxScoreTraditional fetches one game's traditional box score (result sets
+// PlayerStats and TeamStats). The range parameters are required
+// boilerplate: stats.nba.com rejects requests with missing keys.
+func (c *Client) BoxScoreTraditional(ctx context.Context, nbaGameID string) ([]BoxScorePlayerLine, []BoxScoreTeamLine, *Fetch, error) {
+	params := url.Values{
+		"GameID":      {nbaGameID},
+		"StartPeriod": {"0"},
+		"EndPeriod":   {"10"},
+		"StartRange":  {"0"},
+		"EndRange":    {"28800"},
+		"RangeType":   {"0"},
+	}
+
+	var resp statsResponse
+	fetch, err := c.get(ctx, "/stats/boxscoretraditionalv2", params, &resp)
+	if err != nil {
+		return nil, nil, fetch, fmt.Errorf("boxscoretraditionalv2 %s: %w", nbaGameID, err)
+	}
+
+	playerSet, err := resp.set("PlayerStats")
+	if err != nil {
+		return nil, nil, fetch, fmt.Errorf("boxscoretraditionalv2 %s: %w", nbaGameID, err)
+	}
+	var players []BoxScorePlayerLine
+	for _, r := range playerSet.rows() {
+		players = append(players, BoxScorePlayerLine{
+			NBATeamID:   r.str("TEAM_ID"),
+			TeamAbbrev:  r.str("TEAM_ABBREVIATION"),
+			NBAPlayerID: r.str("PLAYER_ID"),
+			Name:        r.str("PLAYER_NAME"),
+			Position:    r.str("START_POSITION"),
+			MIN:         r.str("MIN"),
+			FGM:         r.int("FGM"),
+			FGA:         r.int("FGA"),
+			FG3M:        r.int("FG3M"),
+			FG3A:        r.int("FG3A"),
+			FTM:         r.int("FTM"),
+			FTA:         r.int("FTA"),
+			OREB:        r.int("OREB"),
+			DREB:        r.int("DREB"),
+			REB:         r.int("REB"),
+			AST:         r.int("AST"),
+			STL:         r.int("STL"),
+			BLK:         r.int("BLK"),
+			TOV:         r.int("TO"),
+			PTS:         r.int("PTS"),
+			PlusMinus:   r.int("PLUS_MINUS"),
+		})
+	}
+
+	teamSet, err := resp.set("TeamStats")
+	if err != nil {
+		return nil, nil, fetch, fmt.Errorf("boxscoretraditionalv2 %s: %w", nbaGameID, err)
+	}
+	var teams []BoxScoreTeamLine
+	for _, r := range teamSet.rows() {
+		teams = append(teams, BoxScoreTeamLine{
+			NBATeamID:  r.str("TEAM_ID"),
+			TeamAbbrev: r.str("TEAM_ABBREVIATION"),
+			FGM:        r.int("FGM"),
+			FGA:        r.int("FGA"),
+			FG3M:       r.int("FG3M"),
+			FG3A:       r.int("FG3A"),
+			FTM:        r.int("FTM"),
+			FTA:        r.int("FTA"),
+			OREB:       r.int("OREB"),
+			DREB:       r.int("DREB"),
+			REB:        r.int("REB"),
+			AST:        r.int("AST"),
+			STL:        r.int("STL"),
+			BLK:        r.int("BLK"),
+			TOV:        r.int("TO"),
+			PTS:        r.int("PTS"),
+		})
+	}
+	return players, teams, fetch, nil
 }

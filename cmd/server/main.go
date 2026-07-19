@@ -72,6 +72,7 @@ func main() {
 		Players:   cfg.TTLPlayers,
 		Games:     cfg.TTLGames,
 		Injuries:  cfg.TTLInjuries,
+		BoxScore:  cfg.TTLGameFinal,
 		Stale:     cfg.TTLStale,
 	})
 

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -90,6 +91,7 @@ func (w *GameWatcher) tickLeague(ctx context.Context, span trace.Span, p sportsd
 
 		if before != model.GameFinal && games[i].Status == model.GameFinal {
 			w.publishCompleted(ctx, games[i])
+			w.prefetchBoxScore(ctx, games[i])
 		}
 	}
 
@@ -99,6 +101,19 @@ func (w *GameWatcher) tickLeague(ctx context.Context, span trace.Span, p sportsd
 		}
 	}
 	return nil
+}
+
+// prefetchBoxScore warms the box-score cache on a FINAL transition,
+// best-effort: failures are logged and never block or fail the tick or the
+// game.completed publish. Leagues without box-score support are silently
+// skipped (tracked Phase 7 deferrals).
+func (w *GameWatcher) prefetchBoxScore(ctx context.Context, game model.Game) {
+	if _, err := w.refresh.FetchBoxScore(ctx, &game); err != nil {
+		if errors.Is(err, sportsdata.ErrNotSupported) {
+			return
+		}
+		slog.Warn("failed to prefetch box score", "game_id", game.ID, "error", err)
+	}
 }
 
 // applyScoreboardUpdate folds a neutral scoreboard update into a canonical

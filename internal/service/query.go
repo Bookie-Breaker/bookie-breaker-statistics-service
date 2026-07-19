@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cache"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/cursor"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
@@ -318,6 +319,30 @@ func (q *QueryService) GameResult(ctx context.Context, id string) (*model.GameRe
 		return nil, fmt.Errorf("%w: game has not completed", ErrNotFound)
 	}
 	return game.Result, nil
+}
+
+// BoxScore returns one game's player box score, cache-aside: a cached copy
+// (written once the game went FINAL) is served directly; otherwise the game
+// is resolved to its league and external id and fetched through the
+// provider. Leagues without box-score support map to not-found.
+func (q *QueryService) BoxScore(ctx context.Context, gameID string) (*model.BoxScore, error) {
+	if box, ok, err := q.cache.GetBoxScore(ctx, gameID); err == nil && ok {
+		return box, nil
+	}
+
+	game, err := q.GameByID(ctx, gameID)
+	if err != nil {
+		return nil, err
+	}
+
+	box, err := q.refresh.FetchBoxScore(ctx, game)
+	if errors.Is(err, sportsdata.ErrNotSupported) {
+		return nil, fmt.Errorf("%w: box scores are not available for league %s yet", ErrNotFound, game.League)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return box, nil
 }
 
 // Injuries lists current injury reports. A league filter outside the

@@ -88,10 +88,70 @@ type espnLinescore struct {
 }
 
 // summaryResponse is /apis/site/v2/sports/soccer/{code}/summary?event=.
+// The header carries per-period linescores; boxscore.players carries the
+// per-team player lines behind the Phase 7 box score.
 type summaryResponse struct {
 	Header struct {
 		Competitions []espnCompetition `json:"competitions"`
 	} `json:"header"`
+	Boxscore struct {
+		Players []summaryTeamPlayers `json:"players"`
+	} `json:"boxscore"`
+}
+
+// summaryTeamPlayers is one team's block under boxscore.players: statistic
+// groups (outfield players and goalkeepers separately) with per-athlete
+// stat rows aligned to the group's keys array.
+type summaryTeamPlayers struct {
+	Team       espnTeam           `json:"team"`
+	Statistics []summaryStatBlock `json:"statistics"`
+}
+
+// summaryStatBlock is one statistic group. ESPN's stat vocabulary drifts,
+// so the normalizer indexes keys and labels case-insensitively and maps
+// through synonym lists, defaulting missing stats to zero.
+type summaryStatBlock struct {
+	Name     string               `json:"name"`
+	Keys     []string             `json:"keys"`
+	Labels   []string             `json:"labels"`
+	Athletes []summaryAthleteLine `json:"athletes"`
+}
+
+type summaryAthleteLine struct {
+	Athlete espnAthlete `json:"athlete"`
+	Starter bool        `json:"starter"`
+	// Stats values are display strings positionally aligned to the parent
+	// block's keys/labels arrays.
+	Stats []string `json:"stats"`
+}
+
+// espnAthlete is the athlete object shared by summary and roster payloads.
+type espnAthlete struct {
+	ID          string `json:"id"`
+	FirstName   string `json:"firstName"`
+	LastName    string `json:"lastName"`
+	DisplayName string `json:"displayName"`
+	Jersey      string `json:"jersey"`
+	Position    struct {
+		Name         string `json:"name"`
+		Abbreviation string `json:"abbreviation"`
+	} `json:"position"`
+	// Statistics is present on roster athletes when ESPN attaches season
+	// stats; entries are name/value pairs mapped by the same synonym lists
+	// as the box-score keys. Absent means no season stats.
+	Statistics []espnNamedStat `json:"statistics"`
+}
+
+type espnNamedStat struct {
+	Name         string  `json:"name"`
+	Abbreviation string  `json:"abbreviation"`
+	Value        float64 `json:"value"`
+}
+
+// rosterResponse is /apis/site/v2/sports/soccer/{code}/teams/{id}/roster.
+type rosterResponse struct {
+	Team     espnTeam      `json:"team"`
+	Athletes []espnAthlete `json:"athletes"`
 }
 
 // standingsResponse is /apis/v2/sports/soccer/{code}/standings. Children

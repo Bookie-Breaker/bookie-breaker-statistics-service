@@ -73,6 +73,8 @@ func nbaStub(t *testing.T, now time.Time) *httptest.Server {
 			_, _ = w.Write(scheduleJSON(now))
 		case "/stats/scoreboardv3":
 			_, _ = w.Write(scoreboardJSON(now))
+		case "/stats/boxscoretraditionalv2":
+			_, _ = w.Write(adapterFixture(t, "boxscoretraditionalv2.json"))
 		default:
 			http.NotFound(w, r)
 		}
@@ -410,6 +412,59 @@ func TestStatisticsService(t *testing.T) {
 		}
 	})
 
+	t.Run("box score endpoint serves oriented player lines", func(t *testing.T) {
+		finalUUID := ids.Game("NBA", finalGameID)
+		code, env := doRequest(t, e, "/api/v1/stats/games/"+finalUUID+"/box-score")
+		if code != http.StatusOK {
+			t.Fatalf("status = %d", code)
+		}
+		var box map[string]any
+		if err := json.Unmarshal(env.Data, &box); err != nil {
+			t.Fatal(err)
+		}
+		if box["game_id"] != finalUUID || box["sport"] != "BASKETBALL" || box["status"] != "FINAL" {
+			t.Errorf("box score envelope wrong: game_id=%v sport=%v status=%v", box["game_id"], box["sport"], box["status"])
+		}
+
+		// The fixture emits LAL first, but the canonical game's home team
+		// is BOS: the service must orient home/away against the game.
+		home := box["home_team"].(map[string]any)
+		away := box["away_team"].(map[string]any)
+		if home["abbreviation"] != "BOS" || away["abbreviation"] != "LAL" {
+			t.Fatalf("orientation wrong: home=%v away=%v", home["abbreviation"], away["abbreviation"])
+		}
+		if home["id"] != ids.Team("NBA", celticsNBAID) {
+			t.Errorf("home team id = %v, want canonical Celtics id", home["id"])
+		}
+		if home["score"].(float64) != 104 || away["score"].(float64) != 112 {
+			t.Errorf("scores = %v-%v, want 104-112", home["score"], away["score"])
+		}
+
+		players := away["players"].([]any)
+		if len(players) != 3 {
+			t.Fatalf("away players = %d, want 3", len(players))
+		}
+		lebron := players[0].(map[string]any)
+		if lebron["player_id"] != lebronID || lebron["points"].(float64) != 28 {
+			t.Errorf("player line wrong: %v", lebron)
+		}
+		teamStats := away["team_stats"].(map[string]any)
+		if teamStats["field_goals_made"].(float64) != 42 {
+			t.Errorf("team stats wrong: %v", teamStats)
+		}
+
+		// The FINAL game's box score is now cached under its Redis key.
+		if n, err := testRedis.Exists(ctx, "stats:boxscore:"+finalUUID).Result(); err != nil || n != 1 {
+			t.Errorf("box score not cached: exists=%d err=%v", n, err)
+		}
+
+		// Unknown game ids map to 404.
+		code, env = doRequest(t, e, "/api/v1/stats/games/00000000-0000-0000-0000-000000000000/box-score")
+		if code != http.StatusNotFound || env.Error == nil || env.Error.Code != "NOT_FOUND" {
+			t.Errorf("unknown game: status=%d error=%v", code, env.Error)
+		}
+	})
+
 	t.Run("injuries endpoint serves normalized reports", func(t *testing.T) {
 		code, env := doRequest(t, e, "/api/v1/stats/injuries?league=NBA")
 		if code != http.StatusOK {
@@ -489,6 +544,12 @@ func TestStatisticsService(t *testing.T) {
 		periods := result["period_scores"].([]any)
 		if len(periods) != 4 {
 			t.Errorf("period scores = %d, want 4", len(periods))
+		}
+
+		// The FINAL transition also prefetched the box score (best-effort
+		// GameWatcher hook).
+		if n, err := testRedis.Exists(ctx, "stats:boxscore:"+liveUUID).Result(); err != nil || n != 1 {
+			t.Errorf("box score not prefetched on FINAL transition: exists=%d err=%v", n, err)
 		}
 	})
 

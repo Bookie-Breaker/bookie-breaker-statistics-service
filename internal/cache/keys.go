@@ -32,6 +32,8 @@ func keyGameLog(playerID string, season int) string {
 	return fmt.Sprintf("stats:gamelog:%s:%d", playerID, season)
 }
 
+func keyBoxScore(gameID string) string { return "stats:boxscore:" + gameID }
+
 func keyGameCompleted(gameID string) string { return "stats:gamecompleted:" + gameID }
 
 func keyLastSuccess(source string) string { return "stats:health:" + source + ":last_success" }

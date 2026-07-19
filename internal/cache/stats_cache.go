@@ -18,7 +18,10 @@ type TTLs struct {
 	Players   time.Duration
 	Games     time.Duration
 	Injuries  time.Duration
-	Stale     time.Duration
+	// BoxScore is the box-score expiration (wired from TTL_GAME_FINAL: box
+	// scores are cached once a game is FINAL and are immutable after).
+	BoxScore time.Duration
+	Stale    time.Duration
 }
 
 // StatsCache is the Redis-backed store for all canonical statistics data.
@@ -148,6 +151,22 @@ func (c *StatsCache) GetGameLog(ctx context.Context, playerID string, season int
 	var log []model.PlayerGameLine
 	ok, err := c.get(ctx, keyGameLog(playerID, season), &log, false)
 	return log, ok, err
+}
+
+// SetBoxScore stores one game's box score by canonical game id.
+func (c *StatsCache) SetBoxScore(ctx context.Context, gameID string, box *model.BoxScore) error {
+	return c.set(ctx, keyBoxScore(gameID), box, c.ttls.BoxScore)
+}
+
+// GetBoxScore returns one game's cached box score. Like game logs, box
+// scores are per-entity fetch-on-demand data: no stale-mirror reads.
+func (c *StatsCache) GetBoxScore(ctx context.Context, gameID string) (*model.BoxScore, bool, error) {
+	var box model.BoxScore
+	ok, err := c.get(ctx, keyBoxScore(gameID), &box, false)
+	if !ok || err != nil {
+		return nil, ok, err
+	}
+	return &box, true, nil
 }
 
 // MarkGameCompleted records that a game.completed event was published so
