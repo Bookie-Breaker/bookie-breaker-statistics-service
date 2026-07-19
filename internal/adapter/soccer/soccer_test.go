@@ -375,13 +375,8 @@ func TestTeamStatsRollingWindowUnsupported(t *testing.T) {
 	}
 }
 
-func TestPlayersDescoped(t *testing.T) {
+func TestPlayerGameLogDescoped(t *testing.T) {
 	p := NewProvider(NewClient("http://unused", time.Second), PremierLeague())
-
-	summaries, details, fetches, err := p.Players(context.Background(), 2025)
-	if err != nil || summaries == nil || details == nil || len(summaries) != 0 || len(details) != 0 || fetches != nil {
-		t.Errorf("Players must return empty collections with nil error: %v %v %v %v", summaries, details, fetches, err)
-	}
 
 	log, fetches, err := p.PlayerGameLog(context.Background(), model.PlayerDetail{}, 2025)
 	if err != nil || log == nil || len(log) != 0 || fetches != nil {
@@ -422,6 +417,145 @@ func TestEPLSeasonRollover(t *testing.T) {
 	start, end := epl.SeasonWindow(2026)
 	if start != time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC) || end != time.Date(2027, 6, 15, 0, 0, 0, 0, time.UTC) {
 		t.Errorf("season window wrong: %s – %s", start, end)
+	}
+}
+
+func TestBoxScoreNormalization(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasSuffix(r.URL.Path, "/summary") || r.URL.Query().Get("event") != "760501" {
+			http.NotFound(w, r)
+			return
+		}
+		serveFixture(t, w, "summary_boxscore.json")
+	}))
+
+	box, fetches, err := p.BoxScore(context.Background(), "760501")
+	if err != nil {
+		t.Fatalf("BoxScore failed: %v", err)
+	}
+	if len(fetches) != 1 {
+		t.Errorf("fetches = %d, want 1", len(fetches))
+	}
+
+	if box.Sport != "SOCCER" {
+		t.Errorf("sport = %q, want SOCCER", box.Sport)
+	}
+	if box.GameID != ids.Game(leagueWC, "760501") {
+		t.Errorf("game id not minted with ids.Game: %s", box.GameID)
+	}
+	eng, bel := box.HomeTeam, box.AwayTeam
+	if eng.Abbreviation != "ENG" || bel.Abbreviation != "BEL" {
+		t.Fatalf("home/away = %s/%s, want ENG/BEL (from header homeAway)", eng.Abbreviation, bel.Abbreviation)
+	}
+	if eng.ID != ids.Team(leagueWC, "448") || bel.ID != ids.Team(leagueWC, "459") {
+		t.Errorf("team ids not minted with ids.Team: %s / %s", eng.ID, bel.ID)
+	}
+	if eng.Score != 2 || bel.Score != 1 {
+		t.Errorf("scores = %d-%d, want 2-1", eng.Score, bel.Score)
+	}
+	if eng.TeamStats != nil || len(eng.Players) != 0 {
+		t.Error("basketball blocks must be empty for soccer")
+	}
+
+	// Outfield block plus the goalkeeper block, deduplicated by athlete.
+	if len(eng.SoccerPlayers) != 3 || len(bel.SoccerPlayers) != 2 {
+		t.Fatalf("players = %d/%d, want 3/2", len(eng.SoccerPlayers), len(bel.SoccerPlayers))
+	}
+	byName := make(map[string]model.SoccerPlayerBoxScore)
+	for _, pl := range append(eng.SoccerPlayers, bel.SoccerPlayers...) {
+		byName[pl.PlayerName] = pl
+	}
+
+	kane := byName["Harry Kane"]
+	if kane.PlayerID != ids.Player(leagueWC, "310580") {
+		t.Errorf("player id not minted with ids.Player: %s", kane.PlayerID)
+	}
+	if kane.Position != "F" || kane.Minutes != 90 || kane.Goals != 2 || kane.Assists != 0 ||
+		kane.Shots != 5 || kane.ShotsOnTarget != 3 || kane.YellowCards != 0 || kane.RedCards != 0 {
+		t.Errorf("line wrong: %+v", kane)
+	}
+	if bellingham := byName["Jude Bellingham"]; bellingham.Assists != 1 || bellingham.YellowCards != 1 || bellingham.Minutes != 84 {
+		t.Errorf("line wrong: %+v", bellingham)
+	}
+	// The goalkeeper block has different keys: card and minute synonyms
+	// resolve, everything absent defaults to zero.
+	if gk := byName["Jordan Pickford"]; gk.Minutes != 90 || gk.Goals != 0 || gk.Shots != 0 {
+		t.Errorf("goalkeeper line wrong: %+v", gk)
+	}
+	if kdb := byName["Kevin De Bruyne"]; kdb.Goals != 1 || kdb.RedCards != 1 {
+		t.Errorf("line wrong: %+v", kdb)
+	}
+	// Unparseable stat values ("-") default to zero, never fail.
+	if sub := byName["Late Sub"]; sub.Minutes != 0 {
+		t.Errorf("unparseable minutes should default to 0: %+v", sub)
+	}
+}
+
+func TestPlayersFromRosters(t *testing.T) {
+	emptyRoster := []byte(`{"team":{"id":"0"},"athletes":[]}`)
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/teams/448/roster"):
+			serveFixture(t, w, "roster_eng.json")
+		case strings.Contains(r.URL.Path, "/teams/") && strings.HasSuffix(r.URL.Path, "/roster"):
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write(emptyRoster)
+		case strings.HasSuffix(r.URL.Path, "/teams"):
+			serveFixture(t, w, "teams_fifa_world.json")
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+
+	summaries, details, fetches, err := p.Players(context.Background(), 2026)
+	if err != nil {
+		t.Fatalf("Players failed: %v", err)
+	}
+	// One teams call plus one roster call per team in the fixture.
+	if len(fetches) != 5 {
+		t.Errorf("fetches = %d, want 5", len(fetches))
+	}
+	if len(summaries) != 3 || len(details) != 3 {
+		t.Fatalf("players = %d, details = %d, want 3 each", len(summaries), len(details))
+	}
+
+	var kane model.PlayerSummary
+	for _, s := range summaries {
+		if s.LastName == "Kane" {
+			kane = s
+		}
+	}
+	if kane.ID != ids.Player(leagueWC, "310580") {
+		t.Fatalf("id = %s, want UUIDv5 of espn athlete 310580", kane.ID)
+	}
+	if kane.FirstName != "Harry" || kane.TeamID != ids.Team(leagueWC, "448") || kane.TeamAbbreviation != "ENG" {
+		t.Errorf("summary wrong: %+v", kane)
+	}
+	if kane.Position != "F" || kane.JerseyNumber == nil || *kane.JerseyNumber != 9 {
+		t.Errorf("position/jersey wrong: %+v", kane)
+	}
+	if kane.League != model.LeagueFIFAWC || kane.Status != model.PlayerActive || kane.ExternalIDs["espn"] != "310580" {
+		t.Errorf("summary wrong: %+v", kane)
+	}
+
+	stats := details[kane.ID].SoccerSeasonStats
+	if stats == nil {
+		t.Fatal("season stats missing for athlete with a statistics block")
+	}
+	if stats.Appearances != 6 || stats.Minutes != 512 || stats.Goals != 5 || stats.Assists != 2 ||
+		stats.Shots != 21 || stats.ShotsOnTarget != 11 || stats.YellowCards != 1 || stats.RedCards != 0 {
+		t.Errorf("season stats wrong: %+v", stats)
+	}
+
+	// No statistics block → nil season stats, not zeros.
+	bellingham := details[ids.Player(leagueWC, "384967")]
+	if bellingham.SoccerSeasonStats != nil {
+		t.Errorf("season stats should be nil without a statistics block: %+v", bellingham.SoccerSeasonStats)
+	}
+	// Name fallback: athletes without structured names split displayName.
+	pickford := details[ids.Player(leagueWC, "293119")]
+	if pickford.FirstName != "Jordan" || pickford.LastName != "Pickford" {
+		t.Errorf("displayName split wrong: %+v", pickford.PlayerSummary)
 	}
 }
 

@@ -125,6 +125,42 @@ func TestGameHasTeam(t *testing.T) {
 	}
 }
 
+// TestOrientBoxScore covers the Phase 7 orientation step: the service owns
+// game_id/sport/status and swaps provider-ordered teams to match the
+// canonical game (the NBA box-score endpoint has no home/away marker).
+func TestOrientBoxScore(t *testing.T) {
+	game := &model.Game{
+		ID:       "game-uuid",
+		League:   model.LeagueNBA,
+		Status:   model.GameFinal,
+		HomeTeam: model.TeamRef{ID: "team-home"},
+		AwayTeam: model.TeamRef{ID: "team-away"},
+	}
+
+	// Provider emitted the away team first: swap.
+	box := &model.BoxScore{
+		HomeTeam: model.TeamBoxScore{ID: "team-away", Abbreviation: "AWY", Score: 104},
+		AwayTeam: model.TeamBoxScore{ID: "team-home", Abbreviation: "HOM", Score: 112},
+	}
+	orientBoxScore(box, game)
+	if box.GameID != "game-uuid" || box.Sport != "BASKETBALL" || box.Status != "FINAL" {
+		t.Errorf("canonical fields wrong: %+v", box)
+	}
+	if box.HomeTeam.ID != "team-home" || box.HomeTeam.Score != 112 || box.AwayTeam.ID != "team-away" {
+		t.Errorf("teams not swapped: home=%+v away=%+v", box.HomeTeam, box.AwayTeam)
+	}
+
+	// Already oriented: no swap.
+	oriented := &model.BoxScore{
+		HomeTeam: model.TeamBoxScore{ID: "team-home"},
+		AwayTeam: model.TeamBoxScore{ID: "team-away"},
+	}
+	orientBoxScore(oriented, game)
+	if oriented.HomeTeam.ID != "team-home" || oriented.AwayTeam.ID != "team-away" {
+		t.Errorf("oriented box score must not swap: home=%+v away=%+v", oriented.HomeTeam, oriented.AwayTeam)
+	}
+}
+
 func TestDiffInjuries(t *testing.T) {
 	old := []model.InjuryReport{{PlayerID: "p1", Status: "INJURED"}}
 	current := []model.InjuryReport{

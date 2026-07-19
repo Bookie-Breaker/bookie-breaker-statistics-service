@@ -1,0 +1,171 @@
+{
+  "header": {
+    "id": "760501",
+    "competitions": [
+      {
+        "id": "760501",
+        "date": "2026-07-14T20:00Z",
+        "status": {
+          "period": 2,
+          "type": {
+            "id": "28",
+            "name": "STATUS_FULL_TIME",
+            "state": "post",
+            "completed": true,
+            "description": "Full Time",
+            "detail": "FT",
+            "shortDetail": "FT"
+          }
+        },
+        "competitors": [
+          {
+            "homeAway": "home",
+            "score": "2",
+            "shootoutScore": null,
+            "winner": true,
+            "team": {
+              "id": "448",
+              "displayName": "England",
+              "abbreviation": "ENG"
+            }
+          },
+          {
+            "homeAway": "away",
+            "score": "1",
+            "shootoutScore": null,
+            "winner": false,
+            "team": {
+              "id": "459",
+              "displayName": "Belgium",
+              "abbreviation": "BEL"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "boxscore": {
+    "players": [
+      {
+        "team": {
+          "id": "448",
+          "displayName": "England",
+          "abbreviation": "ENG"
+        },
+        "statistics": [
+          {
+            "name": "general",
+            "keys": [
+              "minutesPlayed",
+              "totalGoals",
+              "goalAssists",
+              "totalShots",
+              "shotsOnTarget",
+              "yellowCards",
+              "redCards"
+            ],
+            "labels": ["MIN", "G", "A", "SH", "ST", "YC", "RC"],
+            "athletes": [
+              {
+                "starter": true,
+                "athlete": {
+                  "id": "310580",
+                  "displayName": "Harry Kane",
+                  "jersey": "9",
+                  "position": {
+                    "name": "Forward",
+                    "abbreviation": "F"
+                  }
+                },
+                "stats": ["90", "2", "0", "5", "3", "0", "0"]
+              },
+              {
+                "starter": true,
+                "athlete": {
+                  "id": "384967",
+                  "displayName": "Jude Bellingham",
+                  "jersey": "10",
+                  "position": {
+                    "name": "Midfielder",
+                    "abbreviation": "M"
+                  }
+                },
+                "stats": ["84", "0", "1", "2", "1", "1", "0"]
+              }
+            ]
+          },
+          {
+            "name": "goalkeepers",
+            "keys": ["minutesPlayed", "saves", "goalsConceded", "yellowCards", "redCards"],
+            "labels": ["MIN", "SV", "GA", "YC", "RC"],
+            "athletes": [
+              {
+                "starter": true,
+                "athlete": {
+                  "id": "293119",
+                  "displayName": "Jordan Pickford",
+                  "jersey": "1",
+                  "position": {
+                    "name": "Goalkeeper",
+                    "abbreviation": "G"
+                  }
+                },
+                "stats": ["90", "4", "1", "0", "0"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "team": {
+          "id": "459",
+          "displayName": "Belgium",
+          "abbreviation": "BEL"
+        },
+        "statistics": [
+          {
+            "name": "general",
+            "keys": [
+              "minutesPlayed",
+              "totalGoals",
+              "goalAssists",
+              "totalShots",
+              "shotsOnTarget",
+              "yellowCards",
+              "redCards"
+            ],
+            "labels": ["MIN", "G", "A", "SH", "ST", "YC", "RC"],
+            "athletes": [
+              {
+                "starter": true,
+                "athlete": {
+                  "id": "202659",
+                  "displayName": "Kevin De Bruyne",
+                  "jersey": "7",
+                  "position": {
+                    "name": "Midfielder",
+                    "abbreviation": "M"
+                  }
+                },
+                "stats": ["90", "1", "0", "3", "2", "0", "1"]
+              },
+              {
+                "starter": false,
+                "athlete": {
+                  "id": "999001",
+                  "displayName": "Late Sub",
+                  "jersey": "17",
+                  "position": {
+                    "name": "Forward",
+                    "abbreviation": "F"
+                  }
+                },
+                "stats": ["-", "0", "0", "0", "0", "0", "0"]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -114,11 +114,62 @@ func (p *Provider) recentForm(ctx context.Context, seasonYear int) (map[string]f
 	return formFromGames(games), fetches, nil
 }
 
-// Players returns empty collections: player rosters, stats, and injuries
-// are a documented soccer descope in Phase 6 (player-level soccer modeling
-// is Phase 7+; ADR-026).
-func (p *Provider) Players(context.Context, int) ([]model.PlayerSummary, map[string]model.PlayerDetail, []*sportsdata.Fetch, error) {
-	return []model.PlayerSummary{}, map[string]model.PlayerDetail{}, nil, nil
+// Players builds the competition's player collections from per-team ESPN
+// rosters (Phase 7: soccer player props need rosters and season stats;
+// amends the Phase 6 descope in ADR-026). One roster call per team on top
+// of the team list.
+func (p *Provider) Players(ctx context.Context, _ int) ([]model.PlayerSummary, map[string]model.PlayerDetail, []*sportsdata.Fetch, error) {
+	teamsResp, fetch, err := p.client.Teams(ctx, p.comp.ESPNCode)
+	var fetches []*sportsdata.Fetch
+	if fetch != nil {
+		fetches = append(fetches, fetch)
+	}
+	if err != nil {
+		return nil, nil, fetches, err
+	}
+
+	summaries := []model.PlayerSummary{}
+	details := map[string]model.PlayerDetail{}
+	for _, sport := range teamsResp.Sports {
+		for _, l := range sport.Leagues {
+			for _, entry := range l.Teams {
+				team := entry.Team
+				roster, fetch, err := p.client.Roster(ctx, p.comp.ESPNCode, team.ID)
+				if fetch != nil {
+					fetches = append(fetches, fetch)
+				}
+				if err != nil {
+					return nil, nil, fetches, fmt.Errorf("fetch roster for team %s: %w", team.ID, err)
+				}
+				s, d := normalizeRoster(p.comp, team.ID, team.Abbreviation, roster)
+				summaries = append(summaries, s...)
+				for id, detail := range d {
+					details[id] = detail
+				}
+			}
+		}
+	}
+	return summaries, details, fetches, nil
+}
+
+// BoxScore fetches one match's summary and normalizes its
+// boxscore.players block into per-player lines. Home/away orientation
+// comes from the summary header's competitors.
+func (p *Provider) BoxScore(ctx context.Context, gameExternalID string) (*model.BoxScore, []*sportsdata.Fetch, error) {
+	summary, fetch, err := p.client.Summary(ctx, p.comp.ESPNCode, gameExternalID)
+	var fetches []*sportsdata.Fetch
+	if fetch != nil {
+		fetches = append(fetches, fetch)
+	}
+	if err != nil {
+		return nil, fetches, err
+	}
+
+	box := normalizeBoxScore(p.comp, gameExternalID, summary)
+	if box == nil {
+		return nil, fetches, fmt.Errorf("no box score data for event %s", gameExternalID)
+	}
+	return box, fetches, nil
 }
 
 // Schedule fetches the season's games by walking the competition's season

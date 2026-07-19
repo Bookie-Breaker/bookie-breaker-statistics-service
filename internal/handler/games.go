@@ -54,6 +54,15 @@ func (h *GamesHandler) GetGameResult(c echo.Context) error {
 	return SuccessResponse(c, result)
 }
 
+// GetBoxScore handles GET /api/v1/stats/games/{game_id}/box-score.
+func (h *GamesHandler) GetBoxScore(c echo.Context) error {
+	box, err := h.query.BoxScore(c.Request().Context(), c.Param("game_id"))
+	if err != nil {
+		return mapError(c, err)
+	}
+	return SuccessResponse(c, box)
+}
+
 // GetSchedule handles GET /api/v1/stats/schedule.
 func (h *GamesHandler) GetSchedule(c echo.Context) error {
 	filters := service.GameFilters{

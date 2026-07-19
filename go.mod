@@ -1,6 +1,6 @@
 module github.com/Bookie-Breaker/bookie-breaker-statistics-service
 
-go 1.25.11
+go 1.25.12
 
 require (
 	github.com/exaring/otelpgx v0.11.1

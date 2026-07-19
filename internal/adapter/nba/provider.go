@@ -201,6 +201,26 @@ func (p *Provider) PlayerGameLog(ctx context.Context, player model.PlayerDetail,
 	return log, fetches, nil
 }
 
+// BoxScore fetches one game's traditional box score by NBA game id. Teams
+// come back in response order; the service orients home/away against the
+// canonical game.
+func (p *Provider) BoxScore(ctx context.Context, gameExternalID string) (*model.BoxScore, []*sportsdata.Fetch, error) {
+	players, teams, fetch, err := p.client.BoxScoreTraditional(ctx, gameExternalID)
+	var fetches []*sportsdata.Fetch
+	if fetch != nil {
+		fetches = append(fetches, fetch)
+	}
+	if err != nil {
+		return nil, fetches, err
+	}
+
+	box := NormalizeBoxScore(players, teams)
+	if box == nil {
+		return nil, fetches, fmt.Errorf("no box score data for game %s", gameExternalID)
+	}
+	return box, fetches, nil
+}
+
 // capitalizeDate converts "JAN 15, 2026" to "Jan 15, 2026" for time.Parse.
 func capitalizeDate(d string) string {
 	if len(d) < 3 {
