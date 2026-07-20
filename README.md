@@ -1,5 +1,12 @@
 # bookie-breaker-statistics-service
 
+[![CI](https://img.shields.io/github/actions/workflow/status/Bookie-Breaker/bookie-breaker-statistics-service/ci.yml?branch=main&label=CI&logo=githubactions&logoColor=white)](https://github.com/Bookie-Breaker/bookie-breaker-statistics-service/actions/workflows/ci.yml)
+[![coverage](https://img.shields.io/codecov/c/github/Bookie-Breaker/bookie-breaker-statistics-service?logo=codecov&logoColor=white)](https://app.codecov.io/gh/Bookie-Breaker/bookie-breaker-statistics-service)
+![Go](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go&logoColor=white)
+![Echo](https://img.shields.io/badge/Echo-v4-1D9BF0)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
+
 Serves team/player statistics, schedules, game results, and injuries with Redis as the primary store — Postgres is
 used for archival only (raw API responses into `public.raw_api_responses`). Sources stats from stats.nba.com and
 injuries from ESPN, and publishes `events:stats.updated` when stat or injury data changes. Which leagues are active
