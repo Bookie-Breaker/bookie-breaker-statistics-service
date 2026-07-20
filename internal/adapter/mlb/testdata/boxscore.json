@@ -1,0 +1,272 @@
+{
+  "copyright": "Copyright 2026 MLB Advanced Media, L.P.  Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt",
+  "teams": {
+    "away": {
+      "team": {
+        "id": 119,
+        "name": "Los Angeles Dodgers",
+        "link": "/api/v1/teams/119",
+        "abbreviation": "LAD",
+        "locationName": "Los Angeles",
+        "active": true
+      },
+      "teamStats": {
+        "batting": {
+          "runs": 8,
+          "doubles": 3,
+          "triples": 0,
+          "homeRuns": 2,
+          "strikeOuts": 8,
+          "baseOnBalls": 4,
+          "hits": 8,
+          "atBats": 35,
+          "rbi": 8,
+          "totalBases": 17,
+          "leftOnBase": 11
+        },
+        "pitching": {
+          "inningsPitched": "8.0",
+          "strikeOuts": 7,
+          "baseOnBalls": 5,
+          "hits": 11,
+          "runs": 9,
+          "earnedRuns": 8,
+          "homeRuns": 3
+        }
+      },
+      "players": {
+        "ID660271": {
+          "person": {
+            "id": 660271,
+            "fullName": "Shohei Ohtani",
+            "link": "/api/v1/people/660271"
+          },
+          "jerseyNumber": "17",
+          "position": {
+            "code": "10",
+            "name": "Designated Hitter",
+            "type": "Hitter",
+            "abbreviation": "DH"
+          },
+          "battingOrder": "100",
+          "stats": {
+            "batting": {
+              "gamesPlayed": 1,
+              "runs": 1,
+              "doubles": 0,
+              "triples": 0,
+              "homeRuns": 1,
+              "strikeOuts": 2,
+              "baseOnBalls": 0,
+              "hits": 1,
+              "atBats": 5,
+              "rbi": 2,
+              "totalBases": 4,
+              "leftOnBase": 1
+            },
+            "pitching": {
+              "gamesPlayed": 1,
+              "gamesStarted": 1,
+              "inningsPitched": "6.2",
+              "strikeOuts": 6,
+              "baseOnBalls": 3,
+              "hits": 6,
+              "runs": 4,
+              "earnedRuns": 3,
+              "homeRuns": 1
+            },
+            "fielding": {}
+          },
+          "gameStatus": {
+            "isOnBench": false,
+            "isSubstitute": false
+          }
+        },
+        "ID663656": {
+          "person": {
+            "id": 663656,
+            "fullName": "Kyle Tucker",
+            "link": "/api/v1/people/663656"
+          },
+          "jerseyNumber": "23",
+          "position": {
+            "code": "9",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "RF"
+          },
+          "battingOrder": "600",
+          "stats": {
+            "batting": {
+              "gamesPlayed": 1,
+              "runs": 0,
+              "doubles": 1,
+              "triples": 0,
+              "homeRuns": 0,
+              "strikeOuts": 2,
+              "baseOnBalls": 0,
+              "hits": 2,
+              "atBats": 4,
+              "rbi": 1,
+              "totalBases": 3,
+              "leftOnBase": 3
+            },
+            "pitching": {},
+            "fielding": {}
+          },
+          "gameStatus": {
+            "isOnBench": false,
+            "isSubstitute": false
+          }
+        },
+        "ID669289": {
+          "person": {
+            "id": 669289,
+            "fullName": "Santiago Espinal",
+            "link": "/api/v1/people/669289"
+          },
+          "jerseyNumber": "21",
+          "position": {
+            "code": "5",
+            "name": "Third Base",
+            "type": "Infielder",
+            "abbreviation": "3B"
+          },
+          "stats": {
+            "batting": {},
+            "pitching": {},
+            "fielding": {}
+          },
+          "gameStatus": {
+            "isOnBench": true,
+            "isSubstitute": false
+          }
+        }
+      }
+    },
+    "home": {
+      "team": {
+        "id": 134,
+        "name": "Pittsburgh Pirates",
+        "link": "/api/v1/teams/134",
+        "abbreviation": "PIT",
+        "locationName": "Pittsburgh",
+        "active": true
+      },
+      "teamStats": {
+        "batting": {
+          "runs": 9,
+          "doubles": 3,
+          "triples": 0,
+          "homeRuns": 3,
+          "strikeOuts": 7,
+          "baseOnBalls": 5,
+          "hits": 11,
+          "atBats": 34,
+          "rbi": 8,
+          "totalBases": 23,
+          "leftOnBase": 18
+        },
+        "pitching": {
+          "inningsPitched": "9.0",
+          "strikeOuts": 8,
+          "baseOnBalls": 4,
+          "hits": 8,
+          "runs": 8,
+          "earnedRuns": 8,
+          "homeRuns": 2
+        }
+      },
+      "players": {
+        "ID683003": {
+          "person": {
+            "id": 683003,
+            "fullName": "Jared Jones",
+            "link": "/api/v1/people/683003"
+          },
+          "jerseyNumber": "17",
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          },
+          "stats": {
+            "batting": {},
+            "pitching": {
+              "gamesPlayed": 1,
+              "gamesStarted": 1,
+              "inningsPitched": "4.0",
+              "strikeOuts": 4,
+              "baseOnBalls": 1,
+              "hits": 3,
+              "runs": 2,
+              "earnedRuns": 2,
+              "homeRuns": 0
+            },
+            "fielding": {}
+          },
+          "gameStatus": {
+            "isOnBench": false,
+            "isSubstitute": false
+          }
+        },
+        "ID663968": {
+          "person": {
+            "id": 663968,
+            "fullName": "Jake Mangum",
+            "link": "/api/v1/people/663968"
+          },
+          "jerseyNumber": "28",
+          "position": {
+            "code": "7",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "LF"
+          },
+          "battingOrder": "800",
+          "stats": {
+            "batting": {
+              "gamesPlayed": 1,
+              "runs": 1,
+              "doubles": 1,
+              "homeRuns": 0,
+              "strikeOuts": 0,
+              "baseOnBalls": 0,
+              "hits": 3,
+              "atBats": 4,
+              "rbi": 0,
+              "totalBases": 4,
+              "leftOnBase": 1
+            },
+            "pitching": {},
+            "fielding": {}
+          },
+          "gameStatus": {
+            "isOnBench": false,
+            "isSubstitute": false
+          }
+        }
+      }
+    }
+  },
+  "officials": [
+    {
+      "official": {
+        "id": 681849,
+        "fullName": "Felix Neon"
+      },
+      "officialType": "Home Plate"
+    }
+  ],
+  "info": [
+    {
+      "label": "T",
+      "value": "2:59."
+    },
+    {
+      "label": "Att",
+      "value": "30,626."
+    }
+  ]
+}

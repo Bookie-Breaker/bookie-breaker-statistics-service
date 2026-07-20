@@ -628,3 +628,93 @@ func TestMLBInjuriesRefresh(t *testing.T) {
 		t.Errorf("day-to-day must map to INJURED: %+v", byName["Jazz Chisholm Jr."])
 	}
 }
+
+// TestMLBBoxScoreFetch mirrors the Wave 0 box-score integration pattern for
+// MLB (Phase 7 Wave 3): FetchBoxScore against a StatsAPI stub serving the
+// real gamePk 823372 capture passes the already-labeled home/away blocks
+// through orientation, caches the FINAL box score under its Redis key, and
+// archives the raw body.
+func TestMLBBoxScoreFetch(t *testing.T) {
+	ctx := context.Background()
+
+	statsAPI := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/game/823372/boxscore" {
+			http.NotFound(w, r)
+			return
+		}
+		data, err := os.ReadFile(filepath.Join("..", "..", "internal", "adapter", "mlb", "testdata", "boxscore.json"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write(data)
+	}))
+	defer statsAPI.Close()
+
+	statsCache := cache.NewStatsCache(testRedis, cache.TTLs{
+		Teams: time.Hour, TeamStats: time.Hour, Players: time.Hour,
+		Games: time.Hour, Injuries: time.Hour, BoxScore: time.Hour, Stale: 24 * time.Hour,
+	})
+	providers := map[model.League]sportsdata.StatsProvider{
+		model.LeagueMLB: mlb.NewProvider(mlb.NewClient(statsAPI.URL, 10*time.Second)),
+	}
+	refresh := service.NewRefreshService(providers, nil, statsCache,
+		postgres.NewRawResponseRepo(testPool), pubsub.NewPublisher(testRedis))
+
+	gameUUID := ids.Game("MLB", "823372")
+	game := &model.Game{
+		ID:         gameUUID,
+		ExternalID: "823372",
+		League:     model.LeagueMLB,
+		HomeTeam:   model.TeamRef{ID: ids.Team("MLB", "134"), Abbreviation: "PIT"},
+		AwayTeam:   model.TeamRef{ID: ids.Team("MLB", "119"), Abbreviation: "LAD"},
+		Status:     model.GameFinal,
+	}
+
+	box, err := refresh.FetchBoxScore(ctx, game)
+	if err != nil {
+		t.Fatalf("FetchBoxScore: %v", err)
+	}
+	if box.GameID != gameUUID || box.Sport != "BASEBALL" || box.Status != "FINAL" {
+		t.Errorf("envelope wrong: game_id=%s sport=%s status=%s", box.GameID, box.Sport, box.Status)
+	}
+	// The StatsAPI labels home/away itself; orientation must be a no-op.
+	if box.HomeTeam.Abbreviation != "PIT" || box.HomeTeam.Score != 9 ||
+		box.AwayTeam.Abbreviation != "LAD" || box.AwayTeam.Score != 8 {
+		t.Errorf("orientation wrong: home=%s %d away=%s %d",
+			box.HomeTeam.Abbreviation, box.HomeTeam.Score, box.AwayTeam.Abbreviation, box.AwayTeam.Score)
+	}
+
+	// Ohtani's real two-way line: batting and pitching on one row, with the
+	// pinned grading keys populated (batter_hits/batter_total_bases/
+	// batter_home_runs → Hits/TotalBases/HomeRuns, pitcher_strikeouts →
+	// StrikeoutsPitching).
+	var found bool
+	for _, line := range box.AwayTeam.BaseballPlayers {
+		if line.PlayerID != ids.Player("MLB", "660271") {
+			continue
+		}
+		found = true
+		if line.Hits != 1 || line.TotalBases != 4 || line.HomeRuns != 1 || line.StrikeoutsPitching != 6 {
+			t.Errorf("Ohtani grading keys wrong: %+v", line)
+		}
+	}
+	if !found {
+		t.Error("Ohtani line missing from the away block")
+	}
+
+	// The FINAL game's box score is cached under its Redis key.
+	if n, err := testRedis.Exists(ctx, "stats:boxscore:"+gameUUID).Result(); err != nil || n != 1 {
+		t.Errorf("box score not cached: exists=%d err=%v", n, err)
+	}
+
+	// The raw body is archived like every provider fetch.
+	var count int
+	if err := testPool.QueryRow(ctx,
+		`SELECT COUNT(*) FROM public.raw_api_responses WHERE source = 'mlb_statsapi' AND endpoint LIKE '%boxscore%'`).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if count == 0 {
+		t.Error("box score body not archived")
+	}
+}

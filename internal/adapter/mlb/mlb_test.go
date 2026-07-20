@@ -5,7 +5,12 @@ package mlb
 // real capture: the extra-innings finals (gamePks 824417 and 824621) and the
 // truncated bottom-of-the-ninth game (823118) come from the July 3–4 slates,
 // the postponed/makeup pair from April 2–3, and the probable pitchers from
-// the July 6 schedule.
+// the July 6 schedule. The Wave 3 box-score and roster fixtures were
+// recorded 2026-07-19: boxscore.json is gamePk 823372 (LAD 8 @ PIT 9,
+// 2026-06-10 — a real Ohtani two-way game: HR at the plate, 6 2/3 IP on the
+// mound) with Jake Mangum's "triples" key trimmed out to pin missing-stat
+// handling; roster_119.json and the person_* season hydrates are the live
+// Dodgers active roster trimmed to Betts, Ohtani, and Yamamoto.
 
 import (
 	"context"
@@ -520,17 +525,296 @@ func TestParseRate(t *testing.T) {
 	}
 }
 
-func TestPlayersDescoped(t *testing.T) {
+func TestPlayerGameLogDescoped(t *testing.T) {
 	p := NewProvider(NewClient("http://unused", time.Second))
-
-	summaries, details, fetches, err := p.Players(context.Background(), 2026)
-	if err != nil || summaries == nil || details == nil || len(summaries) != 0 || len(details) != 0 || fetches != nil {
-		t.Errorf("Players must return empty collections with nil error: %v %v %v %v", summaries, details, fetches, err)
-	}
 
 	log, fetches, err := p.PlayerGameLog(context.Background(), model.PlayerDetail{}, 2026)
 	if err != nil || log == nil || len(log) != 0 || fetches != nil {
 		t.Errorf("PlayerGameLog must return an empty log with nil error: %v %v %v", log, fetches, err)
+	}
+}
+
+// rosterMux routes the Players surface to the recorded fixtures: the team
+// list, the real Dodgers roster (empty rosters elsewhere), and the three
+// dual-group person hydrations.
+func rosterMux(t *testing.T, peopleStatus int) http.Handler {
+	t.Helper()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/teams":
+			serveFixture(t, w, "teams.json")
+		case strings.HasPrefix(r.URL.Path, "/teams/") && strings.HasSuffix(r.URL.Path, "/roster"):
+			if r.URL.Query().Get("rosterType") != "active" {
+				t.Errorf("rosterType = %s, want active", r.URL.Query().Get("rosterType"))
+			}
+			if r.URL.Path == "/teams/119/roster" {
+				serveFixture(t, w, "roster_119.json")
+			} else {
+				_, _ = w.Write([]byte(`{"roster":[]}`))
+			}
+		case strings.HasPrefix(r.URL.Path, "/people/"):
+			if peopleStatus != http.StatusOK {
+				http.Error(w, "boom", peopleStatus)
+				return
+			}
+			if h := r.URL.Query().Get("hydrate"); h != "stats(group=[hitting,pitching],type=[season],season=2026)" {
+				t.Errorf("hydrate = %s, want dual-group season stats", h)
+			}
+			serveFixture(t, w, "person_"+strings.TrimPrefix(r.URL.Path, "/people/")+".json")
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+func TestPlayersRosterAndRates(t *testing.T) {
+	p := testProvider(t, rosterMux(t, http.StatusOK))
+
+	summaries, details, fetches, err := p.Players(context.Background(), 2026)
+	if err != nil {
+		t.Fatalf("Players failed: %v", err)
+	}
+	// One team list + four rosters + three person hydrations.
+	if len(fetches) != 8 {
+		t.Errorf("fetches = %d, want 8", len(fetches))
+	}
+	if len(summaries) != 3 || len(details) != 3 {
+		t.Fatalf("summaries = %d, details = %d, want 3 each", len(summaries), len(details))
+	}
+
+	byLast := make(map[string]model.PlayerSummary, len(summaries))
+	for _, s := range summaries {
+		byLast[s.LastName] = s
+	}
+
+	ohtani := byLast["Ohtani"]
+	if ohtani.ID != ids.Player(leagueMLB, "660271") {
+		t.Errorf("id = %s, want UUIDv5 of statsapi person 660271", ohtani.ID)
+	}
+	if ohtani.TeamID != ids.Team(leagueMLB, "119") || ohtani.TeamAbbreviation != "LAD" {
+		t.Errorf("team ref wrong: %+v", ohtani)
+	}
+	if ohtani.FirstName != "Shohei" || ohtani.Position != "TWP" || ohtani.League != model.LeagueMLB {
+		t.Errorf("summary wrong: %+v", ohtani)
+	}
+	if ohtani.Status != model.PlayerActive || ohtani.JerseyNumber == nil || *ohtani.JerseyNumber != 17 {
+		t.Errorf("status/jersey wrong: %+v", ohtani)
+	}
+	if ohtani.ExternalIDs["mlb"] != "660271" {
+		t.Errorf("external ids wrong: %+v", ohtani.ExternalIDs)
+	}
+
+	// Two-way player: the hitting and the pitching splits fill one block.
+	st := details[ohtani.ID].BaseballSeasonStats
+	if st == nil {
+		t.Fatal("Ohtani season stats missing")
+	}
+	if st.Season != 2026 || st.Games != 95 || st.AtBats != 346 || st.Hits != 101 || st.HomeRuns != 22 {
+		t.Errorf("Ohtani counting stats wrong: %+v", st)
+	}
+	// TB = H + 2B + 2*3B + 3*HR = 101 + 17 + 4 + 66 (the live capture's own
+	// totalBases field agrees: 188).
+	if st.TotalBases != 188 {
+		t.Errorf("total bases = %d, want 188", st.TotalBases)
+	}
+	if st.BattingAvg != 0.292 || math.Abs(st.PlateAppearancesPerGame-417.0/95.0) > 1e-9 {
+		t.Errorf("Ohtani batting rates wrong: %+v", st)
+	}
+	// IP "85.2" is 85 and two thirds; K/9 = 95*9/IP.
+	if math.Abs(st.InningsPitched-(85.0+2.0/3.0)) > 1e-9 {
+		t.Errorf("innings pitched = %v, want 85 2/3", st.InningsPitched)
+	}
+	if math.Abs(st.StrikeoutsPerNine-95.0*9.0/(85.0+2.0/3.0)) > 1e-9 {
+		t.Errorf("K/9 = %v, want 95*9/85.2", st.StrikeoutsPerNine)
+	}
+
+	// Hitter only: pitching fields stay zero; structured names come from the
+	// hydrated person (Betts's legal first name, not the roster fullName).
+	betts := byLast["Betts"]
+	if betts.FirstName != "Markus" || betts.Position != "SS" {
+		t.Errorf("Betts summary wrong: %+v", betts)
+	}
+	st = details[betts.ID].BaseballSeasonStats
+	if st == nil || st.Games != 63 || st.Hits != 56 || st.TotalBases != 99 || st.HomeRuns != 11 {
+		t.Fatalf("Betts season stats wrong: %+v", st)
+	}
+	if st.BattingAvg != 0.228 || math.Abs(st.PlateAppearancesPerGame-270.0/63.0) > 1e-9 {
+		t.Errorf("Betts batting rates wrong: %+v", st)
+	}
+	if st.InningsPitched != 0 || st.StrikeoutsPerNine != 0 {
+		t.Errorf("Betts must carry no pitching rates: %+v", st)
+	}
+
+	// Pitcher only: games come from the pitching split, the batting block
+	// stays zero (the pitching group's "avg" is opponents' average and must
+	// not leak into BattingAvg).
+	yamamoto := byLast["Yamamoto"]
+	st = details[yamamoto.ID].BaseballSeasonStats
+	if st == nil || st.Games != 18 || st.AtBats != 0 || st.BattingAvg != 0 {
+		t.Fatalf("Yamamoto season stats wrong: %+v", st)
+	}
+	if math.Abs(st.InningsPitched-(119.0+2.0/3.0)) > 1e-9 {
+		t.Errorf("Yamamoto innings pitched = %v, want 119 2/3", st.InningsPitched)
+	}
+	if math.Abs(st.StrikeoutsPerNine-113.0*9.0/(119.0+2.0/3.0)) > 1e-9 {
+		t.Errorf("Yamamoto K/9 = %v", st.StrikeoutsPerNine)
+	}
+}
+
+func TestPlayersHydrationFailureDegrades(t *testing.T) {
+	p := testProvider(t, rosterMux(t, http.StatusInternalServerError))
+
+	summaries, details, _, err := p.Players(context.Background(), 2026)
+	if err != nil {
+		t.Fatalf("Players must survive per-player hydration failures: %v", err)
+	}
+	if len(summaries) != 3 {
+		t.Fatalf("summaries = %d, want 3", len(summaries))
+	}
+	for _, s := range summaries {
+		if details[s.ID].BaseballSeasonStats != nil {
+			t.Errorf("season stats must be nil without hydration: %+v", details[s.ID])
+		}
+	}
+	// Names degrade to splitting the roster fullName.
+	byLast := make(map[string]model.PlayerSummary, len(summaries))
+	for _, s := range summaries {
+		byLast[s.LastName] = s
+	}
+	if betts := byLast["Betts"]; betts.FirstName != "Mookie" {
+		t.Errorf("fallback name wrong: %+v", betts)
+	}
+}
+
+func TestPlayersRosterFailureFatal(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/teams" {
+			serveFixture(t, w, "teams.json")
+			return
+		}
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	if _, _, _, err := p.Players(context.Background(), 2026); err == nil {
+		t.Error("a failed roster call must fail the refresh")
+	}
+}
+
+func TestBoxScoreNormalization(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/game/823372/boxscore" {
+			http.NotFound(w, r)
+			return
+		}
+		serveFixture(t, w, "boxscore.json")
+	}))
+
+	box, fetches, err := p.BoxScore(context.Background(), "823372")
+	if err != nil {
+		t.Fatalf("BoxScore failed: %v", err)
+	}
+	if len(fetches) != 1 {
+		t.Errorf("fetches = %d, want 1", len(fetches))
+	}
+	if box.GameID != ids.Game(leagueMLB, "823372") || box.Sport != string(model.SportBaseball) {
+		t.Errorf("envelope wrong: %+v", box)
+	}
+
+	// The StatsAPI labels home/away directly: LAD 8 @ PIT 9 arrives already
+	// oriented, with scores from the box score's own team batting totals.
+	if box.AwayTeam.ID != ids.Team(leagueMLB, "119") || box.AwayTeam.Abbreviation != "LAD" || box.AwayTeam.Score != 8 {
+		t.Errorf("away team wrong: %+v", box.AwayTeam)
+	}
+	if box.HomeTeam.ID != ids.Team(leagueMLB, "134") || box.HomeTeam.Abbreviation != "PIT" || box.HomeTeam.Score != 9 {
+		t.Errorf("home team wrong: %+v", box.HomeTeam)
+	}
+	if box.HomeTeam.Players != nil || box.HomeTeam.SoccerPlayers != nil || box.HomeTeam.TeamStats != nil {
+		t.Error("non-baseball blocks must stay empty for MLB")
+	}
+
+	// Away: Espinal's bench block (empty batting and pitching) is skipped;
+	// lines are sorted by name.
+	away := box.AwayTeam.BaseballPlayers
+	if len(away) != 2 || away[0].PlayerName != "Kyle Tucker" || away[1].PlayerName != "Shohei Ohtani" {
+		t.Fatalf("away lines wrong: %+v", away)
+	}
+
+	// Ohtani's real two-way game: both blocks on one line.
+	ohtani := away[1]
+	if ohtani.PlayerID != ids.Player(leagueMLB, "660271") || ohtani.Position != "DH" {
+		t.Errorf("Ohtani identity wrong: %+v", ohtani)
+	}
+	if ohtani.AtBats != 5 || ohtani.Hits != 1 || ohtani.HomeRuns != 1 || ohtani.RunsBattedIn != 2 ||
+		ohtani.Runs != 1 || ohtani.Walks != 0 || ohtani.StrikeoutsBatting != 2 {
+		t.Errorf("Ohtani batting line wrong: %+v", ohtani)
+	}
+	// TB = H + 2B + 2*3B + 3*HR = 1 + 0 + 0 + 3.
+	if ohtani.TotalBases != 4 {
+		t.Errorf("Ohtani total bases = %d, want 4", ohtani.TotalBases)
+	}
+	// IP "6.2" is 6 and two thirds; the pinned pitcher_strikeouts key grades
+	// against StrikeoutsPitching, not the batting K's.
+	if math.Abs(ohtani.InningsPitched-(6.0+2.0/3.0)) > 1e-9 || ohtani.StrikeoutsPitching != 6 || ohtani.EarnedRuns != 3 {
+		t.Errorf("Ohtani pitching line wrong: %+v", ohtani)
+	}
+
+	// Tucker: double only. TB = 2 + 1 = 3 (h + 2b; not 2*2B).
+	tucker := away[0]
+	if tucker.AtBats != 4 || tucker.Hits != 2 || tucker.TotalBases != 3 || tucker.RunsBattedIn != 1 {
+		t.Errorf("Tucker line wrong: %+v", tucker)
+	}
+	if tucker.InningsPitched != 0 || tucker.StrikeoutsPitching != 0 {
+		t.Errorf("Tucker must carry no pitching stats: %+v", tucker)
+	}
+
+	// Home: Mangum's "triples" key is trimmed from the fixture (missing
+	// stats decode as zero); Jones is a pure pitcher with a zero batting
+	// block.
+	home := box.HomeTeam.BaseballPlayers
+	if len(home) != 2 || home[0].PlayerName != "Jake Mangum" || home[1].PlayerName != "Jared Jones" {
+		t.Fatalf("home lines wrong: %+v", home)
+	}
+	if home[0].TotalBases != 4 || home[0].Hits != 3 {
+		t.Errorf("Mangum line wrong: %+v", home[0])
+	}
+	jones := home[1]
+	if jones.AtBats != 0 || jones.Hits != 0 || jones.TotalBases != 0 {
+		t.Errorf("Jones must carry a zero batting block: %+v", jones)
+	}
+	if jones.InningsPitched != 4 || jones.StrikeoutsPitching != 4 || jones.EarnedRuns != 2 {
+		t.Errorf("Jones pitching line wrong: %+v", jones)
+	}
+}
+
+func TestBoxScoreEmptyResponse(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	if _, _, err := p.BoxScore(context.Background(), "823372"); err == nil ||
+		!strings.Contains(err.Error(), "no box score data") {
+		t.Errorf("empty response must error, got %v", err)
+	}
+}
+
+func TestTotalBases(t *testing.T) {
+	// TB = 1B + 2*2B + 3*3B + 4*HR with 1B = H - 2B - 3B - HR, i.e.
+	// H + 2B + 2*3B + 3*HR. Verified against the live capture's own
+	// totalBases field for every batter of gamePk 823372.
+	tests := []struct {
+		hits, doubles, triples, homeRuns, want int
+	}{
+		{0, 0, 0, 0, 0},
+		{3, 0, 0, 0, 3},  // three singles
+		{2, 1, 0, 0, 3},  // single + double
+		{3, 1, 1, 0, 6},  // single + double + triple
+		{1, 0, 0, 1, 4},  // solo shot
+		{4, 1, 1, 1, 10}, // cycle plus a single: 1+2+3+4
+	}
+	for _, tt := range tests {
+		st := statsapiStatLine{Hits: tt.hits, Doubles: tt.doubles, Triples: tt.triples, HomeRuns: tt.homeRuns}
+		if got := totalBases(st); got != tt.want {
+			t.Errorf("totalBases(h=%d 2b=%d 3b=%d hr=%d) = %d, want %d",
+				tt.hits, tt.doubles, tt.triples, tt.homeRuns, got, tt.want)
+		}
 	}
 }
 

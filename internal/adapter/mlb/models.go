@@ -67,11 +67,18 @@ type statsapiGameTeam struct {
 	ProbablePitcher *statsapiPerson `json:"probablePitcher"`
 }
 
-// statsapiPerson is the hydrated probable-pitcher reference (people carry
-// fullName, not name).
+// statsapiPerson is the id+fullName person reference (people carry
+// fullName, not name) used by probable pitchers, box-score player blocks,
+// and roster entries.
 type statsapiPerson struct {
 	ID       int    `json:"id"`
 	FullName string `json:"fullName"`
+}
+
+// statsapiPosition is the position object on roster entries and box-score
+// player blocks.
+type statsapiPosition struct {
+	Abbreviation string `json:"abbreviation"`
 }
 
 // statsapiLinescore carries per-inning runs and totals. An unplayed bottom
@@ -102,11 +109,54 @@ type peopleResponse struct {
 	People []struct {
 		ID        int    `json:"id"`
 		FullName  string `json:"fullName"`
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
 		PitchHand struct {
 			Code string `json:"code"` // "L" | "R"
 		} `json:"pitchHand"`
 		Stats []statsapiStatGroup `json:"stats"`
 	} `json:"people"`
+}
+
+// rosterResponse is /teams/{teamId}/roster?rosterType=active.
+type rosterResponse struct {
+	Roster []struct {
+		Person       statsapiPerson   `json:"person"`
+		JerseyNumber string           `json:"jerseyNumber"`
+		Position     statsapiPosition `json:"position"`
+	} `json:"roster"`
+}
+
+// boxscoreResponse is /game/{gamePk}/boxscore. Unlike the NBA box-score
+// endpoint, the StatsAPI response labels home and away directly.
+type boxscoreResponse struct {
+	Teams struct {
+		Away boxscoreTeam `json:"away"`
+		Home boxscoreTeam `json:"home"`
+	} `json:"teams"`
+}
+
+// boxscoreTeam is one side of the box score: the full team object (id, name,
+// abbreviation), the game team totals, and the player blocks keyed
+// "ID{personId}" (verified live; the key duplicates person.id).
+type boxscoreTeam struct {
+	Team      statsapiTeam `json:"team"`
+	TeamStats struct {
+		Batting statsapiStatLine `json:"batting"`
+	} `json:"teamStats"`
+	Players map[string]boxscorePlayer `json:"players"`
+}
+
+// boxscorePlayer is one player's block. Players who did not appear carry
+// empty stats objects ({} for batting and pitching); anyone who played has
+// gamesPlayed: 1 on the relevant group. Two-way players fill both.
+type boxscorePlayer struct {
+	Person   statsapiPerson   `json:"person"`
+	Position statsapiPosition `json:"position"`
+	Stats    struct {
+		Batting  statsapiStatLine `json:"batting"`
+		Pitching statsapiStatLine `json:"pitching"`
+	} `json:"stats"`
 }
 
 // teamStatsResponse is /teams/stats?... for both season stats and the
@@ -116,6 +166,12 @@ type teamStatsResponse struct {
 }
 
 type statsapiStatGroup struct {
+	// Group discriminates hitting vs pitching on dual-group person
+	// hydrations (the team-stats endpoints request one group per call and
+	// never need it).
+	Group struct {
+		DisplayName string `json:"displayName"` // "hitting" | "pitching"
+	} `json:"group"`
 	Splits []struct {
 		Team statsapiRef      `json:"team"`
 		Stat statsapiStatLine `json:"stat"`
@@ -140,13 +196,16 @@ type statsapiStatLine struct {
 	SacFlies         int    `json:"sacFlies"`
 	StrikeOuts       int    `json:"strikeOuts"`
 	PlateAppearances int    `json:"plateAppearances"`
+	RBI              int    `json:"rbi"`
 	OBP              string `json:"obp"`
 	SLG              string `json:"slg"`
+	AVG              string `json:"avg"`
 
 	// Pitching.
 	ERA            string `json:"era"`
 	InningsPitched string `json:"inningsPitched"` // "802.1" = 802 and 1/3
 	BattersFaced   int    `json:"battersFaced"`
+	EarnedRuns     int    `json:"earnedRuns"`
 }
 
 // standingsResponse is /standings?leagueId=103,104&season={year}.

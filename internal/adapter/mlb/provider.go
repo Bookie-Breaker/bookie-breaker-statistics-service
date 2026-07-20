@@ -118,13 +118,6 @@ func (p *Provider) teamAbbreviations(ctx context.Context, seasonYear int) (map[i
 	return abbrevs, fetches
 }
 
-// Players returns empty collections: MLB player rosters and stats are a
-// documented Phase 6 descope (player modeling is Phase 7; probable-pitcher
-// stats are embedded on games instead — ADR-026).
-func (p *Provider) Players(context.Context, int) ([]model.PlayerSummary, map[string]model.PlayerDetail, []*sportsdata.Fetch, error) {
-	return []model.PlayerSummary{}, map[string]model.PlayerDetail{}, nil, nil
-}
-
 // Schedule fetches the season schedule in one season-long call (accepted by
 // the live API; verified 2026-07-05), then embeds season pitching stats for
 // each upcoming game's announced probable starters. Pitcher lookups are
@@ -239,14 +232,30 @@ func (p *Provider) Scoreboard(ctx context.Context, date time.Time) (map[string]s
 	return updates, fetches, nil
 }
 
-// PlayerGameLog returns an empty log: MLB player modeling is a documented
-// Phase 6 descope (ADR-026).
+// PlayerGameLog returns an empty log: per-game MLB player logs remain
+// descoped (rosters, season rates, and box scores landed in Phase 7
+// Wave 3; prop grading reads box scores, not game logs).
 func (p *Provider) PlayerGameLog(context.Context, model.PlayerDetail, int) ([]model.PlayerGameLine, []*sportsdata.Fetch, error) {
 	return []model.PlayerGameLine{}, nil, nil
 }
 
-// BoxScore is a tracked Phase 7 deferral: MLB box scores arrive in a later
-// wave.
-func (p *Provider) BoxScore(context.Context, string) (*model.BoxScore, []*sportsdata.Fetch, error) {
-	return nil, nil, sportsdata.ErrNotSupported
+// BoxScore fetches one game's box score by StatsAPI gamePk and normalizes
+// its per-player batting and pitching lines (Phase 7 Wave 3; the tracked
+// deferral is closed). The response labels home/away directly, so the
+// blocks pass through orientBoxScore already oriented.
+func (p *Provider) BoxScore(ctx context.Context, gameExternalID string) (*model.BoxScore, []*sportsdata.Fetch, error) {
+	resp, fetch, err := p.client.BoxScore(ctx, gameExternalID)
+	var fetches []*sportsdata.Fetch
+	if fetch != nil {
+		fetches = append(fetches, fetch)
+	}
+	if err != nil {
+		return nil, fetches, err
+	}
+
+	box := normalizeBoxScore(gameExternalID, resp)
+	if box == nil {
+		return nil, fetches, fmt.Errorf("no box score data for game %s", gameExternalID)
+	}
+	return box, fetches, nil
 }

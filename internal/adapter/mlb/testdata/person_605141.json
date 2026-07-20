@@ -1,0 +1,58 @@
+{
+  "copyright": "Copyright 2026 MLB Advanced Media, L.P.  Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt",
+  "people": [
+    {
+      "id": 605141,
+      "fullName": "Mookie Betts",
+      "firstName": "Markus",
+      "lastName": "Betts",
+      "primaryNumber": "50",
+      "primaryPosition": {
+        "code": "6",
+        "name": "Shortstop",
+        "type": "Infielder",
+        "abbreviation": "SS"
+      },
+      "batSide": {
+        "code": "R",
+        "description": "Right"
+      },
+      "pitchHand": {
+        "code": "R",
+        "description": "Right"
+      },
+      "stats": [
+        {
+          "type": {
+            "displayName": "season"
+          },
+          "group": {
+            "displayName": "hitting"
+          },
+          "splits": [
+            {
+              "season": "2026",
+              "stat": {
+                "gamesPlayed": 63,
+                "runs": 36,
+                "doubles": 10,
+                "triples": 0,
+                "homeRuns": 11,
+                "strikeOuts": 31,
+                "baseOnBalls": 22,
+                "hits": 56,
+                "atBats": 246,
+                "rbi": 31,
+                "totalBases": 99,
+                "avg": ".228",
+                "obp": ".293",
+                "slg": ".402",
+                "plateAppearances": 270
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
