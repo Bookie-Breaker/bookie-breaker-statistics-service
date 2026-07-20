@@ -1,0 +1,86 @@
+{
+  "copyright": "Copyright 2026 MLB Advanced Media, L.P.  Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt",
+  "people": [
+    {
+      "id": 660271,
+      "fullName": "Shohei Ohtani",
+      "firstName": "Shohei",
+      "lastName": "Ohtani",
+      "primaryNumber": "17",
+      "primaryPosition": {
+        "code": "Y",
+        "name": "Two-Way Player",
+        "type": "Two-Way Player",
+        "abbreviation": "TWP"
+      },
+      "batSide": {
+        "code": "L",
+        "description": "Left"
+      },
+      "pitchHand": {
+        "code": "R",
+        "description": "Right"
+      },
+      "stats": [
+        {
+          "type": {
+            "displayName": "season"
+          },
+          "group": {
+            "displayName": "hitting"
+          },
+          "splits": [
+            {
+              "season": "2026",
+              "stat": {
+                "gamesPlayed": 95,
+                "runs": 66,
+                "doubles": 17,
+                "triples": 2,
+                "homeRuns": 22,
+                "strikeOuts": 94,
+                "baseOnBalls": 60,
+                "hits": 101,
+                "atBats": 346,
+                "rbi": 60,
+                "totalBases": 188,
+                "avg": ".292",
+                "obp": ".400",
+                "slg": ".543",
+                "plateAppearances": 417
+              }
+            }
+          ]
+        },
+        {
+          "type": {
+            "displayName": "season"
+          },
+          "group": {
+            "displayName": "pitching"
+          },
+          "splits": [
+            {
+              "season": "2026",
+              "stat": {
+                "gamesPlayed": 14,
+                "gamesStarted": 14,
+                "inningsPitched": "85.2",
+                "strikeOuts": 95,
+                "baseOnBalls": 26,
+                "hits": 55,
+                "runs": 21,
+                "earnedRuns": 17,
+                "homeRuns": 4,
+                "era": "1.79",
+                "battersFaced": 340,
+                "hitByPitch": 6,
+                "avg": ".180"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

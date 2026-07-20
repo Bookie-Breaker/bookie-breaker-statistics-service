@@ -81,6 +81,31 @@ func (c *Client) Person(ctx context.Context, personID, seasonYear int) (*peopleR
 	return &parsed, fetch, err
 }
 
+// PersonSeason fetches one player with season hitting and pitching stats
+// hydrated in one call (the same Person-hydrate pattern the probable
+// pitchers use, widened to both groups for roster hydration).
+func (c *Client) PersonSeason(ctx context.Context, personID, seasonYear int) (*peopleResponse, *sportsdata.Fetch, error) {
+	var parsed peopleResponse
+	path := fmt.Sprintf("/people/%d?hydrate=stats(group=[hitting,pitching],type=[season],season=%d)", personID, seasonYear)
+	fetch, err := c.get(ctx, path, &parsed)
+	return &parsed, fetch, err
+}
+
+// Roster fetches one team's active roster.
+func (c *Client) Roster(ctx context.Context, teamID, seasonYear int) (*rosterResponse, *sportsdata.Fetch, error) {
+	var parsed rosterResponse
+	path := fmt.Sprintf("/teams/%d/roster?rosterType=active&season=%d", teamID, seasonYear)
+	fetch, err := c.get(ctx, path, &parsed)
+	return &parsed, fetch, err
+}
+
+// BoxScore fetches one game's box score by StatsAPI gamePk.
+func (c *Client) BoxScore(ctx context.Context, gamePk string) (*boxscoreResponse, *sportsdata.Fetch, error) {
+	var parsed boxscoreResponse
+	fetch, err := c.get(ctx, fmt.Sprintf("/game/%s/boxscore", gamePk), &parsed)
+	return &parsed, fetch, err
+}
+
 // TeamStats fetches league-wide team season stats for one group ("hitting"
 // or "pitching"). Route verified live: /teams/stats with sportId returns all
 // 30 teams in one call.

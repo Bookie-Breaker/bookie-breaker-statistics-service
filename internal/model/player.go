@@ -48,6 +48,23 @@ type SoccerSeasonStats struct {
 	RedCards      int `json:"red_cards"`
 }
 
+// BaseballPlayerSeasonStats matches the OpenAPI BaseballPlayerSeasonStats
+// schema: season totals and rates for baseball players (Phase 7 Wave 3;
+// PlayerSeasonStats stays basketball-shaped for compatibility). The batting
+// block and the pitching block share one row — two-way players fill both.
+type BaseballPlayerSeasonStats struct {
+	Season                  int     `json:"season"`
+	Games                   int     `json:"games"`
+	AtBats                  int     `json:"at_bats"`
+	Hits                    int     `json:"hits"`
+	TotalBases              int     `json:"total_bases"`
+	HomeRuns                int     `json:"home_runs"`
+	BattingAvg              float64 `json:"batting_avg"`
+	PlateAppearancesPerGame float64 `json:"plate_appearances_per_game"`
+	StrikeoutsPerNine       float64 `json:"strikeouts_per_nine"`
+	InningsPitched          float64 `json:"innings_pitched"`
+}
+
 // PlayerDetail matches the OpenAPI PlayerDetail schema.
 type PlayerDetail struct {
 	PlayerSummary
@@ -55,7 +72,9 @@ type PlayerDetail struct {
 	SeasonStats     *PlayerSeasonStats `json:"season_stats,omitempty"`
 	// SoccerSeasonStats is set for SOCCER leagues only (Phase 7).
 	SoccerSeasonStats *SoccerSeasonStats `json:"soccer_season_stats,omitempty"`
-	GameLog           []PlayerGameLine   `json:"game_log,omitempty"`
+	// BaseballSeasonStats is set for BASEBALL leagues only (Phase 7 Wave 3).
+	BaseballSeasonStats *BaseballPlayerSeasonStats `json:"baseball_season_stats,omitempty"`
+	GameLog             []PlayerGameLine           `json:"game_log,omitempty"`
 }
 
 // PlayerGameLine is one row of a player's per-game log (returned when

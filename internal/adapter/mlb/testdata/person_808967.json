@@ -1,0 +1,56 @@
+{
+  "copyright": "Copyright 2026 MLB Advanced Media, L.P.  Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt",
+  "people": [
+    {
+      "id": 808967,
+      "fullName": "Yoshinobu Yamamoto",
+      "firstName": "Yoshinobu",
+      "lastName": "Yamamoto",
+      "primaryNumber": "18",
+      "primaryPosition": {
+        "code": "1",
+        "name": "Pitcher",
+        "type": "Pitcher",
+        "abbreviation": "P"
+      },
+      "batSide": {
+        "code": "R",
+        "description": "Right"
+      },
+      "pitchHand": {
+        "code": "R",
+        "description": "Right"
+      },
+      "stats": [
+        {
+          "type": {
+            "displayName": "season"
+          },
+          "group": {
+            "displayName": "pitching"
+          },
+          "splits": [
+            {
+              "season": "2026",
+              "stat": {
+                "gamesPlayed": 18,
+                "gamesStarted": 18,
+                "inningsPitched": "119.2",
+                "strikeOuts": 113,
+                "baseOnBalls": 25,
+                "hits": 80,
+                "runs": 38,
+                "earnedRuns": 37,
+                "homeRuns": 13,
+                "era": "2.78",
+                "battersFaced": 455,
+                "hitByPitch": 3,
+                "avg": ".188"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
