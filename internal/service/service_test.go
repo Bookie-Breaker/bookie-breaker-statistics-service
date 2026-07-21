@@ -98,6 +98,16 @@ func TestShapeStatBlocks(t *testing.T) {
 	if all.Stats.Advanced == nil || all.HomeAwaySplits == nil {
 		t.Errorf("all shaping wrong: %+v", all.Stats)
 	}
+
+	def := shapeStatBlocks(full, model.StatDefensive)
+	if def.Stats.Defensive == nil || def.Stats.Offensive != nil || def.Stats.Advanced != nil || def.HomeAwaySplits != nil {
+		t.Errorf("defensive shaping wrong: %+v", def.Stats)
+	}
+
+	adv := shapeStatBlocks(full, model.StatAdvanced)
+	if adv.Stats.Advanced == nil || adv.Stats.Offensive != nil || adv.Stats.Defensive != nil || adv.HomeAwaySplits != nil {
+		t.Errorf("advanced shaping wrong: %+v", adv.Stats)
+	}
 }
 
 func TestParseDateRange(t *testing.T) {

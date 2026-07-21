@@ -332,6 +332,159 @@ func TestPlayersDescoped(t *testing.T) {
 	}
 }
 
+func TestProviderIdentity(t *testing.T) {
+	p := NewProvider(espnfb.NewClient("http://unused", time.Second), NewClient("http://unused", "", time.Second))
+	if p.League() != model.LeagueNCAAFB {
+		t.Errorf("League() = %s, want NCAA_FB", p.League())
+	}
+	if p.Source() != sourceNCAAFB {
+		t.Errorf("Source() = %s, want %s", p.Source(), sourceNCAAFB)
+	}
+}
+
+func TestBoxScoreNotSupported(t *testing.T) {
+	p := NewProvider(espnfb.NewClient("http://unused", time.Second), NewClient("http://unused", "", time.Second))
+	if _, _, err := p.BoxScore(context.Background(), "1"); err == nil {
+		t.Error("BoxScore must return an error (tracked Phase 7 deferral)")
+	}
+}
+
+func TestTeamsUpstreamError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+	if _, _, _, err := p.Teams(context.Background()); err == nil {
+		t.Error("upstream 500 on ESPN teams must error")
+	}
+}
+
+func TestTeamStatsESPNTeamsError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+	if _, _, err := p.TeamStats(context.Background(), 2025, 0); err == nil {
+		t.Error("upstream 500 on ESPN teams must error")
+	}
+}
+
+func TestTeamStatsSPRatingsOutageDegrades(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/teams"):
+			serveFixture(t, w, "teams.json")
+		case r.URL.Path == "/records":
+			_, _ = w.Write([]byte(derivedRecords))
+		case r.URL.Path == "/ratings/sp":
+			http.Error(w, "boom", http.StatusServiceUnavailable)
+		case r.URL.Path == "/stats/season":
+			_, _ = w.Write([]byte(derivedSeasonStats))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+
+	stats, _, err := p.TeamStats(context.Background(), 2025, 0)
+	if err != nil {
+		t.Fatalf("SP+ outage must degrade, not error: %v", err)
+	}
+	unt := stats[ids.Team(leagueNCAAFB, "249")]
+	if unt.Stats.Football == nil || unt.Stats.Football.SPPlusRating != 0 {
+		t.Errorf("sp_plus_rating must stay zero on an SP+ outage: %+v", unt.Stats.Football)
+	}
+	if unt.Stats.Football.PointsPerGame == 0 {
+		t.Error("points per game should still be sourced from season stats despite the SP+ outage")
+	}
+}
+
+func TestTeamStatsSeasonStatsOutageDegrades(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/teams"):
+			serveFixture(t, w, "teams.json")
+		case r.URL.Path == "/records":
+			_, _ = w.Write([]byte(derivedRecords))
+		case r.URL.Path == "/ratings/sp":
+			_, _ = w.Write([]byte(derivedSP))
+		case r.URL.Path == "/stats/season":
+			http.Error(w, "boom", http.StatusServiceUnavailable)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+
+	stats, _, err := p.TeamStats(context.Background(), 2025, 0)
+	if err != nil {
+		t.Fatalf("season stats outage must degrade, not error: %v", err)
+	}
+	unt := stats[ids.Team(leagueNCAAFB, "249")]
+	if unt.Stats.Football == nil || unt.Stats.Football.PointsPerGame != 0 {
+		t.Errorf("points per game must stay zero on a season-stats outage: %+v", unt.Stats.Football)
+	}
+	if unt.Stats.Football.SPPlusRating != 18.5 {
+		t.Error("SP+ rating should still be sourced despite the season-stats outage")
+	}
+}
+
+func TestScoreboardUpstreamError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+	if _, _, err := p.Scoreboard(context.Background(), time.Date(2025, 11, 29, 0, 0, 0, 0, time.UTC)); err == nil {
+		t.Error("upstream 500 on scoreboard must error")
+	}
+}
+
+func TestTeamStatsRecordsMalformedJSON(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/teams"):
+			serveFixture(t, w, "teams.json")
+		case r.URL.Path == "/records":
+			_, _ = w.Write([]byte(`{invalid`))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+
+	stats, _, err := p.TeamStats(context.Background(), 2025, 0)
+	if err != nil {
+		t.Fatalf("malformed records JSON must degrade (records outage), not error: %v", err)
+	}
+	if len(stats) != 0 {
+		t.Errorf("stats = %d, want 0 on a records decode failure", len(stats))
+	}
+}
+
+func TestNormalizeTeamStatsUnknownESPNTeamDropped(t *testing.T) {
+	records := []TeamRecords{{Team: "Ghost State", Total: TeamRecord{Games: 10, Wins: 5, Losses: 5}}}
+	out := normalizeTeamStats(2025, records, nil, nil, map[string]espnRef{})
+	if len(out) != 0 {
+		t.Errorf("unmatched CFBD team must be dropped, got %+v", out)
+	}
+}
+
+func TestLenientFloatUnmarshalFallback(t *testing.T) {
+	var f lenientFloat
+	if err := f.UnmarshalJSON([]byte("true")); err != nil {
+		t.Fatalf("UnmarshalJSON must never error: %v", err)
+	}
+	if f != 0 {
+		t.Errorf("non-numeric, non-string JSON should decode to 0, got %v", f)
+	}
+}
+
 func TestSeasonYear(t *testing.T) {
 	p := NewProvider(espnfb.NewClient("http://unused", time.Second), NewClient("http://unused", "", time.Second))
 	for now, want := range map[time.Time]int{

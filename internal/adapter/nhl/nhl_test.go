@@ -10,6 +10,7 @@ package nhl
 
 import (
 	"context"
+	"errors"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -19,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/adapter/sportsdata"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/ids"
 	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/internal/model"
 )
@@ -324,5 +326,207 @@ func TestPlayersDescoped(t *testing.T) {
 	log, fetches, err := p.PlayerGameLog(context.Background(), model.PlayerDetail{}, 2025)
 	if err != nil || len(log) != 0 || fetches != nil {
 		t.Errorf("PlayerGameLog must return an empty log: %v %v %v", log, fetches, err)
+	}
+}
+
+func TestProviderIdentity(t *testing.T) {
+	p := NewProvider(NewClient("http://unused", "http://unused", time.Second))
+	if p.League() != model.LeagueNHL {
+		t.Errorf("League() = %s, want NHL", p.League())
+	}
+	if p.Source() != sourceNHL {
+		t.Errorf("Source() = %s, want %s", p.Source(), sourceNHL)
+	}
+}
+
+func TestBoxScoreNotSupported(t *testing.T) {
+	p := NewProvider(NewClient("http://unused", "http://unused", time.Second))
+	if _, _, err := p.BoxScore(context.Background(), "1"); !errors.Is(err, sportsdata.ErrNotSupported) {
+		t.Errorf("BoxScore() error = %v, want ErrNotSupported", err)
+	}
+}
+
+func upstream500(t *testing.T) http.Handler {
+	t.Helper()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	})
+}
+
+func testProviderWith(t *testing.T, handler http.Handler) *Provider {
+	t.Helper()
+	server := httptest.NewServer(handler)
+	t.Cleanup(server.Close)
+	return NewProvider(NewClient(server.URL, server.URL, 5*time.Second))
+}
+
+func TestTeamsUpstreamError(t *testing.T) {
+	p := testProviderWith(t, upstream500(t))
+	if _, _, _, err := p.Teams(context.Background()); err == nil {
+		t.Error("upstream 500 on standings must error")
+	}
+}
+
+func TestTeamsMalformedJSON(t *testing.T) {
+	p := testProviderWith(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{invalid`))
+	}))
+	if _, _, _, err := p.Teams(context.Background()); err == nil || !strings.Contains(err.Error(), "decode") {
+		t.Errorf("malformed JSON must produce a decode error, got %v", err)
+	}
+}
+
+func TestTeamStatsSummaryError(t *testing.T) {
+	p := testProviderWith(t, upstream500(t))
+	if _, _, err := p.TeamStats(context.Background(), 2025, 0); err == nil || !strings.Contains(err.Error(), "fetch team summary") {
+		t.Errorf("upstream 500 on team summary must error, got %v", err)
+	}
+}
+
+func TestTeamStatsTeamRefError(t *testing.T) {
+	p := testProviderWith(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasPrefix(r.URL.Path, "/team/summary"):
+			serveFixture(t, w, "team_summary.json")
+		default:
+			http.Error(w, "boom", http.StatusInternalServerError)
+		}
+	}))
+	if _, _, err := p.TeamStats(context.Background(), 2025, 0); err == nil || !strings.Contains(err.Error(), "fetch team reference") {
+		t.Errorf("upstream 500 on team reference must error, got %v", err)
+	}
+}
+
+func TestTeamStatsUnknownTeamIDDropped(t *testing.T) {
+	summary := &teamSummaryResponse{Data: []teamSummaryRow{
+		{TeamID: 999, TeamFullName: "Ghost Team", GamesPlayed: 10},
+	}}
+	out := normalizeTeamStats(2025, summary, map[int]string{1: "AAA"})
+	if len(out) != 0 {
+		t.Errorf("rows with no matching tricode must be dropped, got %+v", out)
+	}
+}
+
+func TestScheduleUpstreamError(t *testing.T) {
+	p := testProviderWith(t, upstream500(t))
+	if _, _, err := p.Schedule(context.Background(), 2025); err == nil || !strings.Contains(err.Error(), "fetch schedule") {
+		t.Errorf("upstream 500 on schedule must error, got %v", err)
+	}
+}
+
+func TestScoreboardUpstreamError(t *testing.T) {
+	p := testProviderWith(t, upstream500(t))
+	if _, _, err := p.Scoreboard(context.Background(), time.Date(2025, 11, 1, 0, 0, 0, 0, time.UTC)); err == nil {
+		t.Error("upstream 500 on scoreboard must error")
+	}
+}
+
+func TestStartingYearBareYear(t *testing.T) {
+	if got := startingYear(2025); got != 2025 {
+		t.Errorf("startingYear(2025) = %d, want 2025 (bare year passed through)", got)
+	}
+}
+
+func TestSeasonTypeMapping(t *testing.T) {
+	cases := map[int]model.SeasonType{
+		1: model.SeasonPreseason,
+		2: model.SeasonRegular,
+		3: model.SeasonPostseason,
+		9: model.SeasonRegular, // unknown values default to regular
+	}
+	for gameType, want := range cases {
+		if got := mapSeasonType(gameType); got != want {
+			t.Errorf("mapSeasonType(%d) = %s, want %s", gameType, got, want)
+		}
+	}
+}
+
+func TestOvertimeFallbackToPeriodDescriptor(t *testing.T) {
+	// No lastPeriodType and no maxRegulationPeriods: falls back to the
+	// package's regulationPeriods constant.
+	g := game{PeriodDescriptor: periodDescriptor{Number: 4}}
+	if !overtime(g) {
+		t.Errorf("period 4 with no explicit max should be past the default regulation of %d", regulationPeriods)
+	}
+	g = game{PeriodDescriptor: periodDescriptor{Number: 3}}
+	if overtime(g) {
+		t.Error("period 3 must not be overtime under the default regulation")
+	}
+	// Explicit maxRegulationPeriods overrides the constant.
+	g = game{PeriodDescriptor: periodDescriptor{Number: 3, MaxRegulationPeriods: 4}}
+	if overtime(g) {
+		t.Error("period 3 must not be overtime when maxRegulationPeriods is 4")
+	}
+}
+
+func TestTeamScoreMissing(t *testing.T) {
+	if got := teamScore(gameTeam{}); got != 0 {
+		t.Errorf("teamScore with a nil score = %d, want 0", got)
+	}
+}
+
+func TestPeriodScoresEdgeCases(t *testing.T) {
+	// A goal's own period can exceed the game's periodDescriptor (e.g. a
+	// shootout goal past regulation): maxPeriod must track the goals, not
+	// just the game header.
+	g := game{
+		PeriodDescriptor: periodDescriptor{Number: 3},
+		HomeTeam:         gameTeam{Abbrev: "HOM"},
+		Goals: []scoreGoal{
+			{TeamAbbrev: "HOM", PeriodDescriptor: periodDescriptor{Number: 5}},
+		},
+	}
+	scores := periodScores(g)
+	if len(scores) != 5 {
+		t.Fatalf("period scores = %d, want 5 (goal detail extends past the header's period count)", len(scores))
+	}
+	if scores[4].Home != 1 {
+		t.Errorf("period 5 goal wrong: %+v", scores[4])
+	}
+
+	// maxPeriod stays zero when neither the header nor any goal carries a
+	// positive period number: must return nil, not a zero-length slice.
+	zero := game{Goals: []scoreGoal{{TeamAbbrev: "HOM"}}}
+	if got := periodScores(zero); got != nil {
+		t.Errorf("all-zero period numbers should yield nil, got %+v", got)
+	}
+
+	// A goal with an out-of-range period index (0, i.e. idx -1) must be
+	// skipped rather than corrupting the scores slice.
+	oor := game{
+		PeriodDescriptor: periodDescriptor{Number: 2},
+		HomeTeam:         gameTeam{Abbrev: "HOM"},
+		Goals: []scoreGoal{
+			{TeamAbbrev: "HOM", PeriodDescriptor: periodDescriptor{Number: 0}},
+			{TeamAbbrev: "HOM", PeriodDescriptor: periodDescriptor{Number: 1}},
+		},
+	}
+	scores = periodScores(oor)
+	if len(scores) != 2 || scores[0].Home != 1 {
+		t.Errorf("out-of-range goal must be skipped, in-range goal kept: %+v", scores)
+	}
+}
+
+func TestNormalizeGameMalformedDate(t *testing.T) {
+	g := game{ID: 1, StartTimeUTC: "not-a-date"}
+	if _, ok := normalizeGame(g); ok {
+		t.Error("unparseable start time must not normalize")
+	}
+}
+
+func TestTeamSavePctZeroShots(t *testing.T) {
+	if got := teamSavePct(teamSummaryRow{GamesPlayed: 10, ShotsAgainstPerGame: 0}); got != 0 {
+		t.Errorf("teamSavePct with zero shots against = %v, want 0", got)
+	}
+}
+
+func TestGameTeamFullNameFallbacks(t *testing.T) {
+	commonOnly := gameTeam{CommonName: localizedName{Default: "Avalanche"}}
+	if got := commonOnly.fullName(); got != "Avalanche" {
+		t.Errorf("common-name-only fullName = %q, want %q", got, "Avalanche")
+	}
+	nameOnly := gameTeam{Name: localizedName{Default: "Colorado Avalanche"}}
+	if got := nameOnly.fullName(); got != "Colorado Avalanche" {
+		t.Errorf("name-only fullName = %q, want %q", got, "Colorado Avalanche")
 	}
 }

@@ -1,9 +1,13 @@
 package pubsub
 
 import (
+	"context"
 	"encoding/json"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/Bookie-Breaker/bookie-breaker-statistics-service/tests/testutil"
 )
 
 // TestGameCompletedEventNBAPayloadUnchanged guards the ADR-027 contract
@@ -60,5 +64,111 @@ func TestGameCompletedEventRegulationScores(t *testing.T) {
 	if !strings.Contains(string(payload), `"regulation_home_score":1`) ||
 		!strings.Contains(string(payload), `"regulation_away_score":1`) {
 		t.Errorf("regulation scores missing when set: %s", payload)
+	}
+}
+
+// subscribe opens a subscription and waits for the channel to be confirmed
+// before returning, so a subsequent publish cannot race the subscriber.
+func subscribe(t *testing.T, channel string) <-chan []byte {
+	t.Helper()
+	rdb := testutil.RedisClient(t)
+	sub := rdb.Subscribe(context.Background(), channel)
+	t.Cleanup(func() { _ = sub.Close() })
+	if _, err := sub.Receive(context.Background()); err != nil {
+		t.Fatalf("confirm subscription: %v", err)
+	}
+
+	out := make(chan []byte, 1)
+	go func() {
+		if msg, err := sub.ReceiveMessage(context.Background()); err == nil {
+			out <- []byte(msg.Payload)
+		}
+	}()
+	return out
+}
+
+func receive(t *testing.T, ch <-chan []byte) []byte {
+	t.Helper()
+	select {
+	case payload := <-ch:
+		return payload
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for published event")
+		return nil
+	}
+}
+
+func TestPublishStatsUpdated(t *testing.T) {
+	rdb := testutil.RedisClient(t)
+	messages := subscribe(t, "events:stats.updated")
+
+	p := NewPublisher(rdb)
+	err := p.PublishStatsUpdated(context.Background(), StatsUpdatedEvent{
+		League:     "NBA",
+		UpdateType: "team_stats",
+		TeamIDs:    []string{"team-1"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var got StatsUpdatedEvent
+	if err := json.Unmarshal(receive(t, messages), &got); err != nil {
+		t.Fatal(err)
+	}
+	if got.Event != "stats.updated" || got.League != "NBA" || got.UpdateType != "team_stats" {
+		t.Errorf("event payload wrong: %+v", got)
+	}
+	if len(got.TeamIDs) != 1 || got.TeamIDs[0] != "team-1" {
+		t.Errorf("team ids wrong: %v", got.TeamIDs)
+	}
+	if _, err := time.Parse(time.RFC3339, got.Timestamp); err != nil {
+		t.Errorf("timestamp not RFC3339: %q", got.Timestamp)
+	}
+}
+
+func TestPublishGameCompleted(t *testing.T) {
+	rdb := testutil.RedisClient(t)
+	messages := subscribe(t, "events:game.completed")
+
+	p := NewPublisher(rdb)
+	err := p.PublishGameCompleted(context.Background(), GameCompletedEvent{
+		GameID:    "g-1",
+		League:    "NBA",
+		HomeTeam:  "LAL",
+		AwayTeam:  "BOS",
+		HomeScore: 112,
+		AwayScore: 104,
+		Total:     216,
+		Margin:    8,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var got GameCompletedEvent
+	if err := json.Unmarshal(receive(t, messages), &got); err != nil {
+		t.Fatal(err)
+	}
+	if got.Event != "game.completed" || got.GameID != "g-1" || got.HomeScore != 112 || got.Total != 216 {
+		t.Errorf("event payload wrong: %+v", got)
+	}
+	if _, err := time.Parse(time.RFC3339, got.Timestamp); err != nil {
+		t.Errorf("timestamp not RFC3339: %q", got.Timestamp)
+	}
+}
+
+func TestPublishRedisDown(t *testing.T) {
+	rdb := testutil.RedisClient(t)
+	if err := rdb.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	p := NewPublisher(rdb)
+	if err := p.PublishStatsUpdated(context.Background(), StatsUpdatedEvent{League: "NBA"}); err == nil {
+		t.Error("PublishStatsUpdated on closed client should error")
+	}
+	if err := p.PublishGameCompleted(context.Background(), GameCompletedEvent{GameID: "g-1"}); err == nil {
+		t.Error("PublishGameCompleted on closed client should error")
 	}
 }
