@@ -122,6 +122,43 @@ func TestMLBInjuriesFetchAndNormalize(t *testing.T) {
 	}
 }
 
+func TestInjuriesUpstreamError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	client := NewClient(server.URL, "basketball/nba", 5*time.Second)
+	if _, fetch, err := client.Injuries(context.Background()); err == nil || fetch == nil || fetch.HTTPStatus != http.StatusInternalServerError {
+		t.Errorf("upstream 500 must error and still archive the fetch: err=%v fetch=%+v", err, fetch)
+	}
+}
+
+func TestInjuriesMalformedJSON(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{invalid`))
+	}))
+	defer server.Close()
+
+	client := NewClient(server.URL, "basketball/nba", 5*time.Second)
+	if _, _, err := client.Injuries(context.Background()); err == nil {
+		t.Error("malformed JSON must produce a decode error")
+	}
+}
+
+func TestParseDateUnparseable(t *testing.T) {
+	if got := parseDate("not-a-date"); !got.IsZero() {
+		t.Errorf("unparseable date should yield the zero time, got %v", got)
+	}
+}
+
+func TestFirstNonEmptyAllEmpty(t *testing.T) {
+	if got := firstNonEmpty("", "", ""); got != "" {
+		t.Errorf("firstNonEmpty with no non-empty values = %q, want empty", got)
+	}
+}
+
 func TestMapStatus(t *testing.T) {
 	tests := map[string]model.PlayerStatus{
 		"Out":          model.PlayerOut,

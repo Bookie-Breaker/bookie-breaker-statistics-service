@@ -14,6 +14,7 @@ package mlb
 
 import (
 	"context"
+	"encoding/json"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -504,6 +505,8 @@ func TestParseInnings(t *testing.T) {
 		"12":    12,
 		"":      0,
 		"x.y":   0,
+		"10.5":  10, // out-of-range thirds fall back to the whole number
+		"10.a":  10, // unparseable thirds fall back to the whole number
 	}
 	for in, want := range tests {
 		if got := parseInnings(in); math.Abs(got-want) > 1e-9 {
@@ -828,5 +831,364 @@ func TestSeasonYear(t *testing.T) {
 		if got := p.SeasonYear(now); got != want {
 			t.Errorf("SeasonYear(%s) = %d, want %d", now.Format("2006-01-02"), got, want)
 		}
+	}
+}
+
+func TestProviderIdentity(t *testing.T) {
+	p := NewProvider(NewClient("http://unused", time.Second))
+	if p.League() != model.LeagueMLB {
+		t.Errorf("League() = %s, want MLB", p.League())
+	}
+	if p.Source() != sourceMLB {
+		t.Errorf("Source() = %s, want %s", p.Source(), sourceMLB)
+	}
+}
+
+func upstream500(t *testing.T) http.Handler {
+	t.Helper()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	})
+}
+
+func TestTeamsUpstreamError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, _, err := p.Teams(context.Background()); err == nil {
+		t.Error("upstream 500 on teams must error")
+	}
+}
+
+func TestTeamsMalformedJSON(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{invalid`))
+	}))
+	if _, _, _, err := p.Teams(context.Background()); err == nil || !strings.Contains(err.Error(), "decode") {
+		t.Errorf("malformed JSON must produce a decode error, got %v", err)
+	}
+}
+
+func TestTeamStatsHittingError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, err := p.TeamStats(context.Background(), 2026, 0); err == nil || !strings.Contains(err.Error(), "fetch hitting stats") {
+		t.Errorf("upstream 500 on hitting stats must error, got %v", err)
+	}
+}
+
+func TestTeamStatsPitchingError(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		switch {
+		case r.URL.Path == "/teams/stats" && q.Get("group") == "hitting":
+			serveFixture(t, w, "teamstats_hitting.json")
+		default:
+			http.Error(w, "boom", http.StatusInternalServerError)
+		}
+	}))
+	if _, _, err := p.TeamStats(context.Background(), 2026, 0); err == nil || !strings.Contains(err.Error(), "fetch pitching stats") {
+		t.Errorf("upstream 500 on pitching stats must error, got %v", err)
+	}
+}
+
+func TestTeamStatsStandingsError(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		switch {
+		case r.URL.Path == "/teams/stats" && q.Get("group") == "hitting":
+			serveFixture(t, w, "teamstats_hitting.json")
+		case r.URL.Path == "/teams/stats" && q.Get("group") == "pitching":
+			serveFixture(t, w, "teamstats_pitching.json")
+		default:
+			http.Error(w, "boom", http.StatusInternalServerError)
+		}
+	}))
+	if _, _, err := p.TeamStats(context.Background(), 2026, 0); err == nil || !strings.Contains(err.Error(), "fetch standings") {
+		t.Errorf("upstream 500 on standings must error, got %v", err)
+	}
+}
+
+func TestTeamStatsAbbreviationsDegrade(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		switch {
+		case r.URL.Path == "/teams/stats" && q.Get("stats") == "statSplits":
+			serveFixture(t, w, "bullpen_rp.json")
+		case r.URL.Path == "/teams/stats" && q.Get("group") == "hitting":
+			serveFixture(t, w, "teamstats_hitting.json")
+		case r.URL.Path == "/teams/stats" && q.Get("group") == "pitching":
+			serveFixture(t, w, "teamstats_pitching.json")
+		case r.URL.Path == "/standings":
+			serveFixture(t, w, "standings.json")
+		case r.URL.Path == "/teams":
+			http.Error(w, "boom", http.StatusInternalServerError)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+
+	stats, _, err := p.TeamStats(context.Background(), 2026, 0)
+	if err != nil {
+		t.Fatalf("TeamStats must survive a team-list outage: %v", err)
+	}
+	lad := stats[ids.Team(leagueMLB, "119")]
+	if lad.TeamAbbreviation != "" {
+		t.Errorf("abbreviation should be empty without the team list, got %q", lad.TeamAbbreviation)
+	}
+	if lad.Stats.Baseball == nil {
+		t.Error("stats should still be present despite the abbreviation outage")
+	}
+}
+
+func TestScheduleUpstreamError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, err := p.Schedule(context.Background(), 2026); err == nil {
+		t.Error("upstream 500 on schedule must error")
+	}
+}
+
+func TestScheduleResolvePitchersDedupAndDegrade(t *testing.T) {
+	const sched = `{"dates":[{"date":"2026-08-01","games":[
+		{"gamePk":9001,"gameType":"R","gameDate":"2026-08-01T18:00:00Z","status":{"abstractGameState":"Preview","detailedState":"Scheduled"},
+		 "teams":{"home":{"team":{"id":10,"name":"Home A"},"probablePitcher":{"id":1001,"fullName":"Ace One"}},
+		          "away":{"team":{"id":20,"name":"Away A"}}}},
+		{"gamePk":9002,"gameType":"R","gameDate":"2026-08-01T21:00:00Z","status":{"abstractGameState":"Preview","detailedState":"Scheduled"},
+		 "teams":{"home":{"team":{"id":10,"name":"Home A"},"probablePitcher":{"id":1001,"fullName":"Ace One"}},
+		          "away":{"team":{"id":30,"name":"Away B"},"probablePitcher":{"id":1002,"fullName":"Bad Arm"}}}}
+	]}]}`
+
+	var personCalls atomic.Int32
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/teams":
+			serveFixture(t, w, "teams.json")
+		case "/schedule":
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(sched))
+		case "/people/1001":
+			personCalls.Add(1)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"people":[{"id":1001,"fullName":"Ace One","pitchHand":{"code":"R"}}]}`))
+		case "/people/1002":
+			http.Error(w, "boom", http.StatusInternalServerError)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+
+	games, _, err := p.Schedule(context.Background(), 2026)
+	if err != nil {
+		t.Fatalf("Schedule failed: %v", err)
+	}
+	if personCalls.Load() != 1 {
+		t.Errorf("person calls = %d, want 1 (pitcher 1001 cached after the first game)", personCalls.Load())
+	}
+	byExternal := make(map[string]model.Game, len(games))
+	for _, g := range games {
+		byExternal[g.ExternalID] = g
+	}
+	g1 := byExternal["9001"]
+	if g1.AwayProbablePitcher != nil {
+		t.Errorf("away probable must be nil with no announced pitcher: %+v", g1.AwayProbablePitcher)
+	}
+	if g1.HomeProbablePitcher == nil || g1.HomeProbablePitcher.Name != "Ace One" || g1.HomeProbablePitcher.Throws != "R" {
+		t.Errorf("home probable wrong: %+v", g1.HomeProbablePitcher)
+	}
+	g2 := byExternal["9002"]
+	if g2.AwayProbablePitcher == nil || g2.AwayProbablePitcher.Name != "Bad Arm" || g2.AwayProbablePitcher.ExternalID != "1002" {
+		t.Errorf("degraded probable must be name/id only: %+v", g2.AwayProbablePitcher)
+	}
+	if g2.AwayProbablePitcher.ERA != 0 || g2.AwayProbablePitcher.Throws != "" {
+		t.Errorf("degraded probable must carry no stats: %+v", g2.AwayProbablePitcher)
+	}
+}
+
+func TestScoreboardUpstreamError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 5, 0, 0, 0, 0, time.UTC)); err == nil {
+		t.Error("upstream 500 on scoreboard must error")
+	}
+}
+
+func TestScoreboardFallbackScoreWithoutLinescore(t *testing.T) {
+	const body = `{"dates":[{"date":"2026-07-05","games":[
+		{"gamePk":5001,"gameType":"R","gameDate":"2026-07-05T18:00:00Z","status":{"abstractGameState":"Final","detailedState":"Final"},
+		 "teams":{"home":{"team":{"id":10,"name":"Home A"},"score":5},
+		          "away":{"team":{"id":20,"name":"Away A"},"score":2}}}
+	]}]}`
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(body))
+	}))
+	updates, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 5, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatalf("Scoreboard failed: %v", err)
+	}
+	final := updates["5001"]
+	if final.HomeScore != 5 || final.AwayScore != 2 {
+		t.Errorf("fallback score fields wrong: %+v", final)
+	}
+}
+
+func TestBoxScoreUpstreamError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, err := p.BoxScore(context.Background(), "1"); err == nil {
+		t.Error("upstream 500 on box score must error")
+	}
+}
+
+func TestPlayersTeamsError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, _, err := p.Players(context.Background(), 2026); err == nil {
+		t.Error("upstream 500 on teams must error")
+	}
+}
+
+func TestPlayersSkipsZeroIDRosterEntries(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/teams":
+			serveFixture(t, w, "teams.json")
+		case strings.HasPrefix(r.URL.Path, "/teams/") && strings.HasSuffix(r.URL.Path, "/roster"):
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"roster":[{"person":{"id":0,"fullName":"Ghost"},"jerseyNumber":"0","position":{"abbreviation":"P"}}]}`))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	summaries, details, _, err := p.Players(context.Background(), 2026)
+	if err != nil {
+		t.Fatalf("Players failed: %v", err)
+	}
+	for _, s := range summaries {
+		if s.LastName == "Ghost" {
+			t.Errorf("roster entry with person id 0 must be skipped: %+v", s)
+		}
+	}
+	if len(summaries) != 0 || len(details) != 0 {
+		t.Errorf("all-zero-id rosters should yield no players: %d summaries, %d details", len(summaries), len(details))
+	}
+}
+
+func TestNormalizeGameSkipsIrrelevantType(t *testing.T) {
+	g := statsapiGame{GamePk: 1, GameType: "A", GameDate: "2026-07-05T18:00:00Z"}
+	if _, ok := normalizeGame(g, 2026, nil, nil); ok {
+		t.Error("all-star game type must not normalize")
+	}
+}
+
+func TestNormalizeGameMalformedDate(t *testing.T) {
+	g := statsapiGame{GamePk: 1, GameType: "R", GameDate: "not-a-date"}
+	if _, ok := normalizeGame(g, 2026, nil, nil); ok {
+		t.Error("unparseable game date must not normalize")
+	}
+}
+
+func TestNormalizeGameScoreFallbackWithoutLinescore(t *testing.T) {
+	var g statsapiGame
+	g.GamePk = 42
+	g.GameType = "R"
+	g.GameDate = "2026-07-05T18:00:00Z"
+	g.Status.AbstractGameState = "Final"
+	g.Status.DetailedState = "Final"
+	g.Teams.Home.Team.ID = 10
+	g.Teams.Away.Team.ID = 20
+	home, away := 5, 2
+	g.Teams.Home.Score = &home
+	g.Teams.Away.Score = &away
+
+	game, ok := normalizeGame(g, 2026, nil, map[int]string{10: "HOM", 20: "AWY"})
+	if !ok {
+		t.Fatal("normalizeGame failed")
+	}
+	if game.HomeScore == nil || *game.HomeScore != 5 || game.AwayScore == nil || *game.AwayScore != 2 {
+		t.Errorf("fallback score without a linescore wrong: %+v", game)
+	}
+}
+
+func TestNormalizePitcherNoData(t *testing.T) {
+	if got := normalizePitcher(&peopleResponse{}); got != nil {
+		t.Errorf("empty people response should yield nil, got %+v", got)
+	}
+}
+
+func TestFIPZeroInnings(t *testing.T) {
+	if got := fip(5, 3, 0, 10, 0); got != 0 {
+		t.Errorf("fip with zero innings pitched = %v, want 0", got)
+	}
+}
+
+func TestWobaZeroDenominator(t *testing.T) {
+	if got := woba(statsapiStatLine{}); got != 0 {
+		t.Errorf("woba with an all-zero line = %v, want 0", got)
+	}
+}
+
+func TestNormalizeTeamStatsPitchingOnlyGamesPlayed(t *testing.T) {
+	var pitching teamStatsResponse
+	if err := json.Unmarshal([]byte(`{"stats":[{"splits":[{"team":{"id":42},"stat":{"gamesPlayed":10,"era":"3.00"}}]}]}`), &pitching); err != nil {
+		t.Fatal(err)
+	}
+	var standings standingsResponse
+
+	out := normalizeTeamStats(2026, nil, &pitching, nil, &standings, map[int]string{42: "XYZ"})
+	ts := out[ids.Team(leagueMLB, "42")]
+	if ts.GamesPlayed != 10 {
+		t.Errorf("games played should come from the pitching split when hitting is absent, got %d", ts.GamesPlayed)
+	}
+	if ts.Stats.Baseball.TeamERA != 3.00 {
+		t.Errorf("team ERA wrong: %+v", ts.Stats.Baseball)
+	}
+	if ts.Stats.Baseball.BullpenERA != ts.Stats.Baseball.TeamERA {
+		t.Errorf("bullpen ERA must fall back to team ERA without a bullpen split: %+v", ts.Stats.Baseball)
+	}
+}
+
+func TestBaseballSeasonStatsNoMatchingGroup(t *testing.T) {
+	var resp peopleResponse
+	if err := json.Unmarshal([]byte(`{"people":[{"id":1,"fullName":"No Stats"}]}`), &resp); err != nil {
+		t.Fatal(err)
+	}
+	if got := baseballSeasonStats(&resp, 2026); got != nil {
+		t.Errorf("no stat groups should yield nil, got %+v", got)
+	}
+}
+
+func TestPersonNamesSingleWordFallback(t *testing.T) {
+	first, last := personNames(nil, "Ichiro")
+	if first != "" || last != "Ichiro" {
+		t.Errorf("single-word name: got (%q, %q), want (\"\", \"Ichiro\")", first, last)
+	}
+}
+
+func TestBoxScoreSameNamePlayerIDTiebreak(t *testing.T) {
+	body := `{"teams":{
+		"home":{"team":{"id":11,"abbreviation":"HOM"},"teamStats":{"batting":{"runs":0}},"players":{
+			"ID100":{"person":{"id":100,"fullName":"Same Name"},"position":{"abbreviation":"P"},"stats":{"batting":{"gamesPlayed":1,"hits":1},"pitching":{}}},
+			"ID200":{"person":{"id":200,"fullName":"Same Name"},"position":{"abbreviation":"P"},"stats":{"batting":{"gamesPlayed":1,"hits":2},"pitching":{}}}
+		}},
+		"away":{"team":{"id":22,"abbreviation":"AWY"},"teamStats":{"batting":{"runs":0}},"players":{}}
+	}}`
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(body))
+	}))
+	box, _, err := p.BoxScore(context.Background(), "1")
+	if err != nil {
+		t.Fatalf("BoxScore failed: %v", err)
+	}
+	lines := box.HomeTeam.BaseballPlayers
+	if len(lines) != 2 {
+		t.Fatalf("lines = %d, want 2", len(lines))
+	}
+	if lines[0].PlayerName != "Same Name" || lines[1].PlayerName != "Same Name" {
+		t.Fatalf("both lines should share the name: %+v", lines)
+	}
+	id100, id200 := ids.Player(leagueMLB, "100"), ids.Player(leagueMLB, "200")
+	present := map[string]bool{lines[0].PlayerID: true, lines[1].PlayerID: true}
+	if !present[id100] || !present[id200] {
+		t.Errorf("expected both player ids present: %+v", lines)
+	}
+	if lines[0].PlayerID == lines[1].PlayerID {
+		t.Errorf("tiebreak must not collapse distinct players: %+v", lines)
 	}
 }

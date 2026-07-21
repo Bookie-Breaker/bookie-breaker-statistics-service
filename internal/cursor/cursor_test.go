@@ -66,3 +66,14 @@ func TestPage(t *testing.T) {
 		t.Fatalf("past-end page = %v hasMore=%v err=%v", page, hasMore, err)
 	}
 }
+
+func TestPageRejectsInvalidCursor(t *testing.T) {
+	items := []int{1, 2, 3}
+	page, hasMore, next, err := Page(items, "nums", "!!!not-a-cursor", 2)
+	if err == nil {
+		t.Fatal("expected error for invalid cursor")
+	}
+	if page != nil || hasMore || next != "" {
+		t.Fatalf("expected zero-value results on error, got page=%v hasMore=%v next=%q", page, hasMore, next)
+	}
+}

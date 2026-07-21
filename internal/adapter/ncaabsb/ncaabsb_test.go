@@ -330,3 +330,141 @@ func TestSeasonYear(t *testing.T) {
 		}
 	}
 }
+
+func TestProviderIdentity(t *testing.T) {
+	p := NewProvider(NewClient("http://unused", time.Second))
+	if p.League() != model.LeagueNCAABSB {
+		t.Errorf("League() = %s, want NCAA_BSB", p.League())
+	}
+	if p.Source() != sourceESPN {
+		t.Errorf("Source() = %s, want %s", p.Source(), sourceESPN)
+	}
+}
+
+func TestBoxScoreNotSupported(t *testing.T) {
+	p := NewProvider(NewClient("http://unused", time.Second))
+	if _, _, err := p.BoxScore(context.Background(), "1"); err == nil {
+		t.Error("BoxScore must return an error (tracked Phase 7 deferral)")
+	}
+}
+
+func upstream500(t *testing.T) http.Handler {
+	t.Helper()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	})
+}
+
+func TestTeamsUpstreamError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, _, err := p.Teams(context.Background()); err == nil {
+		t.Error("upstream 500 on teams must error")
+	}
+}
+
+func TestTeamsMalformedJSON(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{invalid`))
+	}))
+	if _, _, _, err := p.Teams(context.Background()); err == nil || !strings.Contains(err.Error(), "decode") {
+		t.Errorf("malformed JSON must produce a decode error, got %v", err)
+	}
+}
+
+func TestTeamStatsStandingsError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, err := p.TeamStats(context.Background(), 2026, 0); err == nil {
+		t.Error("upstream 500 on standings must error")
+	}
+}
+
+func TestScheduleUpstreamError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, err := p.Schedule(context.Background(), 2026); err == nil || !strings.Contains(err.Error(), "fetch scoreboard") {
+		t.Errorf("upstream 500 on scoreboard must error, got %v", err)
+	}
+}
+
+func TestScoreboardUpstreamError(t *testing.T) {
+	p := testProvider(t, upstream500(t))
+	if _, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 5, 0, 0, 0, 0, time.UTC)); err == nil {
+		t.Error("upstream 500 on scoreboard must error")
+	}
+}
+
+func TestScoreboardMalformedEventSkipped(t *testing.T) {
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"events":[{"id":"malformed"}]}`))
+	}))
+	updates, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 5, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatalf("Scoreboard failed: %v", err)
+	}
+	if _, ok := updates["malformed"]; ok {
+		t.Error("event with no competitors should be skipped, not surfaced")
+	}
+}
+
+func TestScheduleDedupesRepeatedEvents(t *testing.T) {
+	const eventJSON = `{"events":[{"id":"999","date":"2026-02-15T18:00Z","season":{"slug":"regular-season"},
+		"status":{"period":9,"type":{"name":"STATUS_FINAL","state":"post","completed":true}},
+		"competitions":[{"competitors":[
+			{"homeAway":"home","score":"1","team":{"id":"1","displayName":"Home U","abbreviation":"HOM"}},
+			{"homeAway":"away","score":"0","team":{"id":"2","displayName":"Away U","abbreviation":"AWY"}}]}]}]}`
+
+	var scoreboardCalls atomic.Int32
+	p := testProvider(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		scoreboardCalls.Add(1)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(eventJSON))
+	}))
+
+	games, _, err := p.Schedule(context.Background(), 2026)
+	if err != nil {
+		t.Fatalf("Schedule failed: %v", err)
+	}
+	if scoreboardCalls.Load() < 2 {
+		t.Fatalf("scoreboard calls = %d, want at least 2 weekly chunks", scoreboardCalls.Load())
+	}
+	if len(games) != 1 {
+		t.Errorf("games = %d, want 1 (the repeated event across chunks must be deduplicated)", len(games))
+	}
+}
+
+func TestMapStatusPostNotCompleted(t *testing.T) {
+	if got := mapStatus("STATUS_HALFTIME", "post", false); got != model.GamePostponed {
+		t.Errorf("mapStatus post-but-not-completed = %s, want POSTPONED", got)
+	}
+}
+
+func TestHomeAwayCompetitorsEmpty(t *testing.T) {
+	if _, _, ok := homeAwayCompetitors(espnEvent{}); ok {
+		t.Error("empty event should not resolve home/away competitors")
+	}
+}
+
+func TestNormalizeEventMalformed(t *testing.T) {
+	if _, ok := normalizeEvent(espnEvent{ID: "1", Date: "2026-02-15T18:00Z"}, 2026); ok {
+		t.Error("event with no competitors should not normalize")
+	}
+	ev := espnEvent{
+		ID:   "2",
+		Date: "not-a-date",
+		Competitions: []espnCompetition{{Competitors: []espnCompetitor{
+			{HomeAway: "home", Team: espnTeam{ID: "1"}},
+			{HomeAway: "away", Team: espnTeam{ID: "2"}},
+		}}},
+	}
+	if _, ok := normalizeEvent(ev, 2026); ok {
+		t.Error("event with unparseable date should not normalize")
+	}
+}
+
+func TestStatValueMissing(t *testing.T) {
+	e := standingsEntry{Stats: []standingStat{{Name: "wins", Value: 5}}}
+	if got := statValue(e, "missing"); got != 0 {
+		t.Errorf("statValue for missing name = %v, want 0", got)
+	}
+}

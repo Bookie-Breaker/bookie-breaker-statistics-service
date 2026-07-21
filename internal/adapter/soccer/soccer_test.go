@@ -579,3 +579,424 @@ func TestMonthChunks(t *testing.T) {
 		t.Errorf("single-day chunking wrong: %v", got)
 	}
 }
+
+func TestProviderIdentity(t *testing.T) {
+	p := NewProvider(NewClient("http://unused", time.Second), FIFAWorldCup())
+	if p.League() != model.LeagueFIFAWC {
+		t.Errorf("League() = %s, want FIFA_WC", p.League())
+	}
+	if p.Source() != sourceESPN {
+		t.Errorf("Source() = %s, want %s", p.Source(), sourceESPN)
+	}
+	if got := p.SeasonYear(time.Date(2026, 7, 5, 0, 0, 0, 0, time.UTC)); got != 2026 {
+		t.Errorf("SeasonYear() = %d, want 2026", got)
+	}
+}
+
+func upstream500(t *testing.T) http.Handler {
+	t.Helper()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	})
+}
+
+func TestTeamsUpstreamError(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), upstream500(t))
+	if _, _, _, err := p.Teams(context.Background()); err == nil {
+		t.Error("upstream 500 on teams must error")
+	}
+}
+
+func TestTeamsMalformedJSON(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{invalid`))
+	}))
+	if _, _, _, err := p.Teams(context.Background()); err == nil || !strings.Contains(err.Error(), "decode") {
+		t.Errorf("malformed JSON must produce a decode error, got %v", err)
+	}
+}
+
+func TestTeamStatsStandingsError(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), upstream500(t))
+	if _, _, err := p.TeamStats(context.Background(), 2026, 0); err == nil {
+		t.Error("upstream 500 on standings must error")
+	}
+}
+
+func TestTeamStatsFormFetchErrorDegrades(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/standings"):
+			serveFixture(t, w, "standings_fifa_world.json")
+		case strings.HasSuffix(r.URL.Path, "/scoreboard"):
+			http.Error(w, "boom", http.StatusInternalServerError)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	p.now = func() time.Time { return time.Date(2026, 7, 5, 12, 0, 0, 0, time.UTC) }
+
+	stats, _, err := p.TeamStats(context.Background(), 2026, 0)
+	if err != nil {
+		t.Fatalf("TeamStats must degrade rather than fail on form errors: %v", err)
+	}
+	mexico := stats[ids.Team(leagueWC, "203")]
+	if mexico.Stats.Soccer == nil || mexico.Stats.Soccer.FormPointsLast5 != 0 {
+		t.Errorf("form should be zero when the form fetch fails: %+v", mexico.Stats.Soccer)
+	}
+}
+
+func TestRecentFormSeasonNotStarted(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/standings"):
+			serveFixture(t, w, "standings_fifa_world.json")
+		case strings.HasSuffix(r.URL.Path, "/scoreboard"):
+			t.Error("scoreboard should not be fetched before the season starts")
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	p.now = func() time.Time { return time.Date(2026, 5, 1, 0, 0, 0, 0, time.UTC) }
+
+	stats, fetches, err := p.TeamStats(context.Background(), 2026, 0)
+	if err != nil {
+		t.Fatalf("TeamStats failed: %v", err)
+	}
+	if len(fetches) != 1 {
+		t.Errorf("fetches = %d, want 1 (standings only, no scoreboard)", len(fetches))
+	}
+	mexico := stats[ids.Team(leagueWC, "203")]
+	if mexico.Stats.Soccer.FormPointsLast5 != 0 {
+		t.Errorf("form must be zero before the season starts: %+v", mexico.Stats.Soccer)
+	}
+}
+
+func TestPlayersUpstreamTeamsError(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), upstream500(t))
+	if _, _, _, err := p.Players(context.Background(), 2026); err == nil {
+		t.Error("upstream 500 on teams must error")
+	}
+}
+
+func TestPlayersRosterError(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/teams"):
+			serveFixture(t, w, "teams_fifa_world.json")
+		case strings.HasSuffix(r.URL.Path, "/roster"):
+			http.Error(w, "boom", http.StatusInternalServerError)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	_, _, _, err := p.Players(context.Background(), 2026)
+	if err == nil || !strings.Contains(err.Error(), "fetch roster for team") {
+		t.Errorf("roster failure must wrap with team context, got %v", err)
+	}
+}
+
+func TestNormalizeRosterSkipsEmptyID(t *testing.T) {
+	body := `{"team":{"id":"1"},"athletes":[{"id":"","displayName":"Ghost"},{"id":"55","displayName":"Real Player","position":{"abbreviation":"F"},"statistics":[{"name":"goals","value":2}]}]}`
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/teams"):
+			serveFixture(t, w, "teams_fifa_world.json")
+		case strings.HasSuffix(r.URL.Path, "/roster"):
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(body))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	summaries, details, _, err := p.Players(context.Background(), 2026)
+	if err != nil {
+		t.Fatalf("Players failed: %v", err)
+	}
+	for _, s := range summaries {
+		if s.FirstName == "Ghost" || s.LastName == "Ghost" {
+			t.Errorf("athlete with empty id must be skipped: %+v", s)
+		}
+	}
+	real := details[ids.Player(leagueWC, "55")]
+	if real.SoccerSeasonStats == nil || real.SoccerSeasonStats.Goals != 2 {
+		t.Errorf("goals stat wrong: %+v", real.SoccerSeasonStats)
+	}
+	if real.SoccerSeasonStats.Assists != 0 || real.SoccerSeasonStats.RedCards != 0 {
+		t.Errorf("stats with no matching synonym must default to zero: %+v", real.SoccerSeasonStats)
+	}
+}
+
+func TestBoxScoreUpstreamError(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), upstream500(t))
+	if _, _, err := p.BoxScore(context.Background(), "1"); err == nil {
+		t.Error("upstream 500 on summary must error")
+	}
+}
+
+func TestBoxScoreNoData(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"header":{"competitions":[]}}`))
+	}))
+	_, _, err := p.BoxScore(context.Background(), "1")
+	if err == nil || !strings.Contains(err.Error(), "no box score data") {
+		t.Errorf("empty header must error, got %v", err)
+	}
+}
+
+func TestBoxScoreMissingCompetitors(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"header":{"competitions":[{"competitors":[]}]}}`))
+	}))
+	_, _, err := p.BoxScore(context.Background(), "1")
+	if err == nil || !strings.Contains(err.Error(), "no box score data") {
+		t.Errorf("missing home/away competitors must error, got %v", err)
+	}
+}
+
+func TestBoxScorePlayerLinesDedup(t *testing.T) {
+	body := `{
+		"header": {"competitions": [{"competitors": [
+			{"homeAway":"home","score":"1","team":{"id":"1","displayName":"Home FC","abbreviation":"HOM"}},
+			{"homeAway":"away","score":"0","team":{"id":"2","displayName":"Away FC","abbreviation":"AWY"}}
+		]}]},
+		"boxscore": {"players": [{"team":{"id":"1"},"statistics": [
+			{"name":"general","keys":["minutesPlayed","totalGoals"],"labels":["MIN","G"],"athletes":[
+				{"athlete":{"id":"","displayName":"No ID"},"stats":["90","0"]},
+				{"athlete":{"id":"1001","displayName":"Dup Player"},"stats":["90","1"]}
+			]},
+			{"name":"extra","keys":["minutesPlayed","totalGoals"],"labels":["MIN","G"],"athletes":[
+				{"athlete":{"id":"1001","displayName":"Dup Player"},"stats":["1","9"]}
+			]}
+		]}]}
+	}`
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(body))
+	}))
+
+	box, _, err := p.BoxScore(context.Background(), "1")
+	if err != nil {
+		t.Fatalf("BoxScore failed: %v", err)
+	}
+	if len(box.HomeTeam.SoccerPlayers) != 1 {
+		t.Fatalf("players = %d, want 1 (empty-id athlete dropped, duplicate collapsed)", len(box.HomeTeam.SoccerPlayers))
+	}
+	if pl := box.HomeTeam.SoccerPlayers[0]; pl.PlayerName != "Dup Player" || pl.Goals != 1 {
+		t.Errorf("first-seen stat line should win over the duplicate block: %+v", pl)
+	}
+}
+
+func TestScheduleUpstreamError(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), upstream500(t))
+	if _, _, err := p.Schedule(context.Background(), 2026); err == nil || !strings.Contains(err.Error(), "fetch scoreboard") {
+		t.Errorf("upstream 500 on scoreboard must error, got %v", err)
+	}
+}
+
+func TestScheduleDedupesRepeatedEvents(t *testing.T) {
+	dup := Competition{
+		League:     model.LeagueFIFAWC,
+		ESPNCode:   "dup.test",
+		SeasonYear: func(time.Time) int { return 2026 },
+		SeasonWindow: func(int) (time.Time, time.Time) {
+			return time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC), time.Date(2026, 7, 15, 0, 0, 0, 0, time.UTC)
+		},
+		SeasonType: func(string) model.SeasonType { return model.SeasonRegular },
+	}
+	const eventJSON = `{"events":[{"id":"999","date":"2026-06-15T12:00Z","season":{"year":2026,"slug":"group-stage"},
+		"status":{"period":2,"type":{"name":"STATUS_FULL_TIME","state":"post","completed":true}},
+		"competitions":[{"competitors":[
+			{"homeAway":"home","score":"1","team":{"id":"1","displayName":"Home FC","abbreviation":"HOM"}},
+			{"homeAway":"away","score":"0","team":{"id":"2","displayName":"Away FC","abbreviation":"AWY"}}]}]}]}`
+
+	var scoreboardCalls atomic.Int32
+	p := testProvider(t, dup, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		scoreboardCalls.Add(1)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(eventJSON))
+	}))
+
+	games, fetches, err := p.Schedule(context.Background(), 2026)
+	if err != nil {
+		t.Fatalf("Schedule failed: %v", err)
+	}
+	if scoreboardCalls.Load() != 2 {
+		t.Fatalf("scoreboard calls = %d, want 2 (June and July chunks)", scoreboardCalls.Load())
+	}
+	if len(fetches) != 2 {
+		t.Errorf("fetches = %d, want 2", len(fetches))
+	}
+	if len(games) != 1 {
+		t.Errorf("games = %d, want 1 (the repeated event across chunks must be deduplicated)", len(games))
+	}
+}
+
+func TestScoreboardUpstreamError(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), upstream500(t))
+	if _, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 1, 0, 0, 0, 0, time.UTC)); err == nil {
+		t.Error("upstream 500 on scoreboard must error")
+	}
+}
+
+func TestScoreboardMalformedEventSkipped(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"events":[{"id":"malformed"}]}`))
+	}))
+	updates, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 1, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatalf("Scoreboard failed: %v", err)
+	}
+	if _, ok := updates["malformed"]; ok {
+		t.Error("event with no competitors should be skipped, not surfaced")
+	}
+}
+
+func TestScoreboardExtraTimeSummaryFailureDegrades(t *testing.T) {
+	p := testProvider(t, FIFAWorldCup(), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/summary"):
+			http.Error(w, "boom", http.StatusInternalServerError)
+		case strings.HasSuffix(r.URL.Path, "/scoreboard"):
+			serveFixture(t, w, "scoreboard_knockout.json")
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+
+	updates, _, err := p.Scoreboard(context.Background(), time.Date(2026, 7, 1, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatalf("Scoreboard failed: %v", err)
+	}
+	aet := updates["760493"]
+	if aet.Result == nil || !aet.Result.Overtime {
+		t.Fatalf("AET result wrong: %+v", aet.Result)
+	}
+	if aet.Result.HomeScore != 3 || aet.Result.AwayScore != 2 {
+		t.Errorf("full-time score should still be present: %+v", aet.Result)
+	}
+	if aet.Result.RegulationHomeScore != nil || aet.Result.RegulationAwayScore != nil {
+		t.Errorf("summary failure must degrade to no regulation fields: %+v", aet.Result)
+	}
+	if len(aet.Result.PeriodScores) != 0 {
+		t.Errorf("summary failure must degrade to no period scores: %+v", aet.Result.PeriodScores)
+	}
+}
+
+func TestMapStatusVariants(t *testing.T) {
+	cases := []struct {
+		name string
+		in   espnStatusType
+		want model.GameStatus
+	}{
+		{"postponed", espnStatusType{Name: "STATUS_POSTPONED", State: "pre"}, model.GamePostponed},
+		{"canceled", espnStatusType{Name: "STATUS_CANCELED", State: "pre"}, model.GameCancelled},
+		{"canceled double-l variant", espnStatusType{Name: "STATUS_CANCELLED", State: "pre"}, model.GameCancelled}, //nolint:misspell // both ESPN spellings are normalized
+		{"suspended", espnStatusType{Name: "STATUS_SUSPENDED", State: "in"}, model.GameSuspended},
+		{"abandoned", espnStatusType{Name: "STATUS_ABANDONED", State: "in"}, model.GameSuspended},
+		{"delayed", espnStatusType{Name: "STATUS_DELAYED", State: "pre"}, model.GameSuspended},
+		{"post-not-completed", espnStatusType{Name: "STATUS_HALFTIME", State: "post", Completed: false}, model.GamePostponed},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := mapStatus(tc.in); got != tc.want {
+				t.Errorf("mapStatus(%+v) = %s, want %s", tc.in, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestHomeAwayCompetitorsEmpty(t *testing.T) {
+	if _, _, ok := homeAwayCompetitors(espnEvent{}); ok {
+		t.Error("empty event should not resolve home/away competitors")
+	}
+}
+
+func TestParseLinescoresEdgeCases(t *testing.T) {
+	if got := parseLinescores(espnCompetitor{}); got != nil {
+		t.Errorf("no linescores should return nil, got %v", got)
+	}
+	malformed := espnCompetitor{Linescores: []espnLinescore{{DisplayValue: "1"}, {DisplayValue: "not-a-number"}}}
+	if got := parseLinescores(malformed); got != nil {
+		t.Errorf("malformed linescore should return nil, got %v", got)
+	}
+}
+
+func TestNormalizeEventMalformed(t *testing.T) {
+	comp := FIFAWorldCup()
+	if _, ok := normalizeEvent(comp, espnEvent{ID: "1", Date: "2026-06-01T12:00Z"}, 2026, nil, nil); ok {
+		t.Error("event with no competitors should not normalize")
+	}
+	ev := espnEvent{
+		ID:   "2",
+		Date: "not-a-date",
+		Competitions: []espnCompetition{{Competitors: []espnCompetitor{
+			{HomeAway: "home", Team: espnTeam{ID: "1"}},
+			{HomeAway: "away", Team: espnTeam{ID: "2"}},
+		}}},
+	}
+	if _, ok := normalizeEvent(comp, ev, 2026, nil, nil); ok {
+		t.Error("event with unparseable date should not normalize")
+	}
+}
+
+func TestFormFromGamesCapAndDraws(t *testing.T) {
+	team := "team-x"
+	opp := "team-y"
+	var games []model.Game
+	base := time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC)
+	for i := 0; i < 6; i++ {
+		games = append(games, model.Game{
+			HomeTeam:       model.TeamRef{ID: team},
+			AwayTeam:       model.TeamRef{ID: opp},
+			Status:         model.GameFinal,
+			ScheduledStart: base.AddDate(0, 0, i),
+			Result:         &model.GameResult{HomeScore: 1, AwayScore: 1}, // draw
+		})
+	}
+	form := formFromGames(games)
+	r := form[team]
+	if r.Matches != formMatches {
+		t.Errorf("matches = %d, want cap of %d", r.Matches, formMatches)
+	}
+	if r.Points != formMatches {
+		t.Errorf("draw points = %d, want %d (1 pt per drawn match, capped)", r.Points, formMatches)
+	}
+}
+
+func TestStatValueMissing(t *testing.T) {
+	e := standingsEntry{Stats: []standingStat{{Name: "wins", Value: 5}}}
+	if got := statValue(e, "missing"); got != 0 {
+		t.Errorf("statValue for missing name = %v, want 0", got)
+	}
+}
+
+func TestSplitDisplayNameSingleWord(t *testing.T) {
+	first, last := splitDisplayName("Pele")
+	if first != "" || last != "Pele" {
+		t.Errorf("single-word name: got (%q, %q), want (\"\", \"Pele\")", first, last)
+	}
+}
+
+func TestPremierLeagueSeasonTypeAlwaysRegular(t *testing.T) {
+	epl := PremierLeague()
+	if got := epl.SeasonType("anything"); got != model.SeasonRegular {
+		t.Errorf("EPL season type = %s, want REGULAR", got)
+	}
+}
+
+func TestCompetitionForLeague(t *testing.T) {
+	if c, err := CompetitionForLeague(model.LeagueFIFAWC); err != nil || c.ESPNCode != "fifa.world" {
+		t.Errorf("FIFA_WC resolution wrong: %+v, %v", c, err)
+	}
+	if c, err := CompetitionForLeague(model.LeagueEPL); err != nil || c.ESPNCode != "eng.1" {
+		t.Errorf("EPL resolution wrong: %+v, %v", c, err)
+	}
+	if _, err := CompetitionForLeague(model.LeagueNBA); err == nil {
+		t.Error("non-soccer league should error")
+	}
+}

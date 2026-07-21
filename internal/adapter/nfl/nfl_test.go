@@ -307,6 +307,112 @@ func TestPlayersDescoped(t *testing.T) {
 	}
 }
 
+func TestProviderIdentity(t *testing.T) {
+	p := NewProvider(espnfb.NewClient("http://unused", time.Second), NewNFLVerseClient("http://unused", time.Second))
+	if p.League() != model.LeagueNFL {
+		t.Errorf("League() = %s, want NFL", p.League())
+	}
+	if p.Source() != sourceNFL {
+		t.Errorf("Source() = %s, want %s", p.Source(), sourceNFL)
+	}
+}
+
+func TestBoxScoreNotSupported(t *testing.T) {
+	p := NewProvider(espnfb.NewClient("http://unused", time.Second), NewNFLVerseClient("http://unused", time.Second))
+	if _, _, err := p.BoxScore(context.Background(), "1"); err == nil {
+		t.Error("BoxScore must return an error (tracked Phase 7 deferral)")
+	}
+}
+
+func TestTeamsUpstreamError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewNFLVerseClient(server.URL, time.Second))
+	if _, _, _, err := p.Teams(context.Background()); err == nil {
+		t.Error("upstream 500 on ESPN teams must error")
+	}
+}
+
+func TestTeamStatsStandingsError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewNFLVerseClient(server.URL, time.Second))
+	if _, _, err := p.TeamStats(context.Background(), 2025, 0); err == nil {
+		t.Error("upstream 500 on standings must error")
+	}
+}
+
+func TestScoreboardUpstreamError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewNFLVerseClient(server.URL, time.Second))
+	if _, _, err := p.Scoreboard(context.Background(), time.Date(2025, 9, 28, 0, 0, 0, 0, time.UTC)); err == nil {
+		t.Error("upstream 500 on scoreboard must error")
+	}
+}
+
+func TestNFLVerseCodeAlias(t *testing.T) {
+	if got := nflverseCode("LAR"); got != "LA" {
+		t.Errorf("nflverseCode(LAR) = %s, want LA", got)
+	}
+	if got := nflverseCode("WSH"); got != "WAS" {
+		t.Errorf("nflverseCode(WSH) = %s, want WAS", got)
+	}
+	if got := nflverseCode("NE"); got != "NE" {
+		t.Errorf("nflverseCode(NE) = %s, want NE (no alias)", got)
+	}
+}
+
+func TestParseTeamWeekCSVEmptyBody(t *testing.T) {
+	if _, err := parseTeamWeekCSV([]byte("")); err == nil || !strings.Contains(err.Error(), "read header") {
+		t.Errorf("empty body must produce a read-header error, got %v", err)
+	}
+}
+
+func TestParseTeamWeekCSVMissingColumn(t *testing.T) {
+	_, err := parseTeamWeekCSV([]byte("team,opponent_team\nNE,BUF\n"))
+	if err == nil || !strings.Contains(err.Error(), "missing column") {
+		t.Errorf("missing required column must error, got %v", err)
+	}
+}
+
+func TestParseTeamWeekCSVMalformedRow(t *testing.T) {
+	_, err := parseTeamWeekCSV([]byte("team,opponent_team,season_type\nNE,BUF\n"))
+	if err == nil || !strings.Contains(err.Error(), "read row") {
+		t.Errorf("a row with the wrong field count must error, got %v", err)
+	}
+}
+
+func TestTeamStatsNFLVerseMalformedCSVDegrades(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, ".csv"):
+			_, _ = w.Write([]byte("team,opponent_team\nNE,BUF\n")) // missing season_type column
+		case strings.HasSuffix(r.URL.Path, "/standings"):
+			serveFixture(t, w, "standings.json")
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnfb.NewClient(server.URL, time.Second), NewNFLVerseClient(server.URL, time.Second))
+
+	stats, _, err := p.TeamStats(context.Background(), 2025, 0)
+	if err != nil {
+		t.Fatalf("a malformed nflverse CSV must degrade, not error: %v", err)
+	}
+	ne := stats[ids.Team(leagueNFL, "17")]
+	if ne.Stats.Football == nil || ne.Stats.Football.EPAPerPlayOff != 0 {
+		t.Errorf("EPA must stay zero when the CSV fails to parse: %+v", ne.Stats.Football)
+	}
+}
+
 func TestSeasonYear(t *testing.T) {
 	p := NewProvider(espnfb.NewClient("http://unused", time.Second), NewNFLVerseClient("http://unused", time.Second))
 	for now, want := range map[time.Time]int{

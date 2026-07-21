@@ -339,6 +339,122 @@ func TestCBBDSeasonIsEndingYear(t *testing.T) {
 	}
 }
 
+func TestProviderIdentity(t *testing.T) {
+	p := NewProvider(espnbb.NewClient("http://unused", time.Second), NewClient("http://unused", "", time.Second))
+	if p.League() != model.LeagueNCAABB {
+		t.Errorf("League() = %s, want NCAA_BB", p.League())
+	}
+	if p.Source() != sourceNCAABB {
+		t.Errorf("Source() = %s, want %s", p.Source(), sourceNCAABB)
+	}
+}
+
+func TestBoxScoreNotSupported(t *testing.T) {
+	p := NewProvider(espnbb.NewClient("http://unused", time.Second), NewClient("http://unused", "", time.Second))
+	if _, _, err := p.BoxScore(context.Background(), "1"); err == nil {
+		t.Error("BoxScore must return an error (tracked Phase 7 deferral)")
+	}
+}
+
+func TestTeamsUpstreamError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnbb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+	if _, _, _, err := p.Teams(context.Background()); err == nil {
+		t.Error("upstream 500 on ESPN teams must error")
+	}
+}
+
+func TestTeamStatsESPNTeamsError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnbb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+	if _, _, err := p.TeamStats(context.Background(), 2025, 0); err == nil {
+		t.Error("upstream 500 on ESPN teams must error")
+	}
+}
+
+func TestTeamStatsAdjustedRatingsOutageDegrades(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/teams"):
+			serveFixture(t, w, "teams.json")
+		case r.URL.Path == "/stats/team/season":
+			_, _ = w.Write([]byte(derivedSeasonStats))
+		case r.URL.Path == "/ratings/adjusted":
+			http.Error(w, "boom", http.StatusServiceUnavailable)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnbb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+
+	stats, _, err := p.TeamStats(context.Background(), 2025, 0)
+	if err != nil {
+		t.Fatalf("adjusted-ratings outage must degrade, not error: %v", err)
+	}
+	pur := stats[ids.Team(leagueNCAABB, "2509")]
+	if pur.Stats.Advanced == nil || pur.Stats.Advanced.AdjustedEfficiencyMargin != 0 {
+		t.Errorf("adjusted margin must stay zero on an outage: %+v", pur.Stats.Advanced)
+	}
+	if pur.Stats.Offensive == nil || pur.Stats.Offensive.OffensiveRating != 118.5 {
+		t.Error("other blocks should still populate despite the adjusted-ratings outage")
+	}
+}
+
+func TestScoreboardUpstreamError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "boom", http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnbb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+	if _, _, err := p.Scoreboard(context.Background(), time.Date(2026, 1, 24, 0, 0, 0, 0, time.UTC)); err == nil {
+		t.Error("upstream 500 on scoreboard must error")
+	}
+}
+
+func TestTeamStatsSeasonStatsMalformedJSON(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/teams"):
+			serveFixture(t, w, "teams.json")
+		case r.URL.Path == "/stats/team/season":
+			_, _ = w.Write([]byte(`{invalid`))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(server.Close)
+	p := NewProvider(espnbb.NewClient(server.URL, time.Second), NewClient(server.URL, "k", time.Second))
+
+	stats, _, err := p.TeamStats(context.Background(), 2025, 0)
+	if err != nil {
+		t.Fatalf("malformed season-stats JSON must degrade, not error: %v", err)
+	}
+	if len(stats) != 0 {
+		t.Errorf("stats = %d, want 0 on a season-stats decode failure", len(stats))
+	}
+}
+
+func TestNormalizeTeamStatsUnknownESPNTeamDropped(t *testing.T) {
+	stats := []TeamSeasonStats{{Team: "Ghost State", Games: 10, Wins: 5, Losses: 5}}
+	out := normalizeTeamStats(2025, stats, nil, map[string]espnRef{})
+	if len(out) != 0 {
+		t.Errorf("unmatched CBBD team must be dropped, got %+v", out)
+	}
+}
+
+func TestPerGameZeroGames(t *testing.T) {
+	if got := perGame(100, 0); got != 0 {
+		t.Errorf("perGame with zero games = %v, want 0", got)
+	}
+}
+
 func TestPlayersDescoped(t *testing.T) {
 	p := NewProvider(espnbb.NewClient("http://unused", time.Second), NewClient("http://unused", "", time.Second))
 

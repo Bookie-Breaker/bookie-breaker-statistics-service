@@ -1,6 +1,10 @@
 package ids
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/google/uuid"
+)
 
 // Golden values: these UUIDs are shared identifiers across services and
 // restarts; a change here is a breaking change for every consumer.
@@ -27,5 +31,18 @@ func TestIDKindsDoNotCollide(t *testing.T) {
 	}
 	if Team("NBA", "42") == Team("NFL", "42") {
 		t.Error("ids must be league-scoped")
+	}
+	if Venue("NBA", "Chase Center") == Team("NBA", "Chase Center") {
+		t.Error("venue and team ids must not collide for the same name")
+	}
+}
+
+// Golden value: Venue is keyed by name rather than an external numeric id;
+// pin the derived UUID like the other kinds.
+func TestVenueID(t *testing.T) {
+	got := Venue("NBA", "Chase Center")
+	want := uuid.NewSHA1(namespace, []byte("NBA:venue:Chase Center")).String()
+	if got != want {
+		t.Errorf("Venue id = %s, want %s", got, want)
 	}
 }
